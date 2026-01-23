@@ -5,16 +5,21 @@ namespace _Master.Base.Ability
     /// <summary>
     /// Base class for all gameplay abilities (similar to UE's GameplayAbility)
     /// </summary>
-    public abstract class GameplayAbility : ScriptableObject
+    [CreateAssetMenu(fileName = "NewGameplayAbility", menuName = "GAS/Base/Gameplay Ability")]
+    public class GameplayAbility : ScriptableObject
     {
         [Header("Ability Info")]
         public string abilityName;
         public string description;
         
         [Header("Ability Properties")]
-        public float cooldownDuration = 0f;
-        public float costAmount = 0f;
+        public AbilityScalableFloat cooldownDuration = new AbilityScalableFloat();
+        public AbilityScalableFloat costAmount = new AbilityScalableFloat();
         public bool canActivateWhileActive = false;
+        
+        [Header("Level")]
+        [Tooltip("Current level of this ability instance")]
+        public float abilityLevel = 1f;
         
         [Header("Tags")]
         public string[] abilityTags;
@@ -42,7 +47,7 @@ namespace _Master.Base.Ability
                 return false;
             
             // Check cost
-            if (!asc.HasEnoughResource(costAmount))
+            if (!asc.HasEnoughResource(costAmount.GetValueAtLevel(abilityLevel)))
                 return false;
             
             // Check blocked tags
@@ -71,11 +76,12 @@ namespace _Master.Base.Ability
             asc.AddTags(abilityTags);
             
             // Consume cost
-            asc.ConsumeResource(costAmount);
+            asc.ConsumeResource(costAmount.GetValueAtLevel(abilityLevel));
             
             // Start cooldown
-            if (cooldownDuration > 0)
-                asc.StartCooldown(this, cooldownDuration);
+            float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel);
+            if (cooldown > 0)
+                asc.StartCooldown(this, cooldown);
             
             // Execute ability logic
             OnAbilityActivated();
@@ -84,7 +90,9 @@ namespace _Master.Base.Ability
         /// <summary>
         /// Override this to implement ability logic
         /// </summary>
-        protected abstract void OnAbilityActivated();
+        protected virtual void OnAbilityActivated()
+        {
+        }
         
         /// <summary>
         /// End the ability
