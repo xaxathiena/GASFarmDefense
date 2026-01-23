@@ -9,35 +9,24 @@ namespace _Master.Base.Ability
     [Serializable]
     public class AttributeSelector
     {
-        [Tooltip("Use predefined attribute type")]
-        public bool useEnum = true;
         
         [Tooltip("Select from predefined attributes")]
         public EGameplayAttributeType attributeType = EGameplayAttributeType.Health;
         
-        [Tooltip("Or use custom attribute name (when useEnum is false)")]
-        public string customAttributeName = "";
         
         /// <summary>
         /// Get the attribute name as string
         /// </summary>
-        public string GetAttributeName()
+        public EGameplayAttributeType GetAttribute()
         {
-            return useEnum ? attributeType.ToString() : customAttributeName;
+            return attributeType;
         }
         
         public AttributeSelector() { }
         
         public AttributeSelector(EGameplayAttributeType type)
         {
-            useEnum = true;
             attributeType = type;
-        }
-        
-        public AttributeSelector(string customName)
-        {
-            useEnum = false;
-            customAttributeName = customName;
         }
     }
     
@@ -85,19 +74,13 @@ namespace _Master.Base.Ability
             magnitude = mag;
         }
         
-        public GameplayEffectModifier(string attrName, EGameplayModifierOp op, float mag)
-        {
-            attribute = new AttributeSelector(attrName);
-            operation = op;
-            magnitude = mag;
-        }
         
         /// <summary>
         /// Get the attribute name
         /// </summary>
-        public string GetAttributeName()
+        public EGameplayAttributeType GetAttributeName()
         {
-            return attribute.GetAttributeName();
+            return attribute.GetAttribute();
         }
     }
     
@@ -187,12 +170,12 @@ namespace _Master.Base.Ability
         private void ApplyModifier(AttributeSet attributeSet, GameplayEffectModifier modifier, float stackCount)
         {
             // Get attribute by name from dictionary
-            string attributeName = modifier.GetAttributeName();
-            GameplayAttribute targetAttribute = attributeSet.GetAttribute(attributeName);
+            EGameplayAttributeType attributeType = modifier.GetAttributeName();
+            GameplayAttribute targetAttribute = attributeSet.GetAttribute(attributeType);
             
             if (targetAttribute == null)
             {
-                Debug.LogWarning($"Attribute '{attributeName}' not found in attribute set!");
+                Debug.LogWarning($"Attribute '{attributeType}' not found in attribute set!");
                 return;
             }
             

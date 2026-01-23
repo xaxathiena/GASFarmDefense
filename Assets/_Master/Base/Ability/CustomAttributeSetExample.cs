@@ -46,13 +46,26 @@ namespace _Master.Base.Ability
         
         private void InitializeAttributes()
         {
-            Health = new GameplayAttribute(maxHealth, 0f, maxHealth);
-            Energy = new GameplayAttribute(maxEnergy, 0f, maxEnergy);
-            Shield = new GameplayAttribute(maxShield, 0f, maxShield);
-            Speed = new GameplayAttribute(5f, 0f, 20f);
-            Damage = new GameplayAttribute(10f, 0f, float.MaxValue);
-            CritChance = new GameplayAttribute(5f, 0f, 100f); // Percentage
-            CritDamage = new GameplayAttribute(150f, 100f, 300f); // Percentage
+            Health = new GameplayAttribute();
+            Health.SetCurrentValue(maxHealth);
+
+            Energy = new GameplayAttribute();
+            Energy.SetCurrentValue(maxEnergy);
+
+            Shield = new GameplayAttribute();
+            Shield.SetCurrentValue(maxShield);
+            Speed = new GameplayAttribute();
+            Speed.SetCurrentValue(5f);
+
+            Damage = new GameplayAttribute();
+            Damage.SetCurrentValue(10f);
+            Damage.SetCurrentValue(10f);
+            CritChance = new GameplayAttribute();
+            CritChance.SetCurrentValue(0.1f);
+            CritChance.SetCurrentValue(0.1f);
+            CritDamage = new GameplayAttribute();
+            CritDamage.SetCurrentValue(0.5f);
+            CritDamage.SetCurrentValue(0.5f);
             
             // Register using custom enum
             RegisterAttribute(EMyCustomAttributes.Health, Health);

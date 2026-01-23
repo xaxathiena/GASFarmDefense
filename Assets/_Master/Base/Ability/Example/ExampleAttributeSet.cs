@@ -34,14 +34,14 @@ namespace _Master.Base.Ability
         private void InitializeAttributes()
         {
             // Initialize primary attributes
-            Health = new GameplayAttribute(maxHealth, 0f, maxHealth);
-            Mana = new GameplayAttribute(maxMana, 0f, maxMana);
-            Stamina = new GameplayAttribute(maxStamina, 0f, maxStamina);
+            Health = new GameplayAttribute();
+            Mana = new GameplayAttribute();
+            Stamina = new GameplayAttribute();
             
             // Initialize combat attributes
-            AttackPower = new GameplayAttribute(attackPower, 0f, float.MaxValue);
-            Defense = new GameplayAttribute(defense, 0f, float.MaxValue);
-            MoveSpeed = new GameplayAttribute(moveSpeed, 0f, float.MaxValue);
+            AttackPower = new GameplayAttribute();
+            Defense = new GameplayAttribute();
+            MoveSpeed = new GameplayAttribute();
             
             // Register attributes to dictionary using enum (type-safe)
             RegisterAttribute(EGameplayAttributeType.Health, Health);
@@ -163,9 +163,6 @@ namespace _Master.Base.Ability
         /// </summary>
         public void FullRestore()
         {
-            Health.SetCurrentValue(Health.MaxValue);
-            Mana.SetCurrentValue(Mana.MaxValue);
-            Stamina.SetCurrentValue(Stamina.MaxValue);
         }
         
         #endregion

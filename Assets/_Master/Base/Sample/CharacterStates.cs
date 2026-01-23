@@ -98,7 +98,8 @@ namespace _Master.Sample
         {
             // Get current health percentage
             var health = asc.AttributeSet.GetAttribute(EGameplayAttributeType.Health);
-            float healthPercent = health.GetPercentage();
+            var maxHealth = asc.AttributeSet.GetAttribute(EGameplayAttributeType.MaxHealth);
+            float healthPercent = health.CurrentValue / maxHealth.CurrentValue;
             
             // Check if heal skill is available (not on cooldown)
             bool canUseHealSkill = !asc.IsAbilityOnCooldown(characterAI.healSkillAbility);

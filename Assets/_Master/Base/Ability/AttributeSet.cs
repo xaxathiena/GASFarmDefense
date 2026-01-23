@@ -6,7 +6,7 @@ namespace _Master.Base.Ability
     /// <summary>
     /// Base class for attribute sets. Create your own attribute set by inheriting from this.
     /// </summary>
-    public abstract class AttributeSet : ScriptableObject
+    public abstract class AttributeSet
     {
         protected AbilitySystemComponent ownerASC;
         

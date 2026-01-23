@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ff7eafa15209349a4ced771f94c260, type: 3}
+  m_Name: InitStats
+  m_EditorClassIdentifier: 
+  effectName: 
+  description: 
+  durationType: 0
+  durationMagnitude: 0
+  isPeriodic: 0
+  period: 1
+  modifiers:
+  - attribute:
+      attributeType: 0
+    operation: 2
+    magnitude: 1000
+  - attribute:
+      attributeType: 1
+    operation: 2
+    magnitude: 1000
+  - attribute:
+      attributeType: 2
+    operation: 2
+    magnitude: 200
+  - attribute:
+      attributeType: 3
+    operation: 2
+    magnitude: 200
+  grantedTags: []
+  applicationRequiredTags: []
+  applicationBlockedByTags: []
+  removeTagsOnApplication: []
+  allowStacking: 0
+  maxStacks: 1
+  refreshDurationOnStack: 1

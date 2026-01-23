@@ -8,8 +8,11 @@ namespace _Master.Base.Ability
     {
         // Primary Attributes
         Health,
+        MaxHealth,
         Mana,
+        MaxMana,
         Stamina,
+        MaxStamina,
         
         // Combat Attributes
         AttackPower,

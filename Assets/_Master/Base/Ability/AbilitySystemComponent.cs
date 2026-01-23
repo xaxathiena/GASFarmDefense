@@ -9,32 +9,25 @@ namespace _Master.Base.Ability
     /// </summary>
     public class AbilitySystemComponent : MonoBehaviour
     {
-        [Header("Attribute Set")]
-        [SerializeField] private AttributeSet attributeSetTemplate;
         private AttributeSet attributeSet;
-        
+
         [Header("Resources")]
-        [SerializeField] private float currentResource = 100f;
-        [SerializeField] private float maxResource = 100f;
-        
+        [SerializeField] private float currentMana = 100f;
+        [SerializeField] private float maxMana = 100f;
+
         [Header("Abilities")]
         [SerializeField] private List<GameplayAbility> grantedAbilities = new List<GameplayAbility>();
-        
+
         // Runtime data
         private HashSet<string> activeTags = new HashSet<string>();
         private Dictionary<GameplayAbility, float> abilityCooldowns = new Dictionary<GameplayAbility, float>();
         private List<GameplayAbility> activeAbilities = new List<GameplayAbility>();
         private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
-        
-        public float CurrentResource => currentResource;
-        public float MaxResource => maxResource;
+
+        public float CurrentMana => currentMana;
+        public float MaxMana => maxMana;
         public AttributeSet AttributeSet => attributeSet;
-        
-        private void Start()
-        {
-            InitializeAttributeSet();
-        }
-        
+
         private void Update()
         {
             // Update cooldowns
@@ -45,11 +38,11 @@ namespace _Master.Base.Ability
                 if (abilityCooldowns[ability] <= 0)
                     abilityCooldowns.Remove(ability);
             }
-            
+
             // Update active gameplay effects
             UpdateGameplayEffects(Time.deltaTime);
         }
-        
+
         /// <summary>
         /// Grant an ability to this component
         /// </summary>
@@ -58,7 +51,7 @@ namespace _Master.Base.Ability
             if (!grantedAbilities.Contains(ability))
                 grantedAbilities.Add(ability);
         }
-        
+
         /// <summary>
         /// Try to activate an ability
         /// </summary>
@@ -69,17 +62,17 @@ namespace _Master.Base.Ability
                 Debug.LogWarning($"Ability {ability.abilityName} is not granted to {gameObject.name}");
                 return false;
             }
-            
+
             if (ability.CanActivateAbility(this))
             {
                 ability.ActivateAbility(this);
                 activeAbilities.Add(ability);
                 return true;
             }
-            
+
             return false;
         }
-        
+
         /// <summary>
         /// Try to activate an ability by index
         /// </summary>
@@ -87,10 +80,10 @@ namespace _Master.Base.Ability
         {
             if (index < 0 || index >= grantedAbilities.Count)
                 return false;
-            
+
             return TryActivateAbility(grantedAbilities[index]);
         }
-        
+
         /// <summary>
         /// Cancel an ability
         /// </summary>
@@ -102,7 +95,7 @@ namespace _Master.Base.Ability
                 activeAbilities.Remove(ability);
             }
         }
-        
+
         /// <summary>
         /// Cancel abilities that have any of the specified tags
         /// </summary>
@@ -110,19 +103,19 @@ namespace _Master.Base.Ability
         {
             if (tags == null || tags.Length == 0)
                 return;
-            
+
             var abilitiesToCancel = activeAbilities
                 .Where(a => a.abilityTags != null && a.abilityTags.Any(tag => tags.Contains(tag)))
                 .ToList();
-            
+
             foreach (var ability in abilitiesToCancel)
             {
                 CancelAbility(ability);
             }
         }
-        
+
         #region Tags
-        
+
         /// <summary>
         /// Add gameplay tags
         /// </summary>
@@ -130,14 +123,14 @@ namespace _Master.Base.Ability
         {
             if (tags == null)
                 return;
-            
+
             foreach (var tag in tags)
             {
                 if (!string.IsNullOrEmpty(tag))
                     activeTags.Add(tag);
             }
         }
-        
+
         /// <summary>
         /// Remove gameplay tags
         /// </summary>
@@ -145,13 +138,13 @@ namespace _Master.Base.Ability
         {
             if (tags == null)
                 return;
-            
+
             foreach (var tag in tags)
             {
                 activeTags.Remove(tag);
             }
         }
-        
+
         /// <summary>
         /// Check if has any of the specified tags
         /// </summary>
@@ -159,10 +152,10 @@ namespace _Master.Base.Ability
         {
             if (tags == null || tags.Length == 0)
                 return false;
-            
+
             return tags.Any(tag => activeTags.Contains(tag));
         }
-        
+
         /// <summary>
         /// Check if has all of the specified tags
         /// </summary>
@@ -170,27 +163,28 @@ namespace _Master.Base.Ability
         {
             if (tags == null || tags.Length == 0)
                 return false;
-            
+
             return tags.All(tag => activeTags.Contains(tag));
         }
-        
+
         #endregion
-        
+
         #region Attribute Set
-        
+
         /// <summary>
         /// Initialize attribute set
         /// </summary>
-        private void InitializeAttributeSet()
+        public void InitializeAttributeSet(AttributeSet attributeSet)
         {
-            if (attributeSetTemplate != null)
+            this.attributeSet = attributeSet;
+            if (attributeSet == null)
             {
-                // Create instance of attribute set
-                attributeSet = Instantiate(attributeSetTemplate);
-                attributeSet.InitAttributeSet(this);
+                Debug.LogError("AttributeSet is null!");
+                return;
             }
+            attributeSet.InitAttributeSet(this);
         }
-        
+
         /// <summary>
         /// Get attribute set
         /// </summary>
@@ -198,11 +192,11 @@ namespace _Master.Base.Ability
         {
             return attributeSet as T;
         }
-        
+
         #endregion
-        
+
         #region Cooldowns
-        
+
         /// <summary>
         /// Start cooldown for an ability
         /// </summary>
@@ -210,7 +204,7 @@ namespace _Master.Base.Ability
         {
             abilityCooldowns[ability] = duration;
         }
-        
+
         /// <summary>
         /// Check if ability is on cooldown
         /// </summary>
@@ -218,7 +212,7 @@ namespace _Master.Base.Ability
         {
             return abilityCooldowns.ContainsKey(ability) && abilityCooldowns[ability] > 0;
         }
-        
+
         /// <summary>
         /// Get remaining cooldown time
         /// </summary>
@@ -228,47 +222,47 @@ namespace _Master.Base.Ability
                 return remaining;
             return 0f;
         }
-        
+
         #endregion
-        
+
         #region Resources
-        
+
         /// <summary>
         /// Check if has enough resource
         /// </summary>
         public bool HasEnoughResource(float amount)
         {
-            return currentResource >= amount;
+            return currentMana >= amount;
         }
-        
+
         /// <summary>
         /// Consume resource
         /// </summary>
         public void ConsumeResource(float amount)
         {
-            currentResource = Mathf.Max(0, currentResource - amount);
+            currentMana = Mathf.Max(0, currentMana - amount);
         }
-        
+
         /// <summary>
         /// Add resource
         /// </summary>
         public void AddResource(float amount)
         {
-            currentResource = Mathf.Min(maxResource, currentResource + amount);
+            currentMana = Mathf.Min(maxMana, currentMana + amount);
         }
-        
+
         /// <summary>
         /// Set resource
         /// </summary>
         public void SetResource(float amount)
         {
-            currentResource = Mathf.Clamp(amount, 0, maxResource);
+            currentMana = Mathf.Clamp(amount, 0, maxMana);
         }
-        
+
         #endregion
-        
+
         #region Gameplay Effects
-        
+
         /// <summary>
         /// Apply a gameplay effect to this component
         /// </summary>
@@ -276,7 +270,7 @@ namespace _Master.Base.Ability
         {
             return ApplyGameplayEffectToTarget(effect, this, source ?? this);
         }
-        
+
         /// <summary>
         /// Apply a gameplay effect to a target
         /// </summary>
@@ -284,14 +278,14 @@ namespace _Master.Base.Ability
         {
             if (effect == null || target == null)
                 return null;
-            
+
             // Check if effect can be applied
             if (!effect.CanApplyTo(target))
             {
                 Debug.LogWarning($"Cannot apply {effect.effectName} to {target.gameObject.name}");
                 return null;
             }
-            
+
             // Handle stacking
             if (effect.allowStacking)
             {
@@ -305,22 +299,22 @@ namespace _Master.Base.Ability
                     }
                 }
             }
-            
+
             // Create active effect
             var activeEffect = new ActiveGameplayEffect(effect, source, target);
-            
+
             // Apply tags
             if (effect.grantedTags != null && effect.grantedTags.Length > 0)
             {
                 target.AddTags(effect.grantedTags);
             }
-            
+
             // Remove tags
             if (effect.removeTagsOnApplication != null && effect.removeTagsOnApplication.Length > 0)
             {
                 target.RemoveTags(effect.removeTagsOnApplication);
             }
-            
+
             // Apply modifiers for instant effects
             if (effect.durationType == EGameplayEffectDurationType.Instant)
             {
@@ -328,28 +322,28 @@ namespace _Master.Base.Ability
                 {
                     effect.ApplyModifiers(target.AttributeSet, activeEffect.StackCount);
                 }
-                
+
                 Debug.Log($"Applied instant effect {effect.effectName} to {target.gameObject.name}");
                 return activeEffect; // Don't add to active list
             }
-            
+
             // Apply initial modifiers for non-periodic duration/infinite effects
             if (!effect.isPeriodic && target.AttributeSet != null)
             {
                 effect.ApplyModifiers(target.AttributeSet, activeEffect.StackCount);
             }
-            
+
             // Subscribe to expiration
             activeEffect.OnEffectExpired += OnGameplayEffectExpired;
             activeEffect.OnEffectRemoved += OnGameplayEffectRemoved;
-            
+
             // Add to active effects
             target.activeGameplayEffects.Add(activeEffect);
-            
+
             Debug.Log($"Applied {effect.effectName} to {target.gameObject.name} (Duration: {activeEffect.Duration}s)");
             return activeEffect;
         }
-        
+
         /// <summary>
         /// Remove a specific active gameplay effect
         /// </summary>
@@ -357,17 +351,17 @@ namespace _Master.Base.Ability
         {
             if (activeEffect == null || !activeGameplayEffects.Contains(activeEffect))
                 return;
-            
+
             // Remove tags
             if (activeEffect.Effect.grantedTags != null)
             {
                 RemoveTags(activeEffect.Effect.grantedTags);
             }
-            
+
             activeGameplayEffects.Remove(activeEffect);
             Debug.Log($"Removed {activeEffect.Effect.effectName} from {gameObject.name}");
         }
-        
+
         /// <summary>
         /// Remove all gameplay effects with specific tags
         /// </summary>
@@ -375,17 +369,17 @@ namespace _Master.Base.Ability
         {
             if (tags == null || tags.Length == 0)
                 return;
-            
+
             var effectsToRemove = activeGameplayEffects
                 .Where(e => e.Effect.grantedTags != null && e.Effect.grantedTags.Any(tag => tags.Contains(tag)))
                 .ToList();
-            
+
             foreach (var effect in effectsToRemove)
             {
                 RemoveGameplayEffect(effect);
             }
         }
-        
+
         /// <summary>
         /// Remove all gameplay effects
         /// </summary>
@@ -397,7 +391,7 @@ namespace _Master.Base.Ability
                 RemoveGameplayEffect(effect);
             }
         }
-        
+
         /// <summary>
         /// Get all active gameplay effects
         /// </summary>
@@ -405,7 +399,7 @@ namespace _Master.Base.Ability
         {
             return new List<ActiveGameplayEffect>(activeGameplayEffects);
         }
-        
+
         /// <summary>
         /// Check if has active effect
         /// </summary>
@@ -413,7 +407,7 @@ namespace _Master.Base.Ability
         {
             return activeGameplayEffects.Any(e => e.Effect == effect);
         }
-        
+
         /// <summary>
         /// Update all active gameplay effects
         /// </summary>
@@ -427,7 +421,7 @@ namespace _Master.Base.Ability
                 }
             }
         }
-        
+
         /// <summary>
         /// Called when a gameplay effect expires
         /// </summary>
@@ -435,7 +429,7 @@ namespace _Master.Base.Ability
         {
             RemoveGameplayEffect(effect);
         }
-        
+
         /// <summary>
         /// Called when a gameplay effect is removed
         /// </summary>
@@ -443,7 +437,7 @@ namespace _Master.Base.Ability
         {
             RemoveGameplayEffect(effect);
         }
-        
+
         #endregion
     }
 }

@@ -9,54 +9,19 @@ namespace _Master.Base.Ability
     [Serializable]
     public class GameplayAttribute
     {
-        [SerializeField] private float baseValue;
         [SerializeField] private float currentValue;
-        
-        private float minValue = 0f;
-        private float maxValue = float.MaxValue;
-        
-        public float BaseValue
-        {
-            get => baseValue;
-            set
-            {
-                baseValue = value;
-                currentValue = Mathf.Clamp(currentValue, minValue, maxValue);
-            }
-        }
         
         public float CurrentValue
         {
             get => currentValue;
-            set => currentValue = Mathf.Clamp(value, minValue, maxValue);
-        }
-        
-        public float MinValue
-        {
-            get => minValue;
-            set => minValue = value;
-        }
-        
-        public float MaxValue
-        {
-            get => maxValue;
-            set => maxValue = value;
+            set => currentValue = value;
         }
         
         public event Action<float, float> OnValueChanged; // oldValue, newValue
         
         public GameplayAttribute(float initialValue = 0f)
         {
-            baseValue = initialValue;
             currentValue = initialValue;
-        }
-        
-        public GameplayAttribute(float initialValue, float min, float max)
-        {
-            minValue = min;
-            maxValue = max;
-            baseValue = Mathf.Clamp(initialValue, min, max);
-            currentValue = baseValue;
         }
         
         /// <summary>
@@ -65,7 +30,7 @@ namespace _Master.Base.Ability
         public void ModifyCurrentValue(float delta)
         {
             float oldValue = currentValue;
-            currentValue = Mathf.Clamp(currentValue + delta, minValue, maxValue);
+            currentValue = currentValue + delta;
             
             if (!Mathf.Approximately(oldValue, currentValue))
             {
@@ -79,30 +44,12 @@ namespace _Master.Base.Ability
         public void SetCurrentValue(float value)
         {
             float oldValue = currentValue;
-            currentValue = Mathf.Clamp(value, minValue, maxValue);
+            currentValue = value;
             
             if (!Mathf.Approximately(oldValue, currentValue))
             {
                 OnValueChanged?.Invoke(oldValue, currentValue);
             }
-        }
-        
-        /// <summary>
-        /// Get percentage of current/max value
-        /// </summary>
-        public float GetPercentage()
-        {
-            if (maxValue == 0)
-                return 0f;
-            return currentValue / maxValue;
-        }
-        
-        /// <summary>
-        /// Reset to base value
-        /// </summary>
-        public void ResetToBase()
-        {
-            SetCurrentValue(baseValue);
         }
     }
 }
