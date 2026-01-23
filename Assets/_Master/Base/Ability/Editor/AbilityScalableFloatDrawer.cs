@@ -6,8 +6,8 @@ using _Master.Base.Ability;
 
 namespace _Master.Base.Ability.Editor
 {
-    [CustomPropertyDrawer(typeof(AbilityScalableFloat))]
-    public class AbilityScalableFloatDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ScalableFloat))]
+    public class ScalableFloatDrawer : PropertyDrawer
     {
         private static float LineHeight => EditorGUIUtility.singleLineHeight;
         private static float VerticalSpacing => EditorGUIUtility.standardVerticalSpacing;
@@ -21,19 +21,24 @@ namespace _Master.Base.Ability.Editor
                 lines += 1; // scalingMode
 
                 SerializedProperty scalingModeProp = property.FindPropertyRelative("scalingMode");
-                var mode = (AbilityScalableFloat.ScalingMode)scalingModeProp.enumValueIndex;
+                var mode = (ScalableFloat.ScalingMode)scalingModeProp.enumValueIndex;
 
-                if (mode == AbilityScalableFloat.ScalingMode.FlatValue)
+                if (mode == ScalableFloat.ScalingMode.FlatValue)
                 {
                     lines += 1; // flatValue
                 }
-                else
+                else if (mode == ScalableFloat.ScalingMode.Curve)
                 {
                     lines += 1; // csvAsset
                     lines += 1; // csvColumn
                     lines += 1; // previewLevel
                     lines += 1; // preview value
                     lines += 1; // rebuild button
+                }
+                else
+                {
+                    lines += 1; // attributeType
+                    lines += 1; // preview value
                 }
             }
 
@@ -65,14 +70,14 @@ namespace _Master.Base.Ability.Editor
 
             EditorGUI.PropertyField(lineRect, scalingModeProp);
 
-            var mode = (AbilityScalableFloat.ScalingMode)scalingModeProp.enumValueIndex;
+            var mode = (ScalableFloat.ScalingMode)scalingModeProp.enumValueIndex;
 
-            if (mode == AbilityScalableFloat.ScalingMode.FlatValue)
+            if (mode == ScalableFloat.ScalingMode.FlatValue)
             {
                 lineRect.y += LineHeight + VerticalSpacing;
                 EditorGUI.PropertyField(lineRect, flatValueProp);
             }
-            else
+            else if (mode == ScalableFloat.ScalingMode.Curve)
             {
                 lineRect.y += LineHeight + VerticalSpacing;
                 EditorGUI.PropertyField(lineRect, csvAssetProp, new GUIContent("CSV Asset"));
@@ -88,6 +93,15 @@ namespace _Master.Base.Ability.Editor
 
                 lineRect.y += LineHeight + VerticalSpacing;
                 DrawRebuildButton(lineRect, property);
+            }
+            else
+            {
+                SerializedProperty attributeTypeProp = property.FindPropertyRelative("attributeType");
+                lineRect.y += LineHeight + VerticalSpacing;
+                EditorGUI.PropertyField(lineRect, attributeTypeProp, new GUIContent("Attribute"));
+
+                lineRect.y += LineHeight + VerticalSpacing;
+                DrawPreviewValue(lineRect, property, null, attributeTypeProp);
             }
 
             EditorGUI.indentLevel--;
@@ -129,9 +143,9 @@ namespace _Master.Base.Ability.Editor
             }
         }
 
-        private void DrawPreviewValue(Rect rect, SerializedProperty property, SerializedProperty csvColumnProp)
+        private void DrawPreviewValue(Rect rect, SerializedProperty property, SerializedProperty csvColumnProp, SerializedProperty attributeTypeProp = null)
         {
-            AbilityScalableFloat instance = GetInstance(property);
+            ScalableFloat instance = GetInstance(property);
             if (instance == null)
             {
                 EditorGUI.LabelField(rect, "Preview", "No instance");
@@ -139,15 +153,23 @@ namespace _Master.Base.Ability.Editor
             }
 
             float previewValue = instance.GetPreviewValue();
-            string column = string.IsNullOrEmpty(csvColumnProp.stringValue) ? "(none)" : csvColumnProp.stringValue;
-            EditorGUI.LabelField(rect, $"Preview ({column})", previewValue.ToString("F4"));
+            if (attributeTypeProp != null)
+            {
+                string attributeName = attributeTypeProp.enumDisplayNames[attributeTypeProp.enumValueIndex];
+                EditorGUI.LabelField(rect, $"Preview ({attributeName})", previewValue.ToString("F4"));
+            }
+            else
+            {
+                string column = csvColumnProp == null || string.IsNullOrEmpty(csvColumnProp.stringValue) ? "(none)" : csvColumnProp.stringValue;
+                EditorGUI.LabelField(rect, $"Preview ({column})", previewValue.ToString("F4"));
+            }
         }
 
         private void DrawRebuildButton(Rect rect, SerializedProperty property)
         {
             if (GUI.Button(rect, "Rebuild Curve From CSV"))
             {
-                AbilityScalableFloat instance = GetInstance(property);
+                ScalableFloat instance = GetInstance(property);
                 if (instance != null)
                 {
                     instance.RebuildCurveFromCsv();
@@ -156,13 +178,13 @@ namespace _Master.Base.Ability.Editor
             }
         }
 
-        private AbilityScalableFloat GetInstance(SerializedProperty property)
+        private ScalableFloat GetInstance(SerializedProperty property)
         {
             object target = property.serializedObject.targetObject;
             if (target == null)
                 return null;
 
-            return fieldInfo.GetValue(target) as AbilityScalableFloat;
+            return fieldInfo.GetValue(target) as ScalableFloat;
         }
     }
 }

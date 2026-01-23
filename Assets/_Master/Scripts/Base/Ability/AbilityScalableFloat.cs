@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 namespace _Master.Base.Ability
 {
@@ -8,7 +9,8 @@ namespace _Master.Base.Ability
     /// A float value that can scale based on level using AnimationCurve (similar to UE's FScalableFloat)
     /// </summary>
     [Serializable]
-    public class AbilityScalableFloat
+    [MovedFrom(true, null, "_Master.Base.Ability", "AbilityScalableFloat")]
+    public class ScalableFloat
     {
         [SerializeField] private ScalingMode scalingMode = ScalingMode.FlatValue;
         
@@ -31,16 +33,20 @@ namespace _Master.Base.Ability
         [NonSerialized] private int cachedRowCount;
         [NonSerialized] private bool hasCachedCurve;
         
+        [Tooltip("When Attribute is selected, value is read from owner's AttributeSet")]
+        [SerializeField] private EGameplayAttributeType attributeType = EGameplayAttributeType.Health;
+
         public enum ScalingMode
         {
             FlatValue,      // Fixed value, không scale
-            Curve           // Scale theo AnimationCurve
+            Curve,          // Scale theo AnimationCurve
+            Attribute       // Read from AttributeSet
         }
         
         /// <summary>
-        /// Get value at specified level
+        /// Get value at specified level (optional owner ASC for Attribute mode)
         /// </summary>
-        public float GetValueAtLevel(float level)
+        public float GetValueAtLevel(float level, AbilitySystemComponent ownerAsc = null)
         {
             switch (scalingMode)
             {
@@ -50,6 +56,15 @@ namespace _Master.Base.Ability
                 case ScalingMode.Curve:
                     EnsureCurveFromCsv(false);
                     return scalingCurve.Evaluate(level);
+
+                case ScalingMode.Attribute:
+                    if (ownerAsc != null && ownerAsc.AttributeSet != null)
+                    {
+                        var attribute = ownerAsc.AttributeSet.GetAttribute(attributeType);
+                        if (attribute != null)
+                            return attribute.CurrentValue;
+                    }
+                    return 0f;
                 
                 default:
                     return flatValue;
@@ -59,15 +74,15 @@ namespace _Master.Base.Ability
         /// <summary>
         /// Get value at level 1 (base value)
         /// </summary>
-        public float GetBaseValue()
+        public float GetBaseValue(AbilitySystemComponent ownerAsc = null)
         {
-            return GetValueAtLevel(1f);
+            return GetValueAtLevel(1f, ownerAsc);
         }
         
         /// <summary>
         /// Implicit conversion to float (uses level 1)
         /// </summary>
-        public static implicit operator float(AbilityScalableFloat scalable)
+        public static implicit operator float(ScalableFloat scalable)
         {
             return scalable?.GetBaseValue() ?? 0f;
         }
@@ -75,7 +90,7 @@ namespace _Master.Base.Ability
         /// <summary>
         /// Constructor for flat value
         /// </summary>
-        public AbilityScalableFloat(float value)
+        public ScalableFloat(float value)
         {
             scalingMode = ScalingMode.FlatValue;
             flatValue = value;
@@ -84,7 +99,7 @@ namespace _Master.Base.Ability
         /// <summary>
         /// Constructor for curve
         /// </summary>
-        public AbilityScalableFloat(AnimationCurve curve)
+        public ScalableFloat(AnimationCurve curve)
         {
             scalingMode = ScalingMode.Curve;
             scalingCurve = curve;
@@ -93,7 +108,7 @@ namespace _Master.Base.Ability
         /// <summary>
         /// Default constructor
         /// </summary>
-        public AbilityScalableFloat()
+        public ScalableFloat()
         {
             scalingMode = ScalingMode.FlatValue;
             flatValue = 0f;
@@ -103,6 +118,7 @@ namespace _Master.Base.Ability
         public string CsvColumn => csvColumn;
         public float PreviewLevel => previewLevel;
         public int CachedRowCount => cachedRowCount;
+        public EGameplayAttributeType AttributeType => attributeType;
 
         public void SetCsvSource(TextAsset asset, string column)
         {

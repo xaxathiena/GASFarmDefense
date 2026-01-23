@@ -13,8 +13,8 @@ namespace _Master.Base.Ability
         public string description;
         
         [Header("Ability Properties")]
-        public AbilityScalableFloat cooldownDuration = new AbilityScalableFloat();
-        public AbilityScalableFloat costAmount = new AbilityScalableFloat();
+        public ScalableFloat cooldownDuration = new ScalableFloat();
+        public ScalableFloat costAmount = new ScalableFloat();
         public bool canActivateWhileActive = false;
         
         [Header("Level")]
@@ -47,7 +47,7 @@ namespace _Master.Base.Ability
                 return false;
             
             // Check cost
-            if (!asc.HasEnoughResource(costAmount.GetValueAtLevel(abilityLevel)))
+            if (!asc.HasEnoughResource(costAmount.GetValueAtLevel(abilityLevel, asc)))
                 return false;
             
             // Check blocked tags
@@ -76,10 +76,10 @@ namespace _Master.Base.Ability
             asc.AddTags(abilityTags);
             
             // Consume cost
-            asc.ConsumeResource(costAmount.GetValueAtLevel(abilityLevel));
+            asc.ConsumeResource(costAmount.GetValueAtLevel(abilityLevel, ownerASC));
             
             // Start cooldown
-            float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel);
+            float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel, ownerASC);
             if (cooldown > 0)
                 asc.StartCooldown(this, cooldown);
             
