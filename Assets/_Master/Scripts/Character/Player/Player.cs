@@ -19,8 +19,9 @@ namespace FD.Character
             // Player specific start logic
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
             // Player specific update logic
             HandleInput();
         }

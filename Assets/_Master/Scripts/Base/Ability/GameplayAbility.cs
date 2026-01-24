@@ -36,7 +36,7 @@ namespace _Master.Base.Ability
         public virtual bool CanActivateAbility(AbilitySystemComponent asc)
         {
             ownerASC = asc;
-            owner = asc.gameObject;
+            owner = asc.GetOwner();
             
             // Check if already active
             if (isActive && !canActivateWhileActive)
@@ -46,9 +46,16 @@ namespace _Master.Base.Ability
             if (asc.IsAbilityOnCooldown(this))
                 return false;
             
-            // Check cost
-            if (!asc.HasEnoughResource(costAmount.GetValueAtLevel(abilityLevel, asc)))
-                return false;
+            // Check cost (Mana from AttributeSet)
+            float cost = costAmount.GetValueAtLevel(abilityLevel, asc);
+            if (cost > 0f)
+            {
+                var manaAttr = asc.AttributeSet?.GetAttribute(EGameplayAttributeType.Mana);
+                if (manaAttr == null || manaAttr.CurrentValue < cost)
+                {
+                    return false;
+                }
+            }
             
             // Check blocked tags
             if (asc.HasAnyTags(blockAbilitiesWithTags))
@@ -66,7 +73,7 @@ namespace _Master.Base.Ability
                 return;
             
             ownerASC = asc;
-            owner = asc.gameObject;
+            owner = asc.GetOwner();
             isActive = true;
             
             // Cancel conflicting abilities
@@ -75,8 +82,16 @@ namespace _Master.Base.Ability
             // Add ability tags
             asc.AddTags(abilityTags);
             
-            // Consume cost
-            asc.ConsumeResource(costAmount.GetValueAtLevel(abilityLevel, ownerASC));
+            // Consume cost (Mana from AttributeSet)
+            float cost = costAmount.GetValueAtLevel(abilityLevel, ownerASC);
+            if (cost > 0f && ownerASC.AttributeSet != null)
+            {
+                var manaAttr = ownerASC.AttributeSet.GetAttribute(EGameplayAttributeType.Mana);
+                if (manaAttr != null)
+                {
+                    manaAttr.ModifyCurrentValue(-cost);
+                }
+            }
             
             // Start cooldown
             float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel, ownerASC);

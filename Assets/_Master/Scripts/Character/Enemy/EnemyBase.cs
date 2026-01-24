@@ -21,8 +21,9 @@ namespace FD.Character
             // Enemy specific start logic
         }
 
-        protected virtual void Update()
+        protected override void Update()
         {
+            base.Update();
             // Enemy specific update logic
             UpdateBehavior();
         }

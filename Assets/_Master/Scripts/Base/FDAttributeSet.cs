@@ -12,6 +12,7 @@ namespace FD.Ability
         public GameplayAttribute Mana { get; private set; }
         public GameplayAttribute MaxHealth { get; private set; }
         public GameplayAttribute MaxMana { get; private set; }
+        public GameplayAttribute ManaRegen { get; private set; }
         
         public FDAttributeSet()
         {
@@ -20,12 +21,14 @@ namespace FD.Ability
             Mana = new GameplayAttribute();
             MaxHealth = new GameplayAttribute();
             MaxMana = new GameplayAttribute();
+            ManaRegen = new GameplayAttribute();
             
             // Register attributes to dictionary using enum (type-safe)
             RegisterAttribute(EGameplayAttributeType.Health, Health);
             RegisterAttribute(EGameplayAttributeType.Mana, Mana);
             RegisterAttribute(EGameplayAttributeType.MaxHealth, MaxHealth);
             RegisterAttribute(EGameplayAttributeType.MaxMana, MaxMana);
+            RegisterAttribute(EGameplayAttributeType.ManaRegen, ManaRegen);
             
             // Subscribe to value changes
             Health.OnValueChanged += OnHealthChanged;

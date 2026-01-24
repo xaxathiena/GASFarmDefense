@@ -11,6 +11,7 @@ namespace _Master.Base.Ability
         MaxHealth,
         Mana,
         MaxMana,
+        ManaRegen,
         Stamina,
         MaxStamina,
         

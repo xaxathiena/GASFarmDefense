@@ -11,10 +11,6 @@ namespace _Master.Base.Ability
     {
         private AttributeSet attributeSet;
 
-        [Header("Resources")]
-        [SerializeField] private float currentMana = 100f;
-        [SerializeField] private float maxMana = 100f;
-
         [Header("Abilities")]
         [SerializeField] private List<GameplayAbility> grantedAbilities = new List<GameplayAbility>();
 
@@ -23,9 +19,7 @@ namespace _Master.Base.Ability
         private Dictionary<GameplayAbility, float> abilityCooldowns = new Dictionary<GameplayAbility, float>();
         private List<GameplayAbility> activeAbilities = new List<GameplayAbility>();
         private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
-
-        public float CurrentMana => currentMana;
-        public float MaxMana => maxMana;
+        private GameObject owner;
         public AttributeSet AttributeSet => attributeSet;
 
         private void Update()
@@ -42,7 +36,18 @@ namespace _Master.Base.Ability
             // Update active gameplay effects
             UpdateGameplayEffects(Time.deltaTime);
         }
-
+        public void InitOwner(GameObject owner)
+        {
+            this.owner = owner;
+        }
+        public virtual GameObject GetOwner()
+        {
+            if(owner == null)
+            {
+                owner = this.gameObject;
+            }
+            return owner;
+        }
         /// <summary>
         /// Grant an ability to this component
         /// </summary>
@@ -221,42 +226,6 @@ namespace _Master.Base.Ability
             if (abilityCooldowns.TryGetValue(ability, out float remaining))
                 return remaining;
             return 0f;
-        }
-
-        #endregion
-
-        #region Resources
-
-        /// <summary>
-        /// Check if has enough resource
-        /// </summary>
-        public bool HasEnoughResource(float amount)
-        {
-            return currentMana >= amount;
-        }
-
-        /// <summary>
-        /// Consume resource
-        /// </summary>
-        public void ConsumeResource(float amount)
-        {
-            currentMana = Mathf.Max(0, currentMana - amount);
-        }
-
-        /// <summary>
-        /// Add resource
-        /// </summary>
-        public void AddResource(float amount)
-        {
-            currentMana = Mathf.Min(maxMana, currentMana + amount);
-        }
-
-        /// <summary>
-        /// Set resource
-        /// </summary>
-        public void SetResource(float amount)
-        {
-            currentMana = Mathf.Clamp(amount, 0, maxMana);
         }
 
         #endregion

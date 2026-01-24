@@ -1,0 +1,7 @@
+tạo towner:
+Hãy tạo cho tôi một scripts towner base. như sau:
+- Kế thừa từ BaseCharacter.
+- Có 1 ability normal (kiểu attack bình thường), có countdown, cứ hết countdown là active.
+- Có 1 ability skill (nếu còn mana và countdown xong thì active ngay). Khi active skill thì ability normal cũng countdown theo.
+Hãy tạo thêm EGameplayAttributeType là khả năng hồi mana (kiểu bao nhiêu mana trên giây nữa).
+Trong BaseCharacter hãy thêm tính toán hồi mana, sao đó thay đổi mana trong AbilitySystemComponent.

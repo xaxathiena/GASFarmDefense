@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using _Master.Base.Ability;
 using FD.Ability;
 using UnityEngine;
@@ -19,13 +20,18 @@ namespace FD.Character
             {
                 abilitySystemComponent = GetComponent<AbilitySystemComponent>();
             }
-            
+            abilitySystemComponent.InitOwner(this.gameObject);
             InitializeAttributeSet();
         }
 
         protected virtual void Start()
         {
             InitInitialEffects();
+        }
+
+        protected virtual void Update()
+        {
+            TickManaRegen(Time.deltaTime);
         }
 
         protected virtual void InitializeAttributeSet()
@@ -40,6 +46,30 @@ namespace FD.Character
             {
                 abilitySystemComponent.ApplyGameplayEffectToSelf(initialEffect);
             }
+        }
+
+        protected virtual void TickManaRegen(float deltaTime)
+        {
+            if (attributeSet == null)
+            {
+                return;
+            }
+
+            float regenPerSecond = attributeSet.ManaRegen.CurrentValue;
+            if (regenPerSecond <= 0f)
+            {
+                return;
+            }
+
+            float regenAmount = regenPerSecond * deltaTime;
+            float maxMana = attributeSet.MaxMana.CurrentValue;
+            float newMana = Mathf.Min(attributeSet.Mana.CurrentValue + regenAmount, maxMana);
+            attributeSet.Mana.SetCurrentValue(newMana);
+        }
+
+        public virtual List<Transform> GetTargets()
+        {
+            return new List<Transform>();
         }
     }
 }

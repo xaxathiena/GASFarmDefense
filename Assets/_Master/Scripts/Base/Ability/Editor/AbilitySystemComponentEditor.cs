@@ -129,16 +129,23 @@ namespace _Master.Base.Ability.Editor
             EditorGUILayout.LabelField("Resources", EditorStyles.boldLabel);
             
             EditorGUI.indentLevel++;
-            
+
+            var attributeSet = asc.AttributeSet;
+            var manaAttr = attributeSet?.GetAttribute(EGameplayAttributeType.Mana);
+            var maxManaAttr = attributeSet?.GetAttribute(EGameplayAttributeType.MaxMana);
+
+            float current = manaAttr != null ? manaAttr.CurrentValue : 0f;
+            float max = maxManaAttr != null ? maxManaAttr.CurrentValue : 0f;
+
             // Current Resource
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Current", GUILayout.Width(100));
-            EditorGUILayout.LabelField($"{asc.CurrentMana:F2} / {asc.MaxMana:F2}");
+            EditorGUILayout.LabelField($"{current:F2} / {max:F2}");
             EditorGUILayout.EndHorizontal();
-            
+
             // Progress Bar
             Rect rect = EditorGUILayout.GetControlRect(false, 20);
-            float percentage = asc.CurrentMana / asc.MaxMana;
+            float percentage = max > 0f ? current / max : 0f;
             EditorGUI.ProgressBar(rect, percentage, $"{percentage * 100:F0}%");
             
             EditorGUI.indentLevel--;
