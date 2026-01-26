@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using _Master.Base.Ability;
+using GAS;
 using UnityEngine;
 
 namespace FD.Character
@@ -8,8 +8,12 @@ namespace FD.Character
     {
         [Header("Abilities")]
         [SerializeField] private GameplayAbility normalAbility;
+        [SerializeField] private int normalAbilityLevel = 1;
 
         [SerializeField] private GameplayAbility skillAbility;
+        [SerializeField] private int skillAbilityLevel = 1;
+        private GameplayAbilitySpec normalAbilitySpec;
+        private GameplayAbilitySpec skillAbilitySpec;
 
         [Header("Targeting")]
         [SerializeField] private float targetRange = 6f;
@@ -43,13 +47,43 @@ namespace FD.Character
 
             if (normalAbility != null)
             {
-                abilitySystemComponent.GiveAbility(normalAbility);
+                normalAbilitySpec = abilitySystemComponent.GiveAbility(normalAbility, Mathf.Max(1, normalAbilityLevel));
             }
 
             if (skillAbility != null)
             {
-                abilitySystemComponent.GiveAbility(skillAbility);
+                skillAbilitySpec = abilitySystemComponent.GiveAbility(skillAbility, Mathf.Max(1, skillAbilityLevel));
             }
+        }
+
+        public void UpgradeNormalAbility(int deltaLevel)
+        {
+            if (deltaLevel == 0 || abilitySystemComponent == null)
+            {
+                return;
+            }
+
+            if (normalAbilitySpec == null && normalAbility != null)
+            {
+                normalAbilitySpec = abilitySystemComponent.GiveAbility(normalAbility, Mathf.Max(1, normalAbilityLevel));
+            }
+
+            normalAbilitySpec?.AddLevels(deltaLevel);
+        }
+
+        public void UpgradeSkillAbility(int deltaLevel)
+        {
+            if (deltaLevel == 0 || abilitySystemComponent == null)
+            {
+                return;
+            }
+
+            if (skillAbilitySpec == null && skillAbility != null)
+            {
+                skillAbilitySpec = abilitySystemComponent.GiveAbility(skillAbility, Mathf.Max(1, skillAbilityLevel));
+            }
+
+            skillAbilitySpec?.AddLevels(deltaLevel);
         }
 
         private void TryActivateAbilities()

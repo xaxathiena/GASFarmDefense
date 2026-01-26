@@ -2,9 +2,8 @@ using System;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using _Master.Base.Ability;
 
-namespace _Master.Base.Ability.Editor
+namespace GAS.Editor
 {
     [CustomPropertyDrawer(typeof(ScalableFloat))]
     public class ScalableFloatDrawer : PropertyDrawer
@@ -19,15 +18,12 @@ namespace _Master.Base.Ability.Editor
             if (property.isExpanded)
             {
                 lines += 1; // scalingMode
+                lines += 1; // flatValue (always visible)
 
                 SerializedProperty scalingModeProp = property.FindPropertyRelative("scalingMode");
                 var mode = (ScalableFloat.ScalingMode)scalingModeProp.enumValueIndex;
 
-                if (mode == ScalableFloat.ScalingMode.FlatValue)
-                {
-                    lines += 1; // flatValue
-                }
-                else if (mode == ScalableFloat.ScalingMode.Curve)
+                if (mode == ScalableFloat.ScalingMode.Curve)
                 {
                     lines += 1; // csvAsset
                     lines += 1; // csvColumn
@@ -35,7 +31,7 @@ namespace _Master.Base.Ability.Editor
                     lines += 1; // preview value
                     lines += 1; // rebuild button
                 }
-                else
+                else if (mode == ScalableFloat.ScalingMode.Attribute)
                 {
                     lines += 1; // attributeType
                     lines += 1; // preview value
@@ -70,14 +66,12 @@ namespace _Master.Base.Ability.Editor
 
             EditorGUI.PropertyField(lineRect, scalingModeProp);
 
+            lineRect.y += LineHeight + VerticalSpacing;
+            EditorGUI.PropertyField(lineRect, flatValueProp, new GUIContent("Base Value"));
+
             var mode = (ScalableFloat.ScalingMode)scalingModeProp.enumValueIndex;
 
-            if (mode == ScalableFloat.ScalingMode.FlatValue)
-            {
-                lineRect.y += LineHeight + VerticalSpacing;
-                EditorGUI.PropertyField(lineRect, flatValueProp);
-            }
-            else if (mode == ScalableFloat.ScalingMode.Curve)
+            if (mode == ScalableFloat.ScalingMode.Curve)
             {
                 lineRect.y += LineHeight + VerticalSpacing;
                 EditorGUI.PropertyField(lineRect, csvAssetProp, new GUIContent("CSV Asset"));
@@ -94,7 +88,7 @@ namespace _Master.Base.Ability.Editor
                 lineRect.y += LineHeight + VerticalSpacing;
                 DrawRebuildButton(lineRect, property);
             }
-            else
+            else if (mode == ScalableFloat.ScalingMode.Attribute)
             {
                 SerializedProperty attributeTypeProp = property.FindPropertyRelative("attributeType");
                 lineRect.y += LineHeight + VerticalSpacing;
@@ -103,6 +97,8 @@ namespace _Master.Base.Ability.Editor
                 lineRect.y += LineHeight + VerticalSpacing;
                 DrawPreviewValue(lineRect, property, null, attributeTypeProp);
             }
+
+            // FlatValue mode only uses base value, so no extra fields after flatValue
 
             EditorGUI.indentLevel--;
             EditorGUI.EndProperty();
@@ -184,7 +180,62 @@ namespace _Master.Base.Ability.Editor
             if (target == null)
                 return null;
 
-            return fieldInfo.GetValue(target) as ScalableFloat;
+            // Traverse the property path to get the actual instance
+            string[] pathParts = property.propertyPath.Replace(".Array.data[", "[").Split('.');
+            
+            foreach (string part in pathParts)
+            {
+                if (target == null)
+                    return null;
+
+                if (part.Contains("["))
+                {
+                    // Handle array element access
+                    string fieldName = part.Substring(0, part.IndexOf('['));
+                    int index = int.Parse(part.Substring(part.IndexOf('[') + 1, part.IndexOf(']') - part.IndexOf('[') - 1));
+                    
+                    var field = target.GetType().GetField(fieldName, 
+                        System.Reflection.BindingFlags.Public | 
+                        System.Reflection.BindingFlags.NonPublic | 
+                        System.Reflection.BindingFlags.Instance);
+                    
+                    if (field != null)
+                    {
+                        var array = field.GetValue(target) as System.Collections.IList;
+                        if (array != null && index >= 0 && index < array.Count)
+                        {
+                            target = array[index];
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    // Normal field access
+                    var field = target.GetType().GetField(part, 
+                        System.Reflection.BindingFlags.Public | 
+                        System.Reflection.BindingFlags.NonPublic | 
+                        System.Reflection.BindingFlags.Instance);
+                    
+                    if (field != null)
+                    {
+                        target = field.GetValue(target);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return target as ScalableFloat;
         }
     }
 }

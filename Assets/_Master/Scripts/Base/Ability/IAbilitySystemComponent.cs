@@ -1,6 +1,4 @@
-using _Master.Base.Ability;
-
-namespace FD.Ability
+namespace GAS
 {
     public interface IAbilitySystemComponent
     {

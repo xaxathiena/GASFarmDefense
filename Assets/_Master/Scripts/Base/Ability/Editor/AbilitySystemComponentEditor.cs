@@ -1,9 +1,8 @@
 using UnityEditor;
 using UnityEngine;
-using _Master.Base.Ability;
 using System.Reflection;
 
-namespace _Master.Base.Ability.Editor
+namespace GAS.Editor
 {
     [CustomEditor(typeof(AbilitySystemComponent))]
     public class AbilitySystemComponentEditor : UnityEditor.Editor

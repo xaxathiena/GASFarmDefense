@@ -10,12 +10,23 @@ namespace FD.Character
         [SerializeField] private Transform spawnPoint;
         [SerializeField] private Transform[] pathPoints;
 
+        [Header("Player Scoring")]
+        [SerializeField] private Player player;
+
         [Header("Wave Settings")]
         [SerializeField] private bool autoStartOnPlay = true;
         [SerializeField] private float timeBetweenWaves = 2f;
         [SerializeField] private List<FDEnemyWave> waves = new List<FDEnemyWave>();
 
         private Coroutine waveRoutine;
+
+        private void Awake()
+        {
+            if (player == null)
+            {
+                player = FindObjectOfType<Player>();
+            }
+        }
 
         private void Start()
         {
@@ -103,6 +114,17 @@ namespace FD.Character
 
             var enemy = Instantiate(entry.enemyPrefab, spawnPosition, Quaternion.identity);
             enemy.InitializePath(pathPoints);
+            enemy.ReachedPathEnd += HandleEnemyReachedPathEnd;
+        }
+
+        private void HandleEnemyReachedPathEnd(FDEnemyBase enemy)
+        {
+            if (enemy != null)
+            {
+                enemy.ReachedPathEnd -= HandleEnemyReachedPathEnd;
+            }
+
+            player?.ApplyEnemyEscapePenalty();
         }
     }
 

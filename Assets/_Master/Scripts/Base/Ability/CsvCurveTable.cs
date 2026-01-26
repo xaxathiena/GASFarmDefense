@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     public static class CsvCurveTable
     {

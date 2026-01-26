@@ -1,4 +1,4 @@
-namespace _Master.Sample
+namespace GAS.Sample
 {
     /// <summary>
     /// Character AI states

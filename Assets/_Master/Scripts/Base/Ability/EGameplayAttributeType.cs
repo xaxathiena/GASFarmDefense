@@ -1,4 +1,4 @@
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Base attribute enum - Each game can define their own enum

@@ -1,5 +1,6 @@
 using UnityEngine;
 using FD.Ability;
+using GAS;
 
 namespace FD.Projectiles
 {
@@ -20,6 +21,8 @@ namespace FD.Projectiles
         private float elapsed;
         private float travelTime;
         private AudioSource travelSource;
+        private GameplayEffect gameplayEffect;
+        private AbilitySystemComponent sourceASC;
 
         public void Initialize(
             Transform target,
@@ -30,7 +33,9 @@ namespace FD.Projectiles
             float lifeTime,
             GameObject impactVfx,
             AudioClip onTravel,
-            AudioClip onHit)
+            AudioClip onHit,
+            AbilitySystemComponent sourceASC,
+            GameplayEffect gameplayEffect)
         {
             this.target = target;
             this.speed = Mathf.Max(0.01f, speed);
@@ -41,7 +46,8 @@ namespace FD.Projectiles
             this.impactVfx = impactVfx;
             this.onTravel = onTravel;
             this.onHit = onHit;
-
+            this.gameplayEffect = gameplayEffect;
+            this.sourceASC = sourceASC;
             startPosition = transform.position;
             targetPosition = target != null ? target.position : startPosition + transform.forward * 5f;
 
@@ -138,7 +144,15 @@ namespace FD.Projectiles
             {
                 travelSource.Stop();
             }
-
+            if (gameplayEffect != null && target != null)
+            {
+                // get the AbilitySystemComponent of the target from IAbilitySystemComponent
+                var targetAsc = target.GetAbilitySystemComponent();
+                if (targetAsc != null)
+                {
+                   targetAsc.ApplyGameplayEffectToSelf(gameplayEffect, sourceASC);
+                }
+            }
             Destroy(gameObject);
         }
     }

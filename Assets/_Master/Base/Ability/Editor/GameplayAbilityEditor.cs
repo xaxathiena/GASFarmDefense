@@ -1,8 +1,6 @@
 using UnityEditor;
-using UnityEngine;
-using _Master.Base.Ability;
 
-namespace _Master.Base.Ability.Editor
+namespace GAS.Editor
 {
     [CustomEditor(typeof(GameplayAbility), true)]
     public class GameplayAbilityEditor : UnityEditor.Editor

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Alternative approach using Reflection to find attributes

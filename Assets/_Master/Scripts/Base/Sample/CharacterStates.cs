@@ -1,7 +1,6 @@
 using UnityEngine;
-using _Master.Base.Ability;
 
-namespace _Master.Sample
+namespace GAS.Sample
 {
     /// <summary>
     /// Base state for character AI FSM

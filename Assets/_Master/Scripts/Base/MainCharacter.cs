@@ -1,4 +1,4 @@
-using _Master.Base.Ability;
+using GAS;
 using FD.Ability;
 using UnityEngine;
 namespace FD.Player

@@ -16,6 +16,73 @@ MonoBehaviour:
   description: 
   cooldownDuration:
     scalingMode: 0
+    flatValue: 3
+    scalingCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 2
+        value: 5
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 3
+        value: 7
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 4
+        value: 10.333333
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 5
+        value: 13.333333
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 6
+        value: 16.333334
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    csvAsset: {fileID: 4900000, guid: 9a93ce25af184294ab192c433d221b10, type: 3}
+    csvColumn: Curve1
+    previewLevel: 1
+    attributeType: 0
+  costAmount:
+    scalingMode: 0
     flatValue: 2
     scalingCurve:
       serializedVersion: 2
@@ -45,43 +112,12 @@ MonoBehaviour:
     csvColumn: 
     previewLevel: 1
     attributeType: 0
-  costAmount:
-    scalingMode: 0
-    flatValue: 0
-    scalingCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 11.111111
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 10
-        value: 100
-        inSlope: 11.111111
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    csvAsset: {fileID: 0}
-    csvColumn: 
-    previewLevel: 1
-    attributeType: 0
   canActivateWhileActive: 0
-  abilityLevel: 1
   abilityTags: []
   cancelAbilitiesWithTags: []
   blockAbilitiesWithTags: []
   projectilePrefab: {fileID: 839206619978810627, guid: 76994841aa03ee9489c354b708b6627a, type: 3}
+  gameplayEffect: {fileID: 11400000, guid: c36e2eef675571f4f9690a2db1cf5f29, type: 2}
   speed: 10
   movementType: 0
   arcHeight: 2

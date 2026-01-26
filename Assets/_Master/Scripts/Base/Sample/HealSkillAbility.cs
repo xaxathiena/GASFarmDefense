@@ -1,5 +1,5 @@
 using UnityEngine;
-using _Master.Base.Ability;
+using GAS;
 
 namespace _Master.Sample
 {
@@ -16,26 +16,26 @@ namespace _Master.Sample
         [Tooltip("Heal effect to apply")]
         public GameplayEffect healEffect;
         
-        protected override void OnAbilityActivated()
+        protected override void OnAbilityActivated(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             if (healEffect != null)
             {
                 // Apply heal effect
-                ownerASC.ApplyGameplayEffectToSelf(healEffect, ownerASC);
-                Debug.Log($"{owner.name} used Heal Skill! Restored {healAmount} HP");
+                asc.ApplyGameplayEffectToSelf(healEffect, asc);
+                Debug.Log($"{GetAbilityOwner(asc)?.name} used Heal Skill! Restored {healAmount} HP");
             }
             else
             {
                 // Direct heal
-                var health = ownerASC.AttributeSet.GetAttribute(EGameplayAttributeType.Health);
+                var health = asc.AttributeSet.GetAttribute(EGameplayAttributeType.Health);
                 if (health != null)
                 {
                     health.ModifyCurrentValue(healAmount);
-                    Debug.Log($"{owner.name} used Heal Skill! Restored {healAmount} HP");
+                    Debug.Log($"{GetAbilityOwner(asc)?.name} used Heal Skill! Restored {healAmount} HP");
                 }
             }
             
-            EndAbility();
+            EndAbility(asc);
         }
     }
 }

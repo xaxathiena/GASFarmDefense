@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Base class for all gameplay abilities (similar to UE's GameplayAbility)
@@ -11,42 +11,39 @@ namespace _Master.Base.Ability
         [Header("Ability Info")]
         public string abilityName;
         public string description;
-        
+
         [Header("Ability Properties")]
         public ScalableFloat cooldownDuration = new ScalableFloat();
         public ScalableFloat costAmount = new ScalableFloat();
         public bool canActivateWhileActive = false;
-        
-        [Header("Level")]
-        [Tooltip("Current level of this ability instance")]
-        public float abilityLevel = 1f;
-        
+
         [Header("Tags")]
         public string[] abilityTags;
         public string[] cancelAbilitiesWithTags;
         public string[] blockAbilitiesWithTags;
-        
-        protected AbilitySystemComponent ownerASC;
-        protected GameObject owner;
-        protected bool isActive = false;
-        
+
         /// <summary>
-        /// Check if the ability can be activated
+        /// Check if the ability can be activated using its resolved spec.
         /// </summary>
-        public virtual bool CanActivateAbility(AbilitySystemComponent asc)
+        public bool CanActivateAbility(AbilitySystemComponent asc)
         {
-            ownerASC = asc;
-            owner = asc.GetOwner();
-            
-            // Check if already active
-            if (isActive && !canActivateWhileActive)
+            var spec = asc?.GetAbilitySpec(this);
+            return CanActivateAbility(asc, spec);
+        }
+
+        public virtual bool CanActivateAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
+        {
+            if (asc == null || spec == null)
                 return false;
-            
-            // Check cooldown
+
+            if (spec.IsActive && !canActivateWhileActive)
+                return false;
+
             if (asc.IsAbilityOnCooldown(this))
                 return false;
-            
-            // Check cost (Mana from AttributeSet)
+
+            float abilityLevel = GetAbilityLevel(spec);
+
             float cost = costAmount.GetValueAtLevel(abilityLevel, asc);
             if (cost > 0f)
             {
@@ -56,100 +53,112 @@ namespace _Master.Base.Ability
                     return false;
                 }
             }
-            
-            // Check blocked tags
+
             if (asc.HasAnyTags(blockAbilitiesWithTags))
                 return false;
-            
+
             return true;
         }
-        
+
         /// <summary>
-        /// Activate the ability
+        /// Activate the ability.
         /// </summary>
-        public virtual void ActivateAbility(AbilitySystemComponent asc)
+        public void ActivateAbility(AbilitySystemComponent asc)
         {
-            if (!CanActivateAbility(asc))
+            var spec = asc?.GetAbilitySpec(this);
+            ActivateAbility(asc, spec);
+        }
+
+        public virtual void ActivateAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
+        {
+            if (!CanActivateAbility(asc, spec))
                 return;
-            
-            ownerASC = asc;
-            owner = asc.GetOwner();
-            isActive = true;
-            
-            // Cancel conflicting abilities
+
+            spec.SetActiveState(true);
+
             asc.CancelAbilitiesWithTags(cancelAbilitiesWithTags);
-            
-            // Add ability tags
             asc.AddTags(abilityTags);
-            
-            // Consume cost (Mana from AttributeSet)
-            float cost = costAmount.GetValueAtLevel(abilityLevel, ownerASC);
-            if (cost > 0f && ownerASC.AttributeSet != null)
+
+            float abilityLevel = GetAbilityLevel(spec);
+
+            float cost = costAmount.GetValueAtLevel(abilityLevel, asc);
+            if (cost > 0f && asc.AttributeSet != null)
             {
-                var manaAttr = ownerASC.AttributeSet.GetAttribute(EGameplayAttributeType.Mana);
+                var manaAttr = asc.AttributeSet.GetAttribute(EGameplayAttributeType.Mana);
                 if (manaAttr != null)
                 {
                     manaAttr.ModifyCurrentValue(-cost);
                 }
             }
-            
-            // Start cooldown
-            float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel, ownerASC);
+
+            float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel, asc);
             if (cooldown > 0)
+            {
                 asc.StartCooldown(this, cooldown);
-            
-            // Execute ability logic
-            OnAbilityActivated();
+            }
+
+            OnAbilityActivated(asc, spec);
         }
-        
+
         /// <summary>
-        /// Override this to implement ability logic
+        /// Override this to implement ability-specific logic.
         /// </summary>
-        protected virtual void OnAbilityActivated()
+        protected virtual void OnAbilityActivated(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
         }
-        
-        /// <summary>
-        /// End the ability
-        /// </summary>
-        public virtual void EndAbility()
+
+        public void EndAbility(AbilitySystemComponent asc)
         {
-            if (!isActive)
+            var spec = asc?.GetAbilitySpec(this);
+            EndAbility(asc, spec);
+        }
+
+        public virtual void EndAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
+        {
+            if (asc == null || spec == null || !spec.IsActive)
                 return;
-            
-            isActive = false;
-            
-            // Remove ability tags
-            if (ownerASC != null)
-                ownerASC.RemoveTags(abilityTags);
-            
-            OnAbilityEnded();
+
+            spec.SetActiveState(false);
+            asc.RemoveTags(abilityTags);
+            asc.NotifyAbilityEnded(this);
+
+            OnAbilityEnded(asc, spec);
         }
-        
-        /// <summary>
-        /// Override this for cleanup logic
-        /// </summary>
-        protected virtual void OnAbilityEnded()
+
+        protected virtual void OnAbilityEnded(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
         }
-        
-        /// <summary>
-        /// Cancel the ability
-        /// </summary>
-        public virtual void CancelAbility()
+
+        public virtual void CancelAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
-            if (!isActive)
+            if (asc == null || spec == null || !spec.IsActive)
                 return;
-            
-            OnAbilityCancelled();
-            EndAbility();
+
+            OnAbilityCancelled(asc, spec);
+            EndAbility(asc, spec);
         }
-        
-        /// <summary>
-        /// Override this for cancel logic
-        /// </summary>
-        protected virtual void OnAbilityCancelled()
+
+        protected virtual void OnAbilityCancelled(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
+        }
+
+        protected float GetAbilityLevel(AbilitySystemComponent asc)
+        {
+            if (asc == null)
+                return 1f;
+
+            var spec = asc.GetAbilitySpec(this);
+            return GetAbilityLevel(spec);
+        }
+
+        protected float GetAbilityLevel(GameplayAbilitySpec spec)
+        {
+            return spec?.Level ?? 1f;
+        }
+
+        protected GameObject GetAbilityOwner(AbilitySystemComponent asc)
+        {
+            return asc?.GetOwner();
         }
     }
 }

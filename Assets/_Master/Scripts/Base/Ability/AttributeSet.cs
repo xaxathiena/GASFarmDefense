@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Base class for attribute sets. Create your own attribute set by inheriting from this.

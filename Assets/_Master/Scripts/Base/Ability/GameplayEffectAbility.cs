@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Example ability that applies a gameplay effect
@@ -21,39 +21,46 @@ namespace _Master.Base.Ability
         [Tooltip("Layers to target")]
         public LayerMask targetLayers;
         
-        protected override void OnAbilityActivated()
+        protected override void OnAbilityActivated(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             if (effectToApply == null)
             {
                 Debug.LogWarning($"{abilityName} has no effect to apply!");
-                EndAbility();
+                EndAbility(asc);
                 return;
             }
             
             if (applyToSelf)
             {
                 // Apply to self
-                ownerASC.ApplyGameplayEffectToSelf(effectToApply, ownerASC);
+                asc.ApplyGameplayEffectToSelf(effectToApply, asc);
                 Debug.Log($"{abilityName} applied {effectToApply.effectName} to self");
             }
             else
             {
                 // Find target and apply
+                var owner = GetAbilityOwner(asc);
+                if (owner == null)
+                {
+                    EndAbility(asc);
+                    return;
+                }
+
                 Collider[] targets = Physics.OverlapSphere(owner.transform.position, targetRange, targetLayers);
                 
                 foreach (var targetCollider in targets)
                 {
                     var targetASC = targetCollider.GetComponent<AbilitySystemComponent>();
-                    if (targetASC != null && targetASC != ownerASC)
+                    if (targetASC != null && targetASC != asc)
                     {
-                        ownerASC.ApplyGameplayEffectToTarget(effectToApply, targetASC, ownerASC);
+                        asc.ApplyGameplayEffectToTarget(effectToApply, targetASC, asc);
                         Debug.Log($"{abilityName} applied {effectToApply.effectName} to {targetASC.gameObject.name}");
                     }
                 }
             }
             
             // End ability immediately
-            EndAbility();
+            EndAbility(asc);
         }
     }
 }

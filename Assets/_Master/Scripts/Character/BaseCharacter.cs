@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using _Master.Base.Ability;
+using GAS;
 using FD.Ability;
 using UnityEngine;
 

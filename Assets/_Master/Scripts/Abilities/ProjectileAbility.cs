@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using _Master.Base.Ability;
+using GAS;
 using FD.Character;
 using FD.Projectiles;
 using UnityEngine;
@@ -18,6 +18,7 @@ namespace FD.Ability
     {
         [Header("Projectile")]
         public GameObject projectilePrefab;
+        public GameplayEffect gameplayEffect;
         public float speed = 10f;
         public ProjectileMovementType movementType = ProjectileMovementType.Linear;
         public float arcHeight = 2f;
@@ -34,29 +35,30 @@ namespace FD.Ability
         public AudioClip onTravel;
         public AudioClip onHit;
 
-        protected override void OnAbilityActivated()
+        protected override void OnAbilityActivated(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
-            if (owner == null || projectilePrefab == null)
+            var abilityOwner = GetAbilityOwner(asc);
+            if (abilityOwner == null || projectilePrefab == null)
             {
-                EndAbility();
+                EndAbility(asc);
                 return;
             }
 
-            var character = owner.GetComponent<BaseCharacter>();
+            var character = abilityOwner.GetComponent<BaseCharacter>();
             if (character == null)
             {
-                EndAbility();
+                EndAbility(asc);
                 return;
             }
 
             List<Transform> targets = character.GetTargets();
             if (targets == null || targets.Count == 0)
             {
-                EndAbility();
+                EndAbility(asc);
                 return;
             }
 
-            Transform firePoint = muzzleTransform != null ? muzzleTransform : owner.transform;
+            Transform firePoint = muzzleTransform != null ? muzzleTransform : abilityOwner.transform;
 
             foreach (var target in targets)
             {
@@ -82,10 +84,10 @@ namespace FD.Ability
                     projectile = projectileObject.AddComponent<ProjectileBase>();
                 }
 
-                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit);
+                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect);
             }
 
-            EndAbility();
+            EndAbility(asc);
         }
     }
 }

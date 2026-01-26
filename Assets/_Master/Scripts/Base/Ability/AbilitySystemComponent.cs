@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Component that manages abilities for a GameObject (similar to UE's AbilitySystemComponent)
@@ -13,6 +13,9 @@ namespace _Master.Base.Ability
 
         [Header("Abilities")]
         [SerializeField] private List<GameplayAbility> grantedAbilities = new List<GameplayAbility>();
+
+        private readonly List<GameplayAbilitySpec> abilitySpecs = new List<GameplayAbilitySpec>();
+        private readonly Dictionary<GameplayAbility, GameplayAbilitySpec> specLookup = new Dictionary<GameplayAbility, GameplayAbilitySpec>();
 
         // Runtime data
         private HashSet<string> activeTags = new HashSet<string>();
@@ -49,12 +52,53 @@ namespace _Master.Base.Ability
             return owner;
         }
         /// <summary>
-        /// Grant an ability to this component
+        /// Grant an ability to this component with a specific starting level.
         /// </summary>
-        public void GiveAbility(GameplayAbility ability)
+        public GameplayAbilitySpec GiveAbility(GameplayAbility ability, float level = 1f)
         {
+            if (ability == null)
+            {
+                Debug.LogWarning("Cannot grant a null ability.");
+                return null;
+            }
+
+            if (specLookup.TryGetValue(ability, out var existingSpec))
+            {
+                existingSpec.SetLevel(level);
+                return existingSpec;
+            }
+
+            var spec = new GameplayAbilitySpec(ability, level);
+            abilitySpecs.Add(spec);
+            specLookup[ability] = spec;
+
             if (!grantedAbilities.Contains(ability))
+            {
                 grantedAbilities.Add(ability);
+            }
+
+            return spec;
+        }
+
+        /// <summary>
+        /// Try to fetch an existing runtime spec for the provided ability definition.
+        /// </summary>
+        public GameplayAbilitySpec GetAbilitySpec(GameplayAbility ability)
+        {
+            if (ability == null)
+                return null;
+
+            specLookup.TryGetValue(ability, out var spec);
+            return spec;
+        }
+
+        /// <summary>
+        /// Force-set the level for an already granted ability.
+        /// </summary>
+        public void SetAbilityLevel(GameplayAbility ability, float level)
+        {
+            var spec = GetAbilitySpec(ability);
+            spec?.SetLevel(level);
         }
 
         /// <summary>
@@ -62,16 +106,36 @@ namespace _Master.Base.Ability
         /// </summary>
         public bool TryActivateAbility(GameplayAbility ability)
         {
-            if (!grantedAbilities.Contains(ability))
+            var spec = GetAbilitySpec(ability);
+            if (spec == null)
             {
-                Debug.LogWarning($"Ability {ability.abilityName} is not granted to {gameObject.name}");
+                Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {gameObject.name}");
                 return false;
             }
 
-            if (ability.CanActivateAbility(this))
+            return TryActivateAbility(spec);
+        }
+
+        /// <summary>
+        /// Try to activate a specific ability spec instance.
+        /// </summary>
+        public bool TryActivateAbility(GameplayAbilitySpec spec)
+        {
+            if (spec == null || spec.Definition == null)
             {
-                ability.ActivateAbility(this);
-                activeAbilities.Add(ability);
+                Debug.LogWarning($"Invalid ability spec on {gameObject.name}");
+                return false;
+            }
+
+            var ability = spec.Definition;
+
+            if (ability.CanActivateAbility(this, spec))
+            {
+                ability.ActivateAbility(this, spec);
+                if (!activeAbilities.Contains(ability))
+                {
+                    activeAbilities.Add(ability);
+                }
                 return true;
             }
 
@@ -83,10 +147,10 @@ namespace _Master.Base.Ability
         /// </summary>
         public bool TryActivateAbilityByIndex(int index)
         {
-            if (index < 0 || index >= grantedAbilities.Count)
+            if (index < 0 || index >= abilitySpecs.Count)
                 return false;
 
-            return TryActivateAbility(grantedAbilities[index]);
+            return TryActivateAbility(abilitySpecs[index]);
         }
 
         /// <summary>
@@ -94,10 +158,16 @@ namespace _Master.Base.Ability
         /// </summary>
         public void CancelAbility(GameplayAbility ability)
         {
-            if (activeAbilities.Contains(ability))
+            if (ability == null)
+                return;
+
+            var spec = GetAbilitySpec(ability);
+            if (spec == null)
+                return;
+
+            if (spec.IsActive)
             {
-                ability.CancelAbility();
-                activeAbilities.Remove(ability);
+                ability.CancelAbility(this, spec);
             }
         }
 
@@ -116,6 +186,17 @@ namespace _Master.Base.Ability
             foreach (var ability in abilitiesToCancel)
             {
                 CancelAbility(ability);
+            }
+        }
+
+        internal void NotifyAbilityEnded(GameplayAbility ability)
+        {
+            if (ability == null)
+                return;
+
+            if (activeAbilities.Contains(ability))
+            {
+                activeAbilities.Remove(ability);
             }
         }
 
@@ -215,6 +296,9 @@ namespace _Master.Base.Ability
         /// </summary>
         public bool IsAbilityOnCooldown(GameplayAbility ability)
         {
+            if (ability == null)
+                return false;
+
             return abilityCooldowns.ContainsKey(ability) && abilityCooldowns[ability] > 0;
         }
 
@@ -223,6 +307,9 @@ namespace _Master.Base.Ability
         /// </summary>
         public float GetAbilityCooldownRemaining(GameplayAbility ability)
         {
+            if (ability == null)
+                return 0f;
+
             if (abilityCooldowns.TryGetValue(ability, out float remaining))
                 return remaining;
             return 0f;

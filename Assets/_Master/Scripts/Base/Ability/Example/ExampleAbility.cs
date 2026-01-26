@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Example ability implementation - Deal damage in area
@@ -13,8 +13,15 @@ namespace _Master.Base.Ability
         public float radius = 5f;
         public LayerMask targetLayers;
         
-        protected override void OnAbilityActivated()
+        protected override void OnAbilityActivated(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
+            var owner = GetAbilityOwner(asc);
+            if (owner == null)
+            {
+                EndAbility(asc);
+                return;
+            }
+
             Debug.Log($"{abilityName} activated by {owner.name}!");
             
             // Example: Deal damage to all enemies in radius
@@ -32,15 +39,15 @@ namespace _Master.Base.Ability
             }
             
             // End ability immediately (instant cast)
-            EndAbility();
+            EndAbility(asc);
         }
-        
-        protected override void OnAbilityEnded()
+
+        protected override void OnAbilityEnded(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             Debug.Log($"{abilityName} ended!");
         }
-        
-        protected override void OnAbilityCancelled()
+
+        protected override void OnAbilityCancelled(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             Debug.Log($"{abilityName} cancelled!");
         }

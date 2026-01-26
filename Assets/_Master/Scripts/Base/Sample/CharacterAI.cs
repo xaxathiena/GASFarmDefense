@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using _Master.Base.Ability;
 
-namespace _Master.Sample
+namespace GAS.Sample
 {
     /// <summary>
     /// Character AI controller using FSM (Finite State Machine)

@@ -1,5 +1,5 @@
 using System;
-using _Master.Base.Ability;
+using GAS;
 using UnityEngine;
 namespace FD.Ability
 {

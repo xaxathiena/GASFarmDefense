@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Example attribute set with common RPG attributes

@@ -1,7 +1,6 @@
 using UnityEngine;
-using _Master.Base.Ability;
 
-namespace _Master.Sample
+namespace GAS.Sample
 {
     /// <summary>
     /// Normal attack ability - Attacks nearest enemy
@@ -22,15 +21,22 @@ namespace _Master.Sample
         [Tooltip("Damage effect to apply")]
         public GameplayEffect damageEffect;
         
-        protected override void OnAbilityActivated()
+        protected override void OnAbilityActivated(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
+            var owner = GetAbilityOwner(asc);
+            if (owner == null)
+            {
+                EndAbility(asc);
+                return;
+            }
+
             // Find nearest enemy
             Collider[] enemies = Physics.OverlapSphere(owner.transform.position, attackRange, enemyLayers);
             
             if (enemies.Length == 0)
             {
                 Debug.Log($"{owner.name}: No enemies in range!");
-                EndAbility();
+                EndAbility(asc);
                 return;
             }
             
@@ -61,7 +67,7 @@ namespace _Master.Sample
                     // Apply damage effect
                     if (damageEffect != null)
                     {
-                        ownerASC.ApplyGameplayEffectToTarget(damageEffect, targetASC, ownerASC);
+                        asc.ApplyGameplayEffectToTarget(damageEffect, targetASC, asc);
                         Debug.Log($"{owner.name} attacked {nearestEnemy.name} for {damage} damage!");
                     }
                     else
@@ -77,7 +83,7 @@ namespace _Master.Sample
                 }
             }
             
-            EndAbility();
+            EndAbility(asc);
         }
     }
 }

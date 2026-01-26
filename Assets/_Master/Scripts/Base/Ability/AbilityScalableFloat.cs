@@ -3,13 +3,13 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// A float value that can scale based on level using AnimationCurve (similar to UE's FScalableFloat)
     /// </summary>
     [Serializable]
-    [MovedFrom(true, null, "_Master.Base.Ability", "AbilityScalableFloat")]
+    [MovedFrom(true, null, "GAS", "AbilityScalableFloat")]
     public class ScalableFloat
     {
         [SerializeField] private ScalingMode scalingMode = ScalingMode.FlatValue;
@@ -48,26 +48,29 @@ namespace _Master.Base.Ability
         /// </summary>
         public float GetValueAtLevel(float level, AbilitySystemComponent ownerAsc = null)
         {
+            float baseValue = flatValue;
+            
             switch (scalingMode)
             {
                 case ScalingMode.FlatValue:
-                    return flatValue;
+                    return baseValue;
                 
                 case ScalingMode.Curve:
                     EnsureCurveFromCsv(false);
-                    return scalingCurve.Evaluate(level);
+                    float curveValue = scalingCurve.Evaluate(level);
+                    return baseValue * curveValue;
 
                 case ScalingMode.Attribute:
                     if (ownerAsc != null && ownerAsc.AttributeSet != null)
                     {
                         var attribute = ownerAsc.AttributeSet.GetAttribute(attributeType);
                         if (attribute != null)
-                            return attribute.CurrentValue;
+                            return baseValue * attribute.CurrentValue;
                     }
                     return 0f;
                 
                 default:
-                    return flatValue;
+                    return baseValue;
             }
         }
         

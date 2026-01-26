@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace _Master.Base.Ability
+namespace GAS
 {
     /// <summary>
     /// Runtime instance of an active gameplay effect
