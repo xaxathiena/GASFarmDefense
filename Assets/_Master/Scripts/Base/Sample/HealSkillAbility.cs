@@ -21,7 +21,8 @@ namespace _Master.Sample
             if (healEffect != null)
             {
                 // Apply heal effect
-                asc.ApplyGameplayEffectToSelf(healEffect, asc);
+                float effectLevel = spec?.Level ?? 1f;
+                asc.ApplyGameplayEffectToSelf(healEffect, asc, effectLevel);
                 Debug.Log($"{GetAbilityOwner(asc)?.name} used Heal Skill! Restored {healAmount} HP");
             }
             else

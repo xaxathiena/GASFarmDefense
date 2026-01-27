@@ -15,6 +15,7 @@ namespace GAS
         public float StartTime { get; private set; }
         public float Duration { get; private set; }
         public int StackCount { get; private set; }
+        public float Level { get; private set; } = 1f;
         
         // For periodic effects
         private float periodicTimer;
@@ -27,13 +28,14 @@ namespace GAS
         public event Action<ActiveGameplayEffect> OnEffectExpired;
         public event Action<ActiveGameplayEffect> OnEffectRemoved;
         
-        public ActiveGameplayEffect(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target)
+        public ActiveGameplayEffect(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target, float level)
         {
             Effect = effect;
             Source = source;
             Target = target;
             StartTime = Time.time;
             StackCount = 1;
+            Level = Mathf.Max(1f, level);
             
             // Set duration based on effect type
             switch (effect.durationType)
@@ -52,6 +54,13 @@ namespace GAS
             // Setup periodic
             isPeriodic = effect.isPeriodic;
             period = effect.period;
+
+            if (!isPeriodic && period > 0f && effect.durationType != EGameplayEffectDurationType.Instant)
+            {
+                isPeriodic = true;
+                Debug.LogWarning($"GameplayEffect '{effect.name}' has a period value but 'Is Periodic' was disabled. Automatically enabling periodic execution.");
+            }
+
             periodicTimer = period;
         }
         
@@ -85,10 +94,12 @@ namespace GAS
         /// </summary>
         private void ExecutePeriodic()
         {
-            if (Target.AttributeSet != null)
+            if (Target?.AttributeSet == null)
             {
-                Effect.ApplyModifiers(Target.AttributeSet, StackCount);
+                return;
             }
+
+            Effect.ApplyModifiers(Target.AttributeSet, Source, Target, Level, StackCount);
         }
         
         /// <summary>

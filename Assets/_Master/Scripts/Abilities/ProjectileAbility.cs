@@ -60,6 +60,8 @@ namespace FD.Ability
 
             Transform firePoint = muzzleTransform != null ? muzzleTransform : abilityOwner.transform;
 
+            float effectLevel = spec?.Level ?? 1f;
+
             foreach (var target in targets)
             {
                 if (target == null)
@@ -84,7 +86,7 @@ namespace FD.Ability
                     projectile = projectileObject.AddComponent<ProjectileBase>();
                 }
 
-                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect);
+                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect, effectLevel);
             }
 
             EndAbility(asc);

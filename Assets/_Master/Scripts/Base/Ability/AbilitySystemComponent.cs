@@ -322,15 +322,15 @@ namespace GAS
         /// <summary>
         /// Apply a gameplay effect to this component
         /// </summary>
-        public ActiveGameplayEffect ApplyGameplayEffectToSelf(GameplayEffect effect, AbilitySystemComponent source = null)
+        public ActiveGameplayEffect ApplyGameplayEffectToSelf(GameplayEffect effect, AbilitySystemComponent source = null, float effectLevel = 1f)
         {
-            return ApplyGameplayEffectToTarget(effect, this, source ?? this);
+            return ApplyGameplayEffectToTarget(effect, this, source ?? this, effectLevel);
         }
 
         /// <summary>
         /// Apply a gameplay effect to a target
         /// </summary>
-        public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source)
+        public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source, float effectLevel = 1f)
         {
             if (effect == null || target == null)
                 return null;
@@ -357,7 +357,7 @@ namespace GAS
             }
 
             // Create active effect
-            var activeEffect = new ActiveGameplayEffect(effect, source, target);
+            var activeEffect = new ActiveGameplayEffect(effect, source, target, effectLevel);
 
             // Apply tags
             if (effect.grantedTags != null && effect.grantedTags.Length > 0)
@@ -376,7 +376,7 @@ namespace GAS
             {
                 if (target.AttributeSet != null)
                 {
-                    effect.ApplyModifiers(target.AttributeSet, activeEffect.StackCount);
+                    effect.ApplyModifiers(target.AttributeSet, source, target, effectLevel, activeEffect.StackCount);
                 }
 
                 Debug.Log($"Applied instant effect {effect.effectName} to {target.gameObject.name}");
@@ -386,7 +386,7 @@ namespace GAS
             // Apply initial modifiers for non-periodic duration/infinite effects
             if (!effect.isPeriodic && target.AttributeSet != null)
             {
-                effect.ApplyModifiers(target.AttributeSet, activeEffect.StackCount);
+                effect.ApplyModifiers(target.AttributeSet, source, target, effectLevel, activeEffect.StackCount);
             }
 
             // Subscribe to expiration

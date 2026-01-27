@@ -67,7 +67,8 @@ namespace GAS.Sample
                     // Apply damage effect
                     if (damageEffect != null)
                     {
-                        asc.ApplyGameplayEffectToTarget(damageEffect, targetASC, asc);
+                        float effectLevel = spec?.Level ?? 1f;
+                        asc.ApplyGameplayEffectToTarget(damageEffect, targetASC, asc, effectLevel);
                         Debug.Log($"{owner.name} attacked {nearestEnemy.name} for {damage} damage!");
                     }
                     else

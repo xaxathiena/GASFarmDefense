@@ -30,10 +30,12 @@ namespace GAS
                 return;
             }
             
+            float effectLevel = spec?.Level ?? 1f;
+
             if (applyToSelf)
             {
                 // Apply to self
-                asc.ApplyGameplayEffectToSelf(effectToApply, asc);
+                asc.ApplyGameplayEffectToSelf(effectToApply, asc, effectLevel);
                 Debug.Log($"{abilityName} applied {effectToApply.effectName} to self");
             }
             else
@@ -53,7 +55,7 @@ namespace GAS
                     var targetASC = targetCollider.GetComponent<AbilitySystemComponent>();
                     if (targetASC != null && targetASC != asc)
                     {
-                        asc.ApplyGameplayEffectToTarget(effectToApply, targetASC, asc);
+                        asc.ApplyGameplayEffectToTarget(effectToApply, targetASC, asc, effectLevel);
                         Debug.Log($"{abilityName} applied {effectToApply.effectName} to {targetASC.gameObject.name}");
                     }
                 }

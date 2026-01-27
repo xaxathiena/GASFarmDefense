@@ -23,6 +23,7 @@ namespace FD.Projectiles
         private AudioSource travelSource;
         private GameplayEffect gameplayEffect;
         private AbilitySystemComponent sourceASC;
+        private float effectLevel = 1f;
 
         public void Initialize(
             Transform target,
@@ -35,7 +36,8 @@ namespace FD.Projectiles
             AudioClip onTravel,
             AudioClip onHit,
             AbilitySystemComponent sourceASC,
-            GameplayEffect gameplayEffect)
+            GameplayEffect gameplayEffect,
+            float effectLevel)
         {
             this.target = target;
             this.speed = Mathf.Max(0.01f, speed);
@@ -48,6 +50,7 @@ namespace FD.Projectiles
             this.onHit = onHit;
             this.gameplayEffect = gameplayEffect;
             this.sourceASC = sourceASC;
+            this.effectLevel = Mathf.Max(1f, effectLevel);
             startPosition = transform.position;
             targetPosition = target != null ? target.position : startPosition + transform.forward * 5f;
 
@@ -150,7 +153,7 @@ namespace FD.Projectiles
                 var targetAsc = target.GetAbilitySystemComponent();
                 if (targetAsc != null)
                 {
-                   targetAsc.ApplyGameplayEffectToSelf(gameplayEffect, sourceASC);
+                   targetAsc.ApplyGameplayEffectToSelf(gameplayEffect, sourceASC, effectLevel);
                 }
             }
             Destroy(gameObject);

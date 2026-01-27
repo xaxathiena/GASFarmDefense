@@ -1,3 +1,4 @@
+using GAS;
 using UnityEngine;
 
 namespace FD.Character
@@ -8,10 +9,13 @@ namespace FD.Character
         [SerializeField] protected float detectionRange = 10f;
         [SerializeField] protected float attackRange = 2f;
         [SerializeField] protected Transform target;
+        [Header("UI References")]
+        [SerializeField] private DamagePopupManager damagePopupManager;
 
         protected override void Awake()
         {
             base.Awake();
+            ResolveDamagePopupManager();
             // Enemy specific initialization
         }
 
@@ -54,6 +58,35 @@ namespace FD.Character
         protected virtual void Attack()
         {
             // Attack logic
+        }
+
+        protected override void HandleAttributeChanged(AttributeChangeInfo changeInfo)
+        {
+            base.HandleAttributeChanged(changeInfo);
+
+            if (changeInfo.AttributeType == EGameplayAttributeType.Health && changeInfo.ChangeAmount < 0f)
+            {
+                var popup = ResolveDamagePopupManager();
+                if (popup != null)
+                {
+                    popup.ShowDamage(transform, Mathf.Abs(changeInfo.ChangeAmount));
+                }
+            }
+        }
+
+        private DamagePopupManager ResolveDamagePopupManager()
+        {
+            if (damagePopupManager != null)
+            {
+                return damagePopupManager;
+            }
+
+#if UNITY_2023_1_OR_NEWER
+            damagePopupManager = FindFirstObjectByType<DamagePopupManager>();
+#else
+            damagePopupManager = FindObjectOfType<DamagePopupManager>();
+#endif
+            return damagePopupManager;
         }
 
         public void SetTarget(Transform newTarget)
