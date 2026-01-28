@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using GAS;
 using FD.Character;
+using FD.Core;
 using FD.Projectiles;
+using GAS;
 using UnityEngine;
 
 namespace FD.Ability
@@ -79,7 +80,7 @@ namespace FD.Ability
                     AudioSource.PlayClipAtPoint(onSpawn, firePoint.position);
                 }
 
-                var projectileObject = Object.Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+                var projectileObject = PoolManager.Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
                 var projectile = projectileObject.GetComponent<ProjectileBase>();
                 if (projectile == null)
                 {

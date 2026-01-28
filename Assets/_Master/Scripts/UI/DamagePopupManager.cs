@@ -1,3 +1,4 @@
+using FD.Core;
 using UnityEngine;
 
 public class DamagePopupManager : MonoBehaviour
@@ -34,7 +35,7 @@ public class DamagePopupManager : MonoBehaviour
             return;
         }
 
-        var popupInstance = Instantiate(popupPrefab, popupRoot);
+        var popupInstance = PoolManager.Instantiate(popupPrefab, popupRoot);
         var canvas = cachedCanvas != null ? cachedCanvas : popupRoot.GetComponentInParent<Canvas>();
         var canvasCamera = canvas != null && canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : cam;
 
@@ -44,7 +45,7 @@ public class DamagePopupManager : MonoBehaviour
         }
         else
         {
-            Destroy(popupInstance.gameObject);
+            PoolManager.Destroy(popupInstance.gameObject);
         }
     }
 }

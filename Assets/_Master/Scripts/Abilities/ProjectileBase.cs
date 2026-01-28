@@ -1,6 +1,7 @@
-using UnityEngine;
 using FD.Ability;
+using FD.Core;
 using GAS;
+using UnityEngine;
 
 namespace FD.Projectiles
 {
@@ -57,15 +58,7 @@ namespace FD.Projectiles
             float distance = Vector3.Distance(startPosition, targetPosition);
             travelTime = distance / this.speed;
 
-            if (onTravel != null)
-            {
-                travelSource = gameObject.AddComponent<AudioSource>();
-                travelSource.clip = onTravel;
-                travelSource.loop = true;
-                travelSource.playOnAwake = false;
-                travelSource.spatialBlend = 1f;
-                travelSource.Play();
-            }
+            ConfigureTravelAudio(onTravel);
         }
 
         private void Update()
@@ -73,7 +66,7 @@ namespace FD.Projectiles
             elapsed += Time.deltaTime;
             if (elapsed >= lifeTime)
             {
-                Destroy(gameObject);
+                ReturnToPool();
                 return;
             }
 
@@ -156,7 +149,44 @@ namespace FD.Projectiles
                    targetAsc.ApplyGameplayEffectToSelf(gameplayEffect, sourceASC, effectLevel);
                 }
             }
-            Destroy(gameObject);
+            ReturnToPool();
+        }
+
+        private void ConfigureTravelAudio(AudioClip clip)
+        {
+            if (clip == null)
+            {
+                if (travelSource != null)
+                {
+                    travelSource.Stop();
+                    travelSource.clip = null;
+                }
+                return;
+            }
+
+            if (travelSource == null)
+            {
+                travelSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            travelSource.clip = clip;
+            travelSource.loop = true;
+            travelSource.playOnAwake = false;
+            travelSource.spatialBlend = 1f;
+            travelSource.Play();
+        }
+
+        private void ReturnToPool()
+        {
+            if (travelSource != null)
+            {
+                travelSource.Stop();
+                travelSource.clip = null;
+            }
+
+            elapsed = 0f;
+            target = null;
+            PoolManager.Destroy(gameObject);
         }
     }
 }

@@ -1,5 +1,6 @@
 
 using DG.Tweening;
+using FD.Core;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -58,7 +59,7 @@ public class DamagePopupUI : MonoBehaviour
         activeSequence = DOTween.Sequence();
         activeSequence.Append(rectTransform.DOAnchorPos(targetPosition, lifetime).SetEase(moveEase));
         activeSequence.Join(canvasGroup.DOFade(0f, lifetime).SetEase(fadeEase));
-        activeSequence.OnComplete(() => Destroy(gameObject));
+        activeSequence.OnComplete(() => PoolManager.Destroy(gameObject));
     }
 
     private IEnumerator AnimateFallback(Vector2 startPosition, Vector2 targetPosition, float lifetime)
@@ -81,6 +82,6 @@ public class DamagePopupUI : MonoBehaviour
 
         rectTransform.anchoredPosition = targetPosition;
         canvasGroup.alpha = 0f;
-        Destroy(gameObject);
+        PoolManager.Destroy(gameObject);
     }
 }
