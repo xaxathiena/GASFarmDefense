@@ -15,7 +15,7 @@ namespace FD.Ability
     }
 
     [CreateAssetMenu(fileName = "ProjectileAbility", menuName = "GAS/Abilities/Projectile Ability")]
-    public class ProjectileAbility : GameplayAbility
+    public class ProjectileAbility : FDGameplayAbility
     {
         [Header("Projectile")]
         public GameObject projectilePrefab;
@@ -87,7 +87,7 @@ namespace FD.Ability
                     projectile = projectileObject.AddComponent<ProjectileBase>();
                 }
 
-                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect, effectLevel);
+                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect, spec, effectLevel, this);
             }
 
             EndAbility(asc);

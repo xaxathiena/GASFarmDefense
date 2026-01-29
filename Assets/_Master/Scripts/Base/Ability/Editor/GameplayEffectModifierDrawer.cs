@@ -30,7 +30,7 @@ namespace GAS.Editor
 
             // Magnitude Calculation section
             totalHeight += LineHeight + VerticalSpacing; // header label
-            totalHeight += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("calculationType"), true) + VerticalSpacing; // calculation type field
+            totalHeight += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("calculationType"), true) + VerticalSpacing * 3; // calculation type field
 
             SerializedProperty calculationTypeProp = property.FindPropertyRelative("calculationType");
             var calculationType = (EModifierCalculationType)calculationTypeProp.enumValueIndex;
@@ -53,7 +53,9 @@ namespace GAS.Editor
                     break;
 
                 case EModifierCalculationType.CustomCalculationClass:
-                    totalHeight += LineHeight * 2 + VerticalSpacing; // Info box (2 lines)
+                    SerializedProperty customCalculationProp = property.FindPropertyRelative("customCalculation");
+                    totalHeight += EditorGUI.GetPropertyHeight(customCalculationProp, true) + VerticalSpacing;
+                    totalHeight += LineHeight * 2 + VerticalSpacing; // Info/help box height
                     break;
 
                 case EModifierCalculationType.SetByCaller:
@@ -94,6 +96,7 @@ namespace GAS.Editor
             SerializedProperty preMultiplyAdditiveValueProp = property.FindPropertyRelative("preMultiplyAdditiveValue");
             SerializedProperty postMultiplyAdditiveValueProp = property.FindPropertyRelative("postMultiplyAdditiveValue");
             SerializedProperty setByCallerTagProp = property.FindPropertyRelative("setByCallerTag");
+            SerializedProperty customCalculationProp = property.FindPropertyRelative("customCalculation");
 
             // Target section
             currentRect.y += LineHeight + VerticalSpacing;
@@ -130,7 +133,7 @@ namespace GAS.Editor
                     break;
 
                 case EModifierCalculationType.AttributeBased:
-                    currentRect.y += LineHeight + VerticalSpacing;
+                    currentRect.y += LineHeight*2.5f + VerticalSpacing;
                     float backingHeight = EditorGUI.GetPropertyHeight(backingAttributeProp, true);
                     currentRect.height = backingHeight;
                     EditorGUI.PropertyField(currentRect, backingAttributeProp, new GUIContent("Backing Attribute"), true);
@@ -153,14 +156,24 @@ namespace GAS.Editor
                     break;
 
                 case EModifierCalculationType.CustomCalculationClass:
-                    currentRect.y += LineHeight + VerticalSpacing;
-                    currentRect.height = LineHeight * 2;
-                    EditorGUI.HelpBox(currentRect, "Custom calculation classes not yet implemented", MessageType.Info);
+                    currentRect.y += LineHeight*2 + VerticalSpacing;
+                    currentRect.height = EditorGUI.GetPropertyHeight(customCalculationProp, true);
+                    EditorGUI.PropertyField(currentRect, customCalculationProp, new GUIContent("Custom Calculation"), true);
+
+                    currentRect.y += currentRect.height + VerticalSpacing;
+                    currentRect.height = LineHeight;
+
+                    bool hasCalculation = customCalculationProp.objectReferenceValue != null;
+                    string infoText = hasCalculation
+                        ? "Selected calculation asset will determine the final magnitude."
+                        : "Assign a DamageCalculation asset (e.g., WC3DamageCalculation).";
+                    MessageType infoType = hasCalculation ? MessageType.Info : MessageType.Warning;
+                    EditorGUI.HelpBox(currentRect, infoText, infoType);
                     break;
 
                 case EModifierCalculationType.SetByCaller:
-                    currentRect.y += LineHeight + VerticalSpacing;
-                    currentRect.height = LineHeight;
+                    currentRect.y += LineHeight * 3 + VerticalSpacing;
+                    currentRect.height = LineHeight * 4;
                     EditorGUI.PropertyField(currentRect, setByCallerTagProp, new GUIContent("Gameplay Tag"));
                     break;
             }

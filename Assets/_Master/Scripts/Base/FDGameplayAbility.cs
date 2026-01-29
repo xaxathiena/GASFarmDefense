@@ -17,14 +17,10 @@ namespace FD.Ability
         [Tooltip("Base damage of this ability")]
         public ScalableFloat baseDamage = new ScalableFloat();
         
-        [Header("Effect")]
-        [Tooltip("GameplayEffect to apply when ability activates")]
-        public GameplayEffect effectToApply;
-        
         /// <summary>
         /// Create FD-specific context for this ability
         /// </summary>
-        protected virtual FDGameplayEffectContext CreateFDContext(AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
+        protected override GameplayEffectContext CreateFDContext(AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
         {
             float level = GetAbilityLevel(spec);
             
@@ -41,40 +37,6 @@ namespace FD.Ability
             return context;
         }
         
-        /// <summary>
-        /// Apply effect with FD context
-        /// </summary>
-        protected void ApplyEffectWithContext(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
-        {
-            if (effect == null)
-            {
-                Debug.LogWarning($"[{abilityName}] No effect to apply!");
-                return;
-            }
-            
-            // Create FD context
-            var context = CreateFDContext(source, target, spec);
-            
-            // Set as current context for calculation pipeline
-            context.MakeCurrent();
-            
-            try
-            {
-                // Apply effect with context
-                effect.ApplyModifiers(
-                    target.AttributeSet,
-                    source,
-                    target,
-                    context.Level,
-                    context.StackCount
-                );
-            }
-            finally
-            {
-                // Always clear context
-                GameplayEffectContext.ClearCurrent();
-            }
-        }
         
         /// <summary>
         /// Override to use FD context when applying effects

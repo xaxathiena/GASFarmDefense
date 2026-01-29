@@ -24,7 +24,9 @@ namespace FD.Projectiles
         private AudioSource travelSource;
         private GameplayEffect gameplayEffect;
         private AbilitySystemComponent sourceASC;
+        private GameplayAbilitySpec spec;
         private float effectLevel = 1f;
+        private FDGameplayAbility owningAbility;
 
         public void Initialize(
             Transform target,
@@ -38,7 +40,9 @@ namespace FD.Projectiles
             AudioClip onHit,
             AbilitySystemComponent sourceASC,
             GameplayEffect gameplayEffect,
-            float effectLevel)
+            GameplayAbilitySpec spec,
+            float effectLevel,
+            FDGameplayAbility owningAbility)
         {
             this.target = target;
             this.speed = Mathf.Max(0.01f, speed);
@@ -51,7 +55,9 @@ namespace FD.Projectiles
             this.onHit = onHit;
             this.gameplayEffect = gameplayEffect;
             this.sourceASC = sourceASC;
+            this.spec = spec;
             this.effectLevel = Mathf.Max(1f, effectLevel);
+            this.owningAbility = owningAbility;
             startPosition = transform.position;
             targetPosition = target != null ? target.position : startPosition + transform.forward * 5f;
 
@@ -146,7 +152,14 @@ namespace FD.Projectiles
                 var targetAsc = target.GetAbilitySystemComponent();
                 if (targetAsc != null)
                 {
-                   targetAsc.ApplyGameplayEffectToSelf(gameplayEffect, sourceASC, effectLevel);
+                    if (owningAbility != null)
+                    {
+                        owningAbility.ApplyEffectToTarget(gameplayEffect, sourceASC, targetAsc, spec);
+                    }
+                    else
+                    {
+                        targetAsc.ApplyGameplayEffectToSelf(gameplayEffect, sourceASC, effectLevel);
+                    }
                 }
             }
             ReturnToPool();

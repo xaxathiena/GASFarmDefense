@@ -11,11 +11,8 @@ namespace FD.Ability
     public class DamageTypeModifierTable : ScriptableObject
     {
         [System.Serializable]
-        public class TypeModifierEntry
+        public class ArmorModifierEntry
         {
-            [Tooltip("Loại damage (từ ability)")]
-            public EDamageType attackType;
-            
             [Tooltip("Loại giáp (từ character)")]
             public EArmorType armorType;
             
@@ -23,21 +20,34 @@ namespace FD.Ability
             [Tooltip("Hệ số nhân damage (0.35 = 35%, 1.0 = 100%, 2.0 = 200%)")]
             public float modifier = 1f;
         }
+
+        [System.Serializable]
+        public class AttackTypeGroup
+        {
+            [Tooltip("Loại damage (từ ability)")]
+            public EDamageType attackType;
+            
+            [Tooltip("Các modifier theo từng loại giáp")]
+            public List<ArmorModifierEntry> armorModifiers = new List<ArmorModifierEntry>();
+        }
         
         [Header("Type Modifier Table")]
-        [Tooltip("Bảng khắc hệ theo Warcraft 3")]
-        public List<TypeModifierEntry> modifiers = new List<TypeModifierEntry>();
+        [Tooltip("Bảng khắc hệ theo Warcraft 3, được nhóm theo Attack Type")]
+        public List<AttackTypeGroup> groups = new List<AttackTypeGroup>();
         
         /// <summary>
         /// Get modifier for attack type vs armor type combination
         /// </summary>
         public float GetModifier(EDamageType attackType, EArmorType armorType)
         {
-            var entry = modifiers.Find(x => 
-                x.attackType == attackType && x.armorType == armorType);
+            var group = groups.Find(g => g.attackType == attackType);
             
-            if (entry != null)
-                return entry.modifier;
+            if (group != null)
+            {
+                var entry = group.armorModifiers.Find(x => x.armorType == armorType);
+                if (entry != null)
+                    return entry.modifier;
+            }
             
             // Default to 1.0 (100% damage) if not found
             Debug.LogWarning($"No modifier found for {attackType} vs {armorType}, using 1.0");
@@ -50,7 +60,7 @@ namespace FD.Ability
         [ContextMenu("Initialize Default WC3 Table")]
         public void InitializeDefaultTable()
         {
-            modifiers.Clear();
+            groups.Clear();
             
             // Normal vs...
             AddModifier(EDamageType.Normal, EArmorType.Light, 1.0f);
@@ -99,7 +109,7 @@ namespace FD.Ability
             AddModifier(EDamageType.Hero, EArmorType.Hero, 1.0f);
             AddModifier(EDamageType.Hero, EArmorType.Unarmored, 1.0f);
             
-            Debug.Log($"[DamageTypeTable] Initialized with {modifiers.Count} entries");
+            Debug.Log($"[DamageTypeTable] Initialized with {groups.Count} entries");
             
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
@@ -108,12 +118,23 @@ namespace FD.Ability
         
         private void AddModifier(EDamageType attack, EArmorType armor, float modifier)
         {
-            modifiers.Add(new TypeModifierEntry
+            var group = GetOrCreateGroup(attack);
+            group.armorModifiers.Add(new ArmorModifierEntry
             {
-                attackType = attack,
                 armorType = armor,
                 modifier = modifier
             });
+        }
+
+        private AttackTypeGroup GetOrCreateGroup(EDamageType attackType)
+        {
+            var group = groups.Find(g => g.attackType == attackType);
+            if (group == null)
+            {
+                group = new AttackTypeGroup { attackType = attackType };
+                groups.Add(group);
+            }
+            return group;
         }
     }
 }

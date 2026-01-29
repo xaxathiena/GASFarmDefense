@@ -10,11 +10,13 @@ namespace FD.Character
     {
         [SerializeField] protected AbilitySystemComponent abilitySystemComponent;
         [SerializeField] protected GameplayEffect initialEffect;
+        [SerializeField] protected EArmorType armorType = EArmorType.Medium;
         protected FDAttributeSet attributeSet;
         private bool attributeChangeListenersRegistered;
 
         public AbilitySystemComponent AbilitySystemComponent => abilitySystemComponent;
         public FDAttributeSet AttributeSet => attributeSet;
+        public EArmorType ArmorType => armorType;
 
         public event Action<AttributeChangeInfo> AttributeChanged;
 
@@ -41,6 +43,7 @@ namespace FD.Character
         protected virtual void InitializeAttributeSet()
         {
             attributeSet = new FDAttributeSet();
+            attributeSet.armorType = armorType;
             abilitySystemComponent.InitializeAttributeSet(attributeSet);
             RegisterAttributeChangeListeners();
         }

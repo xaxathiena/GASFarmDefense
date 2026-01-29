@@ -16,7 +16,8 @@ namespace FD.Ability
         [Header("Projectile Settings")]
         [Tooltip("Projectile prefab to spawn")]
         public GameObject projectilePrefab;
-        
+        [Tooltip("GameplayEffect to apply on hit")]
+         public GameplayEffect gameplayEffect;
         [Tooltip("Projectile speed")]
         public float projectileSpeed = 10f;
         
@@ -35,9 +36,9 @@ namespace FD.Ability
             }
             
             // Apply effect with FD context
-            if (effectToApply != null)
+            if (gameplayEffect != null)
             {
-                ApplyEffectWithContext(effectToApply, asc, targetASC, spec);
+                ApplyEffectWithContext(gameplayEffect, asc, targetASC, spec);
             }
             
             // Spawn projectile (optional - for visual feedback)

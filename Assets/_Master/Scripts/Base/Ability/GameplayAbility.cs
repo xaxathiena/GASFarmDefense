@@ -155,6 +155,58 @@ namespace GAS
         {
             return spec?.Level ?? 1f;
         }
+        /// <summary>
+        /// Public helper for non-ability classes (e.g., projectiles) to apply effects using FD context.
+        /// </summary>
+        public void ApplyEffectToTarget(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
+        {
+            ApplyEffectWithContext(effect, source, target, spec);
+        }
+        /// <summary>
+        /// Apply effect with FD context
+        /// </summary>
+        protected void ApplyEffectWithContext(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
+        {
+            if (effect == null)
+            {
+                Debug.LogWarning($"[{abilityName}] No effect to apply!");
+                return;
+            }
+
+            // Create FD context
+            var context = CreateFDContext(source, target, spec);
+
+            // Set as current context for calculation pipeline
+            context.MakeCurrent();
+
+            try
+            {
+                // Apply effect with context
+                effect.ApplyModifiers(
+                    target.AttributeSet,
+                    source,
+                    target,
+                    context.Level,
+                    context.StackCount
+                );
+            }
+            finally
+            {
+                // Always clear context
+                GameplayEffectContext.ClearCurrent();
+            }
+        }
+
+        protected virtual GameplayEffectContext CreateFDContext(AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
+        {
+            return new GameplayEffectContext
+            {
+                SourceASC = source,
+                TargetASC = target,
+                SourceAbility = this,
+                Level = GetAbilityLevel(spec)
+            };
+        }
 
         protected GameObject GetAbilityOwner(AbilitySystemComponent asc)
         {
