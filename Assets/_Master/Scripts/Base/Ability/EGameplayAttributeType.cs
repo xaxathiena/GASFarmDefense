@@ -19,11 +19,12 @@ namespace GAS
         AttackPower,
         Defense,
         MoveSpeed,
+        Armor,
+        CriticalChance,
+        CriticalMultiplier,
+        BaseDamage,
         
         // Add more attributes as needed for your game
-        // CriticalChance,
-        // CriticalDamage,
-        // Armor,
         // MagicResist,
         // etc...
     }

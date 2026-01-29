@@ -6,6 +6,9 @@ namespace FD.Ability
     [Serializable]
     public class FDAttributeSet : AttributeSet
     {
+        [Header("FD Character Configuration")]
+        [Tooltip("Loại giáp của character này (Heavy, Light, Medium, etc.)")]
+        public EArmorType armorType = EArmorType.Medium;
         
         // Runtime attributes
         public GameplayAttribute Health { get; protected set; }
@@ -13,6 +16,10 @@ namespace FD.Ability
         public GameplayAttribute MaxHealth { get; private set; }
         public GameplayAttribute MaxMana { get; private set; }
         public GameplayAttribute ManaRegen { get; private set; }
+        public GameplayAttribute Armor { get; private set; }
+        public GameplayAttribute CriticalChance { get; private set; }
+        public GameplayAttribute CriticalMultiplier { get; private set; }
+        public GameplayAttribute BaseDamage { get; private set; }
         
         public FDAttributeSet()
         {
@@ -22,6 +29,10 @@ namespace FD.Ability
             MaxHealth = new GameplayAttribute();
             MaxMana = new GameplayAttribute();
             ManaRegen = new GameplayAttribute();
+            Armor = new GameplayAttribute();
+            CriticalChance = new GameplayAttribute();
+            CriticalMultiplier = new GameplayAttribute();
+            BaseDamage = new GameplayAttribute();
             
             // Register attributes to dictionary using enum (type-safe)
             RegisterAttribute(EGameplayAttributeType.Health, Health);
@@ -29,10 +40,18 @@ namespace FD.Ability
             RegisterAttribute(EGameplayAttributeType.MaxHealth, MaxHealth);
             RegisterAttribute(EGameplayAttributeType.MaxMana, MaxMana);
             RegisterAttribute(EGameplayAttributeType.ManaRegen, ManaRegen);
+            RegisterAttribute(EGameplayAttributeType.Armor, Armor);
+            RegisterAttribute(EGameplayAttributeType.CriticalChance, CriticalChance);
+            RegisterAttribute(EGameplayAttributeType.CriticalMultiplier, CriticalMultiplier);
+            RegisterAttribute(EGameplayAttributeType.BaseDamage, BaseDamage);
+            
+            // Set default values
+            CriticalMultiplier.SetBaseValue(2f); // Default 2x crit
             
             // Subscribe to value changes
             Health.OnValueChanged += OnHealthChanged;
             Mana.OnValueChanged += OnManaChanged;
+            Armor.OnValueChanged += OnArmorChanged;
 
         }
         
@@ -63,6 +82,12 @@ namespace FD.Ability
         private void OnStaminaChanged(float oldValue, float newValue)
         {
             Debug.Log($"Stamina changed: {oldValue} -> {newValue}");
+        }
+        
+        private void OnArmorChanged(float oldValue, float newValue)
+        {
+            float reduction = CalculateArmorReduction(newValue);
+            Debug.Log($"Armor changed: {oldValue} -> {newValue} (Reduction: {reduction * 100f:F1}%)");
         }
         
         #endregion
@@ -133,7 +158,22 @@ namespace FD.Ability
         /// </summary>
         public void FullRestore()
         {
-            
+            Health.SetCurrentValue(MaxHealth.CurrentValue);
+            Mana.SetCurrentValue(MaxMana.CurrentValue);
+        }
+        
+        /// <summary>
+        /// Get armor type of this character
+        /// </summary>
+        public EArmorType GetArmorType() => armorType;
+        
+        /// <summary>
+        /// Calculate armor reduction percentage based on Warcraft 3 formula
+        /// Formula: Reduction = (Armor × 0.06) / (1 + 0.06 × Armor)
+        /// </summary>
+        private float CalculateArmorReduction(float armor)
+        {
+            return (armor * 0.06f) / (1f + 0.06f * armor);
         }
         
         #endregion

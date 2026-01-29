@@ -110,6 +110,11 @@ namespace GAS
         [Tooltip("Value added after applying coefficient")]
         public float postMultiplyAdditiveValue = 0f;
         
+        // Custom Calculation Class
+        [Header("Custom Calculation (Optional)")]
+        [Tooltip("Custom calculation class (e.g., WC3DamageCalculation for FD game)")]
+        public FD.Ability.DamageCalculationBase customCalculation;
+        
         // SetByCaller
         [Tooltip("GameplayTag for SetByCaller magnitude")]
         public string setByCallerTag = "";
@@ -155,9 +160,36 @@ namespace GAS
                     break;
                     
                 case EModifierCalculationType.CustomCalculationClass:
-                    // Placeholder for future custom calculation classes
-                    Debug.LogWarning("Custom Calculation Class not yet implemented");
-                    rawMagnitude = 0f;
+                    // Use custom calculation class if assigned
+                    if (customCalculation != null)
+                    {
+                        // Get base magnitude from scalableMagnitude
+                        float baseMag = scalableMagnitude.GetValueAtLevel(level, sourceASC);
+                        
+                        // Get current context (should be set by ability/effect)
+                        var context = GameplayEffectContext.Current;
+                        if (context == null)
+                        {
+                            Debug.LogWarning("[CustomCalculation] No context available! Using base magnitude.");
+                            rawMagnitude = baseMag;
+                        }
+                        else
+                        {
+                            // Calculate using custom class
+                            rawMagnitude = customCalculation.CalculateMagnitude(
+                                context,
+                                sourceASC,
+                                targetASC,
+                                baseMag,
+                                level
+                            );
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("CustomCalculationClass selected but no calculation assigned!");
+                        rawMagnitude = 0f;
+                    }
                     break;
                     
                 case EModifierCalculationType.SetByCaller:
