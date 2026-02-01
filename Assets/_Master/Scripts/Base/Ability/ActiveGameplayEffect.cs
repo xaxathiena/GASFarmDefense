@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GAS
@@ -16,6 +17,9 @@ namespace GAS
         public float Duration { get; private set; }
         public int StackCount { get; private set; }
         public float Level { get; private set; } = 1f;
+
+        // Track affected attributes for cleanup
+        private List<GameplayAttribute> affectedAttributes = new List<GameplayAttribute>();
         
         // For periodic effects
         private float periodicTimer;
@@ -99,7 +103,11 @@ namespace GAS
                 return;
             }
 
-            Effect.ApplyModifiers(Target.AttributeSet, Source, Target, Level, StackCount);
+            // Periodic effects are like instant effects - apply directly to BaseValue
+            foreach (var modifier in Effect.modifiers)
+            {
+                Effect.ApplyModifierWithAggregation(Target.AttributeSet, modifier, Source, Target, Level, StackCount, this, true);
+            }
         }
         
         /// <summary>
@@ -138,6 +146,25 @@ namespace GAS
             }
             
             return false;
+        }
+
+        /// <summary>
+        /// Add an attribute that this effect modifies (for cleanup)
+        /// </summary>
+        public void AddAffectedAttribute(GameplayAttribute attribute)
+        {
+            if (attribute != null && !affectedAttributes.Contains(attribute))
+            {
+                affectedAttributes.Add(attribute);
+            }
+        }
+
+        /// <summary>
+        /// Get all attributes affected by this effect
+        /// </summary>
+        public List<GameplayAttribute> GetAffectedAttributes()
+        {
+            return new List<GameplayAttribute>(affectedAttributes);
         }
         
         /// <summary>

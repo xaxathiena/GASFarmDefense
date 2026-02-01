@@ -376,17 +376,24 @@ namespace GAS
             {
                 if (target.AttributeSet != null)
                 {
-                    effect.ApplyModifiers(target.AttributeSet, source, target, effectLevel, activeEffect.StackCount);
+                    // Instant effects: Apply directly to BaseValue using aggregation system
+                    foreach (var modifier in effect.modifiers)
+                    {
+                        effect.ApplyModifierWithAggregation(target.AttributeSet, modifier, source, target, effectLevel, activeEffect.StackCount, activeEffect, true);
+                    }
                 }
 
                 Debug.Log($"Applied instant effect {effect.effectName} to {target.gameObject.name}");
                 return activeEffect; // Don't add to active list
             }
 
-            // Apply initial modifiers for non-periodic duration/infinite effects
+            // Apply initial modifiers for non-periodic duration/infinite effects using aggregation
             if (!effect.isPeriodic && target.AttributeSet != null)
             {
-                effect.ApplyModifiers(target.AttributeSet, source, target, effectLevel, activeEffect.StackCount);
+                foreach (var modifier in effect.modifiers)
+                {
+                    effect.ApplyModifierWithAggregation(target.AttributeSet, modifier, source, target, effectLevel, activeEffect.StackCount, activeEffect, false);
+                }
             }
 
             // Subscribe to expiration
@@ -407,6 +414,13 @@ namespace GAS
         {
             if (activeEffect == null || !activeGameplayEffects.Contains(activeEffect))
                 return;
+
+            // Remove modifiers from all affected attributes (triggers recalculation)
+            var affectedAttributes = activeEffect.GetAffectedAttributes();
+            foreach (var attribute in affectedAttributes)
+            {
+                attribute.RemoveModifiersFromEffect(activeEffect);
+            }
 
             // Remove tags
             if (activeEffect.Effect.grantedTags != null)

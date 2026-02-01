@@ -371,5 +371,70 @@ namespace GAS
                     break;
             }
         }
+
+        /// <summary>
+        /// Apply a single modifier to attribute using aggregation system
+        /// For Duration/Infinite effects - adds to aggregator
+        /// For Instant effects - applies directly to BaseValue (permanent)
+        /// </summary>
+        public void ApplyModifierWithAggregation(AttributeSet targetAttributeSet, GameplayEffectModifier modifier, AbilitySystemComponent sourceASC, AbilitySystemComponent targetASC, float level, float stackCount, ActiveGameplayEffect activeEffect, bool isInstant)
+        {
+            // Get attribute by name from dictionary
+            EGameplayAttributeType attributeType = modifier.GetAttributeName();
+            GameplayAttribute targetAttribute = targetAttributeSet.GetAttribute(attributeType);
+            
+            if (targetAttribute == null)
+            {
+                Debug.LogWarning($"Attribute '{attributeType}' not found in attribute set!");
+                return;
+            }
+            
+            // Calculate magnitude
+            float finalMagnitude = modifier.CalculateMagnitude(sourceASC, targetASC, level, stackCount);
+            
+            // Backward compatibility
+            if (finalMagnitude == 0f && modifier.calculationType == EModifierCalculationType.ScalableFloat)
+            {
+                finalMagnitude = modifier.magnitude * stackCount;
+            }
+            
+            // Instant effects: Apply directly to BaseValue (permanent change)
+            if (isInstant)
+            {
+                switch (modifier.operation)
+                {
+                    case EGameplayModifierOp.Add:
+                        targetAttribute.ModifyBaseValue(finalMagnitude);
+                        break;
+                        
+                    case EGameplayModifierOp.Multiply:
+                        float baseValue = targetAttribute.BaseValue;
+                        targetAttribute.SetBaseValue(baseValue * finalMagnitude);
+                        break;
+                        
+                    case EGameplayModifierOp.Divide:
+                        if (finalMagnitude != 0f)
+                        {
+                            float baseVal = targetAttribute.BaseValue;
+                            targetAttribute.SetBaseValue(baseVal / finalMagnitude);
+                        }
+                        break;
+                        
+                    case EGameplayModifierOp.Override:
+                        targetAttribute.SetBaseValue(finalMagnitude);
+                        break;
+                }
+            }
+            else // Duration/Infinite effects: Add to aggregator (temporary change)
+            {
+                targetAttribute.AddModifier(activeEffect, modifier.operation, finalMagnitude);
+                
+                // Track affected attribute in the active effect
+                if (activeEffect != null)
+                {
+                    activeEffect.AddAffectedAttribute(targetAttribute);
+                }
+            }
+        }
     }
 }
