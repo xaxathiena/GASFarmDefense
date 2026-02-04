@@ -6,14 +6,18 @@ namespace FD.Character
 {
     public class TowerBase : BaseCharacter
     {
-        [Header("Abilities")]
-        [SerializeField] private GameplayAbility normalAbility;
-        [SerializeField] private int normalAbilityLevel = 1;
+        [System.Serializable]
+        public class AbilityInit
+        {
+            public GameplayAbility ability;
+            public int level = 1;
+            [Tooltip("Passive abilities will be continuously activated (e.g., aura effects)")]
+            public bool isPassive = false;
+        }
 
-        [SerializeField] private GameplayAbility skillAbility;
-        [SerializeField] private int skillAbilityLevel = 1;
-        private GameplayAbilitySpec normalAbilitySpec;
-        private GameplayAbilitySpec skillAbilitySpec;
+        [Header("Abilities")]
+        [SerializeField] private List<AbilityInit> abilities = new List<AbilityInit>();
+        private List<GameplayAbilitySpec> abilitySpecs = new List<GameplayAbilitySpec>();
 
         [Header("Targeting")]
         [SerializeField] private float targetRange = 6f;
@@ -26,12 +30,23 @@ namespace FD.Character
 
         private List<Transform> cachedTargets = new List<Transform>();
 
-        protected override void Start()
+        protected override void InitializeAttributeSet()
         {
-            base.Start();
+            attributeSet.MoveSpeed.BaseValue = 10f;
+            attributeSet.MaxHealth.BaseValue = 200f;
+            attributeSet.Health.BaseValue = attributeSet.MaxHealth.BaseValue;
+            attributeSet.Armor.BaseValue = 5f;
+            attributeSet.Mana.BaseValue = 100f;
+            attributeSet.MaxMana.BaseValue = 100f;
+            attributeSet.ManaRegen.BaseValue = 2f; // 2 mana per
+            attributeSet.CriticalChance.BaseValue = 0.1f; // 10% crit chance
+            attributeSet.CriticalMultiplier.BaseValue = 2f; // 2x crit damage
+            attributeSet.BaseDamage.BaseValue = 15f;
+        }
+        void Start()
+        {
             GrantAbilities();
         }
-
         protected override void Update()
         {
             base.Update();
@@ -45,90 +60,81 @@ namespace FD.Character
                 return;
             }
 
-            if (normalAbility != null)
+            abilitySpecs.Clear();
+            foreach (var abilityInit in abilities)
             {
-                normalAbilitySpec = abilitySystemComponent.GiveAbility(normalAbility, Mathf.Max(1, normalAbilityLevel));
+                if (abilityInit.ability != null)
+                {
+                    var spec = abilitySystemComponent.GiveAbility(abilityInit.ability, Mathf.Max(1, abilityInit.level));
+                    abilitySpecs.Add(spec);
+                }
             }
-
-            if (skillAbility != null)
+            // Activate passive abilities first (auras, buffs, etc.)
+            // These don't require targets and should be reactivated after cooldown
+            foreach (var abilityInit in abilities)
             {
-                skillAbilitySpec = abilitySystemComponent.GiveAbility(skillAbility, Mathf.Max(1, skillAbilityLevel));
+                if (abilityInit.isPassive && abilityInit.ability != null && CanActivateAbility(abilityInit.ability))
+                {
+                    abilitySystemComponent.TryActivateAbility(abilityInit.ability);
+                }
             }
         }
 
-        public void UpgradeNormalAbility(int deltaLevel)
+        public void UpgradeAbility(int abilityIndex, int deltaLevel)
         {
-            if (deltaLevel == 0 || abilitySystemComponent == null)
+            if (deltaLevel == 0 || abilitySystemComponent == null || abilityIndex < 0)
             {
                 return;
             }
 
-            if (normalAbilitySpec == null && normalAbility != null)
-            {
-                normalAbilitySpec = abilitySystemComponent.GiveAbility(normalAbility, Mathf.Max(1, normalAbilityLevel));
-            }
-
-            normalAbilitySpec?.AddLevels(deltaLevel);
-        }
-
-        public void UpgradeSkillAbility(int deltaLevel)
-        {
-            if (deltaLevel == 0 || abilitySystemComponent == null)
+            if (abilityIndex >= abilitySpecs.Count)
             {
                 return;
             }
 
-            if (skillAbilitySpec == null && skillAbility != null)
-            {
-                skillAbilitySpec = abilitySystemComponent.GiveAbility(skillAbility, Mathf.Max(1, skillAbilityLevel));
-            }
-
-            skillAbilitySpec?.AddLevels(deltaLevel);
+            abilitySpecs[abilityIndex]?.AddLevels(deltaLevel);
         }
 
         private void TryActivateAbilities()
         {
+            // Check if can perform actions (not stunned, not disabled, etc.)
+            if (!CanPerformActions())
+            {
+                return;
+            }
+
+            
+
+            // For active abilities, only activate if we have targets
             cachedTargets = GetTargets();
             if (cachedTargets == null || cachedTargets.Count == 0)
             {
                 return;
             }
 
-            bool skillActivated = skillAbility != null && TryActivateSkill();
-            if (!skillActivated)
+            // Try to activate each active ability that can be activated
+            foreach (var abilityInit in abilities)
             {
-                TryActivateNormal();
+                if (!abilityInit.isPassive && abilityInit.ability != null && CanActivateAbility(abilityInit.ability))
+                {
+                    abilitySystemComponent.TryActivateAbility(abilityInit.ability);
+                }
             }
         }
 
-        private bool TryActivateSkill()
+        private bool CanActivateAbility(GameplayAbility ability)
         {
-            if (skillAbility == null || abilitySystemComponent == null)
+            if (ability == null || abilitySystemComponent == null)
             {
                 return false;
             }
 
-            if (abilitySystemComponent.IsAbilityOnCooldown(skillAbility))
+            if (abilitySystemComponent.IsAbilityOnCooldown(ability))
             {
                 return false;
             }
 
-            return abilitySystemComponent.TryActivateAbility(skillAbility);
-        }
-
-        private bool TryActivateNormal()
-        {
-            if (normalAbility == null || abilitySystemComponent == null)
-            {
-                return false;
-            }
-
-            if (abilitySystemComponent.IsAbilityOnCooldown(normalAbility))
-            {
-                return false;
-            }
-
-            return abilitySystemComponent.TryActivateAbility(normalAbility);
+            return true;
         }
 
         public override List<Transform> GetTargets()

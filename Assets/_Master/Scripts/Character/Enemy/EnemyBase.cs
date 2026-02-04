@@ -18,11 +18,18 @@ namespace FD.Character
             ResolveDamagePopupManager();
             // Enemy specific initialization
         }
-
-        protected override void Start()
+        protected override void InitializeAttributeSet()
         {
-            base.Start();
-            // Enemy specific start logic
+            attributeSet.MoveSpeed.BaseValue = 10f;
+            attributeSet.MaxHealth.BaseValue = 200f;
+            attributeSet.Health.BaseValue = attributeSet.MaxHealth.BaseValue;
+            attributeSet.Armor.BaseValue = 5f;
+            attributeSet.Mana.BaseValue = 100f;
+            attributeSet.MaxMana.BaseValue = 100f;
+            attributeSet.ManaRegen.BaseValue = 2f; // 2 mana per
+            attributeSet.CriticalChance.BaseValue = 0.1f; // 10% crit chance
+            attributeSet.CriticalMultiplier.BaseValue = 2f; // 2x crit damage
+            attributeSet.BaseDamage.BaseValue = 15f;
         }
 
         protected override void Update()
@@ -64,16 +71,31 @@ namespace FD.Character
         {
             base.HandleAttributeChanged(changeInfo);
 
-            if (changeInfo.AttributeType == EGameplayAttributeType.Health && changeInfo.ChangeAmount < 0f)
+            if (changeInfo.AttributeType == EGameplayAttributeType.Health)
             {
-                var popup = ResolveDamagePopupManager();
-                if (popup != null)
+                // Show damage popup for damage taken
+                if (changeInfo.ChangeAmount < 0f)
                 {
-                    popup.ShowDamage(transform, Mathf.Abs(changeInfo.ChangeAmount));
+                    var popup = ResolveDamagePopupManager();
+                    if (popup != null)
+                    {
+                        popup.ShowDamage(transform, Mathf.Abs(changeInfo.ChangeAmount));
+                    }
+                }
+
+                // Check for death
+                if (changeInfo.NewValue <= 0f)
+                {
+                    OnDeath();
                 }
             }
         }
 
+        protected virtual void OnDeath()
+        {
+            Debug.Log($"[EnemyBase] {name} died!");
+            Destroy(gameObject);
+        }
         private DamagePopupManager ResolveDamagePopupManager()
         {
             if (damagePopupManager != null)

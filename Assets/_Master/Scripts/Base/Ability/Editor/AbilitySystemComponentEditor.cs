@@ -106,12 +106,12 @@ namespace GAS.Editor
             // Base Value
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Base Value", GUILayout.Width(100));
+            EditorGUILayout.LabelField(attribute.BaseValue.ToString("F2"));
             EditorGUILayout.EndHorizontal();
             
             // Current Value with color
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Current Value", GUILayout.Width(100));
-            
             
             EditorGUILayout.LabelField(attribute.CurrentValue.ToString("F2"));
             

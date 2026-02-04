@@ -9,7 +9,6 @@ namespace FD.Character
     public abstract class BaseCharacter : MonoBehaviour, IAbilitySystemComponent
     {
         [SerializeField] protected AbilitySystemComponent abilitySystemComponent;
-        [SerializeField] protected GameplayEffect initialEffect;
         [SerializeField] protected EArmorType armorType = EArmorType.Medium;
         protected FDAttributeSet attributeSet;
         private bool attributeChangeListenersRegistered;
@@ -27,33 +26,24 @@ namespace FD.Character
                 abilitySystemComponent = GetComponent<AbilitySystemComponent>();
             }
             abilitySystemComponent.InitOwner(this.gameObject);
-            InitializeAttributeSet();
-        }
-
-        protected virtual void Start()
-        {
-            InitInitialEffects();
+            Initialize();
         }
 
         protected virtual void Update()
         {
             TickManaRegen(Time.deltaTime);
         }
-
-        protected virtual void InitializeAttributeSet()
+        protected void Initialize()
         {
             attributeSet = new FDAttributeSet();
             attributeSet.armorType = armorType;
             abilitySystemComponent.InitializeAttributeSet(attributeSet);
             RegisterAttributeChangeListeners();
+            InitializeAttributeSet();
         }
-
-        protected virtual void InitInitialEffects()
+        protected virtual void InitializeAttributeSet()
         {
-            if (initialEffect != null)
-            {
-                abilitySystemComponent.ApplyGameplayEffectToSelf(initialEffect);
-            }
+            
         }
 
         protected virtual void TickManaRegen(float deltaTime)
@@ -78,6 +68,44 @@ namespace FD.Character
         public virtual List<Transform> GetTargets()
         {
             return new List<Transform>();
+        }
+
+        /// <summary>
+        /// Check if character is stunned (has State.Stunned tag)
+        /// </summary>
+        public bool IsStunned()
+        {
+            return abilitySystemComponent != null && 
+                   abilitySystemComponent.HasAnyTags("State.Stunned");
+        }
+
+        /// <summary>
+        /// Check if character is immune to CC effects
+        /// </summary>
+        public bool IsImmune()
+        {
+            return abilitySystemComponent != null && 
+                   abilitySystemComponent.HasAnyTags("State.Immune", "State.Immune.CC");
+        }
+
+        /// <summary>
+        /// Check if can perform actions (not stunned, not disabled, etc.)
+        /// </summary>
+        public virtual bool CanPerformActions()
+        {
+            if (IsStunned())
+            {
+                return false;
+            }
+
+            // Check other blocking states
+            if (abilitySystemComponent != null && 
+                abilitySystemComponent.HasAnyTags("State.Disabled", "State.Silenced"))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void RegisterAttributeChangeListeners()

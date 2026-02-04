@@ -97,6 +97,7 @@ MonoBehaviour:
     coefficient: 1
     preMultiplyAdditiveValue: 0
     postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
     setByCallerTag: 
     magnitude: 100
   - attribute:
@@ -177,6 +178,7 @@ MonoBehaviour:
     coefficient: 1
     preMultiplyAdditiveValue: 0
     postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
     setByCallerTag: 
     magnitude: 100
   - attribute:
@@ -257,6 +259,7 @@ MonoBehaviour:
     coefficient: 1
     preMultiplyAdditiveValue: 0
     postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
     setByCallerTag: 
     magnitude: 100
   - attribute:
@@ -337,6 +340,88 @@ MonoBehaviour:
     coefficient: 1
     preMultiplyAdditiveValue: 0
     postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
+    setByCallerTag: 
+    magnitude: 100
+  - attribute:
+      attributeType: 9
+    operation: 3
+    calculationType: 0
+    scalableMagnitude:
+      scalingMode: 0
+      flatValue: 10
+      scalingCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 1
+          value: 2
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 2
+          value: 3
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 3
+          value: 5
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 4
+          value: 6.3333335
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 5
+          value: 7.8333335
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 6
+          value: 9.333333
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      csvAsset: {fileID: 4900000, guid: 9a93ce25af184294ab192c433d221b10, type: 3}
+      csvColumn: Curve2
+      previewLevel: 5
+      attributeType: 0
+    backingAttribute:
+      attributeType: 0
+    attributeSource: 0
+    snapshotAttribute: 0
+    coefficient: 1
+    preMultiplyAdditiveValue: 0
+    postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
     setByCallerTag: 
     magnitude: 100
   grantedTags: []

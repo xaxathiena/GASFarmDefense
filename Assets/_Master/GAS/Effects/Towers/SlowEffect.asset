@@ -14,11 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GAS.GameplayEffect
   effectName: 
   description: 
-  durationType: 0
+  durationType: 2
   durationMagnitude: 0
   isPeriodic: 0
   period: 1
-  modifiers: []
+  modifiers:
+  - attribute:
+      attributeType: 9
+    operation: 0
+    calculationType: 0
+    scalableMagnitude:
+      scalingMode: 0
+      flatValue: -6
+      scalingCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+      csvAsset: {fileID: 0}
+      csvColumn: 
+      previewLevel: 0
+      attributeType: 0
+    backingAttribute:
+      attributeType: 0
+    attributeSource: 0
+    snapshotAttribute: 0
+    coefficient: 0
+    preMultiplyAdditiveValue: 0
+    postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
+    setByCallerTag: 
+    magnitude: 0
   grantedTags: []
   applicationRequiredTags: []
   applicationBlockedByTags: []

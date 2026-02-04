@@ -194,15 +194,17 @@ namespace FD.Ability
             if (activeEffect != null)
             {
                 targetASC.RemoveGameplayEffect(activeEffect);
+                #if UNITY_EDITOR
                 Debug.Log($"✗ Removed slow from {targetASC.gameObject.name}");
                 
                 // Log restored speed
-                var attrSet = targetASC.AttributeSet as FDAttributeSet;
+                var attrSet = targetASC.AttributeSet;
                 if (attrSet != null)
                 {
                     float currentSpeed = attrSet.GetAttribute(EGameplayAttributeType.MoveSpeed).CurrentValue;
                     Debug.Log($"  → Restored MoveSpeed: {currentSpeed:F2}");
                 }
+                #endif
             }
 
             affectedTargets.Remove(targetASC);

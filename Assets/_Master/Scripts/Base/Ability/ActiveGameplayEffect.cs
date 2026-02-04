@@ -59,12 +59,6 @@ namespace GAS
             isPeriodic = effect.isPeriodic;
             period = effect.period;
 
-            if (!isPeriodic && period > 0f && effect.durationType != EGameplayEffectDurationType.Instant)
-            {
-                isPeriodic = true;
-                Debug.LogWarning($"GameplayEffect '{effect.name}' has a period value but 'Is Periodic' was disabled. Automatically enabling periodic execution.");
-            }
-
             periodicTimer = period;
         }
         

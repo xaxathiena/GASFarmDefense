@@ -374,8 +374,8 @@ namespace GAS
 
         /// <summary>
         /// Apply a single modifier to attribute using aggregation system
-        /// For Duration/Infinite effects - adds to aggregator
-        /// For Instant effects - applies directly to BaseValue (permanent)
+        /// For Duration/Infinite effects - adds to aggregator (temporary, removable)
+        /// For Instant effects - applies directly to CurrentValue (immediate, not removable)
         /// </summary>
         public void ApplyModifierWithAggregation(AttributeSet targetAttributeSet, GameplayEffectModifier modifier, AbilitySystemComponent sourceASC, AbilitySystemComponent targetASC, float level, float stackCount, ActiveGameplayEffect activeEffect, bool isInstant)
         {
@@ -398,38 +398,41 @@ namespace GAS
                 finalMagnitude = modifier.magnitude * stackCount;
             }
             
-            // Instant effects: Apply directly to BaseValue (permanent change)
+            // Instant effects: Apply directly to CurrentValue (immediate, not tracked for removal)
+            // Examples: damage, healing
             if (isInstant)
             {
                 switch (modifier.operation)
                 {
                     case EGameplayModifierOp.Add:
-                        targetAttribute.ModifyBaseValue(finalMagnitude);
+                        targetAttribute.ModifyCurrentValue(finalMagnitude);
                         break;
                         
                     case EGameplayModifierOp.Multiply:
-                        float baseValue = targetAttribute.BaseValue;
-                        targetAttribute.SetBaseValue(baseValue * finalMagnitude);
+                        float currentValue = targetAttribute.CurrentValue;
+                        targetAttribute.SetCurrentValue(currentValue * finalMagnitude);
                         break;
                         
                     case EGameplayModifierOp.Divide:
                         if (finalMagnitude != 0f)
                         {
-                            float baseVal = targetAttribute.BaseValue;
-                            targetAttribute.SetBaseValue(baseVal / finalMagnitude);
+                            float currentVal = targetAttribute.CurrentValue;
+                            targetAttribute.SetCurrentValue(currentVal / finalMagnitude);
                         }
                         break;
                         
                     case EGameplayModifierOp.Override:
-                        targetAttribute.SetBaseValue(finalMagnitude);
+                        targetAttribute.SetCurrentValue(finalMagnitude);
                         break;
                 }
             }
-            else // Duration/Infinite effects: Add to aggregator (temporary change)
+            else // Duration/Infinite effects: Add to aggregator (temporary, will be removed when effect ends)
             {
+                // Examples: slow debuff, attack buff, defense buff
+                // These will be automatically removed when effect expires or is removed
                 targetAttribute.AddModifier(activeEffect, modifier.operation, finalMagnitude);
                 
-                // Track affected attribute in the active effect
+                // Track affected attribute in the active effect for cleanup
                 if (activeEffect != null)
                 {
                     activeEffect.AddAffectedAttribute(targetAttribute);

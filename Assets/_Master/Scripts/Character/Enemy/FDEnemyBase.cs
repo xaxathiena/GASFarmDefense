@@ -24,6 +24,12 @@ namespace FD.Character
 
         protected override void UpdateBehavior()
         {
+            // Check if stunned - cannot move
+            if (IsStunned())
+            {
+                return;
+            }
+
             if (hasPath)
             {
                 MoveAlongPath();
@@ -53,10 +59,17 @@ namespace FD.Character
                 return;
             }
 
+            // Use MoveSpeed attribute if available, fallback to moveSpeed field
+            float currentMoveSpeed = moveSpeed;
+            if (attributeSet != null && attributeSet.MoveSpeed != null)
+            {
+                currentMoveSpeed = attributeSet.MoveSpeed.CurrentValue;
+            }
+
             transform.position = Vector3.MoveTowards(
                 transform.position,
                 target.position,
-                moveSpeed * Time.deltaTime
+                currentMoveSpeed * Time.deltaTime
             );
 
             if (Vector3.Distance(transform.position, target.position) <= waypointReachedDistance)

@@ -24,12 +24,10 @@ namespace FD.TrainingArea
             ? availableAbilities[selectedAbilityIndex] 
             : null;
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             InitializeAbilities();
         }
-
         private void InitializeAbilities()
         {
             // Grant all available abilities to the ability system

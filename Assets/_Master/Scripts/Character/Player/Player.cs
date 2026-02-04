@@ -22,9 +22,8 @@ namespace FD.Character
             // Player specific initialization
         }
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             currentScore = startingScore;
             RaiseScoreChanged();
             // Player specific start logic
