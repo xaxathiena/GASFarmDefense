@@ -214,44 +214,163 @@ namespace GAS.Editor
             }
             else
             {
+                EditorGUILayout.LabelField($"Total Active Effects: {activeEffects.Count}", EditorStyles.miniLabel);
+                EditorGUILayout.Space(3);
+
                 foreach (var activeEffect in activeEffects)
                 {
                     if (activeEffect != null && activeEffect.Effect != null)
                     {
-                        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                        
-                        EditorGUILayout.LabelField(activeEffect.Effect.effectName, EditorStyles.boldLabel);
-                        
-                        EditorGUI.indentLevel++;
-                        
-                        // Duration
-                        if (activeEffect.Duration > 0)
-                        {
-                            EditorGUILayout.LabelField($"Time Remaining: {activeEffect.RemainingTime:F1}s / {activeEffect.Duration:F1}s");
-                            
-                            Rect rect = EditorGUILayout.GetControlRect(false, 15);
-                            float percentage = activeEffect.RemainingTime / activeEffect.Duration;
-                            EditorGUI.ProgressBar(rect, percentage, "");
-                        }
-                        else
-                        {
-                            EditorGUILayout.LabelField("Duration: Infinite");
-                        }
-                        
-                        // Stack count
-                        if (activeEffect.StackCount > 1)
-                        {
-                            EditorGUILayout.LabelField($"Stacks: {activeEffect.StackCount}");
-                        }
-                        
-                        EditorGUI.indentLevel--;
-                        
-                        EditorGUILayout.EndVertical();
+                        DrawActiveEffectDetails(activeEffect);
+                        EditorGUILayout.Space(2);
                     }
                 }
             }
 
             EditorGUI.indentLevel--;
+        }
+
+        private void DrawActiveEffectDetails(ActiveGameplayEffect activeEffect)
+        {
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            
+            // Header with effect name
+            EditorGUILayout.LabelField(activeEffect.Effect.effectName, EditorStyles.boldLabel);
+            
+            EditorGUI.indentLevel++;
+            
+            // Source and Target information
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Source:", GUILayout.Width(100));
+            string sourceName = activeEffect.Source != null ? activeEffect.Source.GetOwner().name : "None";
+            EditorGUILayout.LabelField(sourceName, EditorStyles.miniLabel);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Target:", GUILayout.Width(100));
+            string targetName = activeEffect.Target != null ? activeEffect.Target.GetOwner().name : "None";
+            EditorGUILayout.LabelField(targetName, EditorStyles.miniLabel);
+            EditorGUILayout.EndHorizontal();
+
+            // Level
+            if (activeEffect.Level > 1f)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Level:", GUILayout.Width(100));
+                EditorGUILayout.LabelField(activeEffect.Level.ToString("F1"), EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Duration with progress bar
+            if (activeEffect.Duration > 0)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Duration:", GUILayout.Width(100));
+                EditorGUILayout.LabelField($"{activeEffect.RemainingTime:F1}s / {activeEffect.Duration:F1}s", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+                
+                Rect rect = EditorGUILayout.GetControlRect(false, 12);
+                float percentage = activeEffect.Duration > 0 ? activeEffect.RemainingTime / activeEffect.Duration : 0f;
+                EditorGUI.ProgressBar(rect, percentage, "");
+            }
+            else if (activeEffect.Duration < 0)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Duration:", GUILayout.Width(100));
+                EditorGUILayout.LabelField("Infinite", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+            }
+            else
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Type:", GUILayout.Width(100));
+                EditorGUILayout.LabelField("Instant", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Stack count
+            if (activeEffect.Effect.allowStacking)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Stacks:", GUILayout.Width(100));
+                EditorGUILayout.LabelField($"{activeEffect.StackCount} / {activeEffect.Effect.maxStacks}", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Periodic info
+            if (activeEffect.Effect.isPeriodic)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Periodic:", GUILayout.Width(100));
+                EditorGUILayout.LabelField($"Every {activeEffect.Effect.period:F1}s", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Granted Tags
+            if (activeEffect.Effect.grantedTags != null && activeEffect.Effect.grantedTags.Length > 0)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Tags:", GUILayout.Width(100));
+                EditorGUILayout.BeginVertical();
+                foreach (var tag in activeEffect.Effect.grantedTags)
+                {
+                    EditorGUILayout.LabelField($"• {tag}", EditorStyles.miniLabel);
+                }
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Affected Attributes
+            var affectedAttributes = activeEffect.GetAffectedAttributes();
+            if (affectedAttributes != null && affectedAttributes.Count > 0)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Modifies:", GUILayout.Width(60));
+                EditorGUILayout.BeginVertical();
+                foreach (var attr in affectedAttributes)
+                {
+                    if (attr != null)
+                    {
+                        // Try to find the attribute name
+                        string attrName = GetAttributeName(attr);
+                        EditorGUILayout.LabelField($"• {attrName}", EditorStyles.miniLabel);
+                    }
+                }
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Modifiers summary
+            if (activeEffect.Effect.modifiers != null && activeEffect.Effect.modifiers.Length > 0)
+            {
+                EditorGUILayout.LabelField($"Modifiers: {activeEffect.Effect.modifiers.Length}", EditorStyles.miniLabel);
+            }
+            
+            EditorGUI.indentLevel--;
+            
+            EditorGUILayout.EndVertical();
+        }
+
+        private string GetAttributeName(GameplayAttribute attribute)
+        {
+            if (attribute == null || asc.AttributeSet == null)
+                return "Unknown";
+
+            // Try to find which property this attribute belongs to
+            var properties = asc.AttributeSet.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var prop in properties)
+            {
+                if (prop.PropertyType == typeof(GameplayAttribute))
+                {
+                    var propAttr = prop.GetValue(asc.AttributeSet) as GameplayAttribute;
+                    if (propAttr == attribute)
+                    {
+                        return prop.Name;
+                    }
+                }
+            }
+
+            return "Unknown";
         }
 
         private void DrawTags()
@@ -262,7 +381,7 @@ namespace GAS.Editor
             EditorGUI.indentLevel++;
 
             var activeTagsField = typeof(AbilitySystemComponent).GetField("activeTags", BindingFlags.NonPublic | BindingFlags.Instance);
-            var activeTags = activeTagsField?.GetValue(asc) as System.Collections.Generic.HashSet<string>;
+            var activeTags = activeTagsField?.GetValue(asc) as System.Collections.Generic.HashSet<byte>;
 
             if (activeTags == null || activeTags.Count == 0)
             {
@@ -270,9 +389,10 @@ namespace GAS.Editor
             }
             else
             {
-                foreach (var tag in activeTags)
+                foreach (var tagByte in activeTags)
                 {
-                    EditorGUILayout.LabelField($"• {tag}", EditorStyles.miniLabel);
+                    GameplayTag tag = (GameplayTag)tagByte;
+                    EditorGUILayout.LabelField($"• {tag} ({tagByte})", EditorStyles.miniLabel);
                 }
             }
 

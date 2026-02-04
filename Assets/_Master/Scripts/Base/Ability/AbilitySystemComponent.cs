@@ -18,7 +18,7 @@ namespace GAS
         private readonly Dictionary<GameplayAbility, GameplayAbilitySpec> specLookup = new Dictionary<GameplayAbility, GameplayAbilitySpec>();
 
         // Runtime data
-        private HashSet<string> activeTags = new HashSet<string>();
+        private HashSet<byte> activeTags = new HashSet<byte>();
         private Dictionary<GameplayAbility, float> abilityCooldowns = new Dictionary<GameplayAbility, float>();
         private List<GameplayAbility> activeAbilities = new List<GameplayAbility>();
         private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
@@ -174,13 +174,13 @@ namespace GAS
         /// <summary>
         /// Cancel abilities that have any of the specified tags
         /// </summary>
-        public void CancelAbilitiesWithTags(string[] tags)
+        public void CancelAbilitiesWithTags(GameplayTag[] tags)
         {
             if (tags == null || tags.Length == 0)
                 return;
 
             var abilitiesToCancel = activeAbilities
-                .Where(a => a.abilityTags != null && a.abilityTags.Any(tag => tags.Contains(tag)))
+                .Where(a => a.abilityTags != null && a.abilityTags.Any(abilityTag => tags.Contains(abilityTag)))
                 .ToList();
 
             foreach (var ability in abilitiesToCancel)
@@ -205,52 +205,62 @@ namespace GAS
         /// <summary>
         /// Add gameplay tags
         /// </summary>
-        public void AddTags(params string[] tags)
+        public void AddTags(params GameplayTag[] tags)
         {
             if (tags == null)
                 return;
 
             foreach (var tag in tags)
             {
-                if (!string.IsNullOrEmpty(tag))
-                    activeTags.Add(tag);
+                if (tag != GameplayTag.None)
+                    activeTags.Add((byte)tag);
             }
         }
 
         /// <summary>
         /// Remove gameplay tags
         /// </summary>
-        public void RemoveTags(params string[] tags)
+        public void RemoveTags(params GameplayTag[] tags)
         {
             if (tags == null)
                 return;
 
             foreach (var tag in tags)
             {
-                activeTags.Remove(tag);
+                activeTags.Remove((byte)tag);
             }
         }
 
         /// <summary>
-        /// Check if has any of the specified tags
+        /// Check if has any of the specified tags (OR logic)
         /// </summary>
-        public bool HasAnyTags(params string[] tags)
+        public bool HasAnyTags(params GameplayTag[] tags)
         {
             if (tags == null || tags.Length == 0)
                 return false;
 
-            return tags.Any(tag => activeTags.Contains(tag));
+            foreach (var tag in tags)
+            {
+                if (activeTags.Contains((byte)tag))
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
-        /// Check if has all of the specified tags
+        /// Check if has all of the specified tags (AND logic)
         /// </summary>
-        public bool HasAllTags(params string[] tags)
+        public bool HasAllTags(params GameplayTag[] tags)
         {
             if (tags == null || tags.Length == 0)
                 return false;
 
-            return tags.All(tag => activeTags.Contains(tag));
+            foreach (var tag in tags)
+            {
+                if (!activeTags.Contains((byte)tag))
+                    return false;
+            }
+            return true;
         }
 
         #endregion
@@ -435,13 +445,13 @@ namespace GAS
         /// <summary>
         /// Remove all gameplay effects with specific tags
         /// </summary>
-        public void RemoveGameplayEffectsWithTags(params string[] tags)
+        public void RemoveGameplayEffectsWithTags(params GameplayTag[] tags)
         {
             if (tags == null || tags.Length == 0)
                 return;
 
             var effectsToRemove = activeGameplayEffects
-                .Where(e => e.Effect.grantedTags != null && e.Effect.grantedTags.Any(tag => tags.Contains(tag)))
+                .Where(e => e.Effect.grantedTags != null && e.Effect.grantedTags.Any(effectTag => tags.Contains(effectTag)))
                 .ToList();
 
             foreach (var effect in effectsToRemove)

@@ -76,7 +76,7 @@ namespace FD.Character
         public bool IsStunned()
         {
             return abilitySystemComponent != null && 
-                   abilitySystemComponent.HasAnyTags("State.Stunned");
+                   abilitySystemComponent.HasAnyTags(GameplayTag.State_Stunned);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace FD.Character
         public bool IsImmune()
         {
             return abilitySystemComponent != null && 
-                   abilitySystemComponent.HasAnyTags("State.Immune", "State.Immune.CC");
+                   abilitySystemComponent.HasAnyTags(GameplayTag.State_Immune, GameplayTag.State_Immune_CC);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace FD.Character
 
             // Check other blocking states
             if (abilitySystemComponent != null && 
-                abilitySystemComponent.HasAnyTags("State.Disabled", "State.Silenced"))
+                abilitySystemComponent.HasAnyTags(GameplayTag.State_Disabled, GameplayTag.State_Silenced))
             {
                 return false;
             }

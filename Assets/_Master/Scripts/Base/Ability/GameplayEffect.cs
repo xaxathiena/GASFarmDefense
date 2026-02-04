@@ -259,13 +259,13 @@ namespace GAS
         
         [Header("Gameplay Tags")]
         [Tooltip("Tags granted while effect is active")]
-        public string[] grantedTags;
+        public GameplayTag[] grantedTags;
         [Tooltip("Tags added to application requirements (must have ALL)")]
-        public string[] applicationRequiredTags;
+        public GameplayTag[] applicationRequiredTags;
         [Tooltip("Tags that block this effect (if target has ANY)")]
-        public string[] applicationBlockedByTags;
+        public GameplayTag[] applicationBlockedByTags;
         [Tooltip("Tags to remove on application")]
-        public string[] removeTagsOnApplication;
+        public GameplayTag[] removeTagsOnApplication;
         
         [Header("Stacking")]
         [Tooltip("Can this effect stack?")]

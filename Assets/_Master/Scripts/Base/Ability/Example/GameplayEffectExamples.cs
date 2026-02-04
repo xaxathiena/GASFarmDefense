@@ -107,7 +107,7 @@ namespace GAS.Example
                 }
             };
             
-            effect.grantedTags = new string[] { "Buff.Speed" };
+            effect.grantedTags = new GameplayTag[] { GameplayTag.Buff_Speed };
             
             return effect;
         }
@@ -136,7 +136,7 @@ namespace GAS.Example
                 }
             };
             
-            effect.grantedTags = new string[] { "Debuff.Poison" };
+            effect.grantedTags = new GameplayTag[] { GameplayTag.Debuff_Poison };
             
             return effect;
         }
@@ -163,7 +163,7 @@ namespace GAS.Example
                 }
             };
             
-            effect.grantedTags = new string[] { "Debuff.DefenseBreak" };
+            effect.grantedTags = new GameplayTag[] { GameplayTag.Debuff_DefenseBreak };
             
             return effect;
         }
@@ -193,7 +193,7 @@ namespace GAS.Example
                 }
             };
             
-            effect.grantedTags = new string[] { "Buff.AttackPower" };
+            effect.grantedTags = new GameplayTag[] { GameplayTag.Buff_Attack };
             
             return effect;
         }
@@ -249,7 +249,7 @@ namespace GAS.Example
                 }
             };
             
-            effect.grantedTags = new string[] { "Buff.Stamina" };
+            effect.grantedTags = new GameplayTag[] { GameplayTag.Buff_Stamina };
             
             return effect;
         }

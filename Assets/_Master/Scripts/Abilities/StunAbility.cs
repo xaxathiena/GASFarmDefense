@@ -105,7 +105,7 @@ namespace FD.Ability
         private bool IsImmune(AbilitySystemComponent targetASC)
         {
             // Check for general immunity tag
-            if (targetASC.HasAnyTags("State.Immune", "State.Immune.Stun", "State.Immune.CC"))
+            if (targetASC.HasAnyTags(GameplayTag.State_Immune, GameplayTag.State_Immune_Stun, GameplayTag.State_Immune_CC))
             {
                 return true;
             }

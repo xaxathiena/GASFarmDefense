@@ -177,7 +177,7 @@ namespace GAS
             // Add death tag
             if (ownerASC != null)
             {
-                ownerASC.AddTags("State.Dead");
+                ownerASC.AddTags(GameplayTag.State_Dead);
             }
         }
     }

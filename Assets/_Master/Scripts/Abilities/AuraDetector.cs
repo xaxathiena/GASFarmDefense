@@ -165,7 +165,7 @@ namespace FD.Ability
             }
 
             // Apply effect and store handle
-            var activeEffect = targetASC.ApplyGameplayEffectToSelf(effectToApply);
+            var activeEffect = targetASC.ApplyGameplayEffectToSelf(effectToApply, ownerASC);
             #if UNITY_EDITOR
             if (activeEffect != null)
             {

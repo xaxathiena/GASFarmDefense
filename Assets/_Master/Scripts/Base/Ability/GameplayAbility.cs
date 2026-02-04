@@ -18,9 +18,9 @@ namespace GAS
         public bool canActivateWhileActive = false;
 
         [Header("Tags")]
-        public string[] abilityTags;
-        public string[] cancelAbilitiesWithTags;
-        public string[] blockAbilitiesWithTags;
+        public GameplayTag[] abilityTags;
+        public GameplayTag[] cancelAbilitiesWithTags;
+        public GameplayTag[] blockAbilitiesWithTags;
 
         /// <summary>
         /// Check if the ability can be activated using its resolved spec.

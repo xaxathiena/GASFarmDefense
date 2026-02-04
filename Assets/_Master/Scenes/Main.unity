@@ -1755,7 +1755,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilitySystemComponent: {fileID: 570839291}
-  initialEffect: {fileID: 11400000, guid: 4978ac602345c4148aaba0ecf78ee73f, type: 2}
   armorType: 1
   interactionRange: 2
   startingScore: 0
@@ -2093,7 +2092,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -2485,7 +2484,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilitySystemComponent: {fileID: 364894150}
-  initialEffect: {fileID: 11400000, guid: 4978ac602345c4148aaba0ecf78ee73f, type: 2}
   armorType: 1
   abilities:
   - ability: {fileID: 11400000, guid: 789665ed671035845bc384b19712f854, type: 2}
@@ -4053,13 +4051,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 724810737048468215, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
+      propertyPath: damagePopupManager
+      value: 
+      objectReference: {fileID: 855052817}
     - target: {fileID: 4694688756292592845, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
       propertyPath: m_Name
       value: Enemy01
       objectReference: {fileID: 0}
     - target: {fileID: 4694688756292592845, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7098978771037612272, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
       propertyPath: m_LocalPosition.x

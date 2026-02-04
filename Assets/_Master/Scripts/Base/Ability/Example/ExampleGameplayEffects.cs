@@ -75,7 +75,7 @@ namespace GAS
             
             if (grantedTags == null || grantedTags.Length == 0)
             {
-                grantedTags = new string[] { "State.Buffed" };
+                grantedTags = new GameplayTag[] { GameplayTag.State_Buffed };
             }
             
             if (modifiers == null || modifiers.Length == 0)
@@ -101,7 +101,7 @@ namespace GAS
             
             if (grantedTags == null || grantedTags.Length == 0)
             {
-                grantedTags = new string[] { "State.Stunned", "State.CannotMove", "State.CannotAttack" };
+                grantedTags = new GameplayTag[] { GameplayTag.State_Stunned, GameplayTag.State_CannotMove, GameplayTag.State_CannotAttack };
             }
         }
     }
