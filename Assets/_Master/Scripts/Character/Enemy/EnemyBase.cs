@@ -20,7 +20,7 @@ namespace FD.Character
         }
         protected override void InitializeAttributeSet()
         {
-            attributeSet.MoveSpeed.BaseValue = 10f;
+            attributeSet.MoveSpeed.BaseValue = 3f;
             attributeSet.MaxHealth.BaseValue = 200f;
             attributeSet.Health.BaseValue = attributeSet.MaxHealth.BaseValue;
             attributeSet.Armor.BaseValue = 5f;

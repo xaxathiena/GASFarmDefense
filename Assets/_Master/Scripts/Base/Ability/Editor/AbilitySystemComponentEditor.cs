@@ -47,14 +47,14 @@ namespace GAS.Editor
             DrawAbilities();
 
             EditorGUILayout.Space(5);
+            // Draw Tags
+            DrawTags();
 
+
+            EditorGUILayout.Space(5);
             // Draw Active Effects
             DrawActiveEffects();
 
-            EditorGUILayout.Space(5);
-
-            // Draw Tags
-            DrawTags();
 
             // Force repaint to update values in real-time
             if (Application.isPlaying)
@@ -98,27 +98,27 @@ namespace GAS.Editor
         private void DrawGameplayAttribute(string name, GameplayAttribute attribute)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             EditorGUILayout.LabelField(name, EditorStyles.boldLabel);
-            
+
             EditorGUI.indentLevel++;
-            
+
             // Base Value
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Base Value", GUILayout.Width(100));
             EditorGUILayout.LabelField(attribute.BaseValue.ToString("F2"));
             EditorGUILayout.EndHorizontal();
-            
+
             // Current Value with color
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Current Value", GUILayout.Width(100));
-            
+
             EditorGUILayout.LabelField(attribute.CurrentValue.ToString("F2"));
-            
+
             EditorGUILayout.EndHorizontal();
-            
+
             EditorGUI.indentLevel--;
-            
+
             EditorGUILayout.EndVertical();
         }
 
@@ -126,7 +126,7 @@ namespace GAS.Editor
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.LabelField("Resources", EditorStyles.boldLabel);
-            
+
             EditorGUI.indentLevel++;
 
             var attributeSet = asc.AttributeSet;
@@ -146,9 +146,9 @@ namespace GAS.Editor
             Rect rect = EditorGUILayout.GetControlRect(false, 20);
             float percentage = max > 0f ? current / max : 0f;
             EditorGUI.ProgressBar(rect, percentage, $"{percentage * 100:F0}%");
-            
+
             EditorGUI.indentLevel--;
-            
+
             EditorGUILayout.EndVertical();
         }
 
@@ -173,11 +173,11 @@ namespace GAS.Editor
                     if (ability != null)
                     {
                         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                        
+
                         EditorGUILayout.LabelField(ability.abilityName, EditorStyles.boldLabel);
-                        
+
                         EditorGUI.indentLevel++;
-                        
+
                         // Cooldown info
                         if (asc.IsAbilityOnCooldown(ability))
                         {
@@ -188,9 +188,9 @@ namespace GAS.Editor
                         {
                             EditorGUILayout.LabelField("Ready", EditorStyles.miniLabel);
                         }
-                        
+
                         EditorGUI.indentLevel--;
-                        
+
                         EditorGUILayout.EndVertical();
                     }
                 }
@@ -233,12 +233,12 @@ namespace GAS.Editor
         private void DrawActiveEffectDetails(ActiveGameplayEffect activeEffect)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             // Header with effect name
             EditorGUILayout.LabelField(activeEffect.Effect.effectName, EditorStyles.boldLabel);
-            
+
             EditorGUI.indentLevel++;
-            
+
             // Source and Target information
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Source:", GUILayout.Width(100));
@@ -268,7 +268,7 @@ namespace GAS.Editor
                 EditorGUILayout.LabelField("Duration:", GUILayout.Width(100));
                 EditorGUILayout.LabelField($"{activeEffect.RemainingTime:F1}s / {activeEffect.Duration:F1}s", EditorStyles.miniLabel);
                 EditorGUILayout.EndHorizontal();
-                
+
                 Rect rect = EditorGUILayout.GetControlRect(false, 12);
                 float percentage = activeEffect.Duration > 0 ? activeEffect.RemainingTime / activeEffect.Duration : 0f;
                 EditorGUI.ProgressBar(rect, percentage, "");
@@ -325,7 +325,7 @@ namespace GAS.Editor
             if (affectedAttributes != null && affectedAttributes.Count > 0)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Modifies:", GUILayout.Width(60));
+                EditorGUILayout.LabelField("Modifies:", GUILayout.Width(100));
                 EditorGUILayout.BeginVertical();
                 foreach (var attr in affectedAttributes)
                 {
@@ -345,9 +345,9 @@ namespace GAS.Editor
             {
                 EditorGUILayout.LabelField($"Modifiers: {activeEffect.Effect.modifiers.Length}", EditorStyles.miniLabel);
             }
-            
+
             EditorGUI.indentLevel--;
-            
+
             EditorGUILayout.EndVertical();
         }
 
@@ -380,8 +380,8 @@ namespace GAS.Editor
 
             EditorGUI.indentLevel++;
 
-            var activeTagsField = typeof(AbilitySystemComponent).GetField("activeTags", BindingFlags.NonPublic | BindingFlags.Instance);
-            var activeTags = activeTagsField?.GetValue(asc) as System.Collections.Generic.HashSet<byte>;
+            // Use the new GetActiveTags() method instead of reflection
+            var activeTags = asc.GetActiveTags();
 
             if (activeTags == null || activeTags.Count == 0)
             {
@@ -389,10 +389,14 @@ namespace GAS.Editor
             }
             else
             {
-                foreach (var tagByte in activeTags)
+                foreach (var tag in activeTags)
                 {
-                    GameplayTag tag = (GameplayTag)tagByte;
-                    EditorGUILayout.LabelField($"• {tag} ({tagByte})", EditorStyles.miniLabel);
+                    int count = asc.GetTagCount(tag);
+                    byte tagByte = (byte)tag;
+
+                    // Show tag name and reference count
+                    string countLabel = count > 1 ? $" [x{count}]" : "";
+                    EditorGUILayout.LabelField($"• {tag} ({tagByte}){countLabel}", EditorStyles.miniLabel);
                 }
             }
 

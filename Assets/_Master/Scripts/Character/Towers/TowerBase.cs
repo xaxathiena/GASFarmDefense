@@ -115,7 +115,7 @@ namespace FD.Character
             // Try to activate each active ability that can be activated
             foreach (var abilityInit in abilities)
             {
-                if (!abilityInit.isPassive && abilityInit.ability != null && CanActivateAbility(abilityInit.ability))
+                if (abilityInit.isPassive && abilityInit.ability != null && CanActivateAbility(abilityInit.ability))
                 {
                     abilitySystemComponent.TryActivateAbility(abilityInit.ability);
                 }

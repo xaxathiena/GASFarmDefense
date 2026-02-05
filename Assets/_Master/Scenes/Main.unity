@@ -167,8 +167,8 @@ MonoBehaviour:
     delayBeforeWave: 0
     enemies:
     - enemyPrefab: {fileID: 724810737048468215, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
-      count: 1
-      spawnInterval: 2
+      count: 10
+      spawnInterval: 3
 --- !u!4 &6875329
 Transform:
   m_ObjectHideFlags: 0
@@ -1375,51 +1375,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 357557171}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &364894149
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 364894151}
-  - component: {fileID: 364894150}
-  m_Layer: 0
-  m_Name: ASC
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &364894150
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 364894149}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f584b67cc8e12654291cb0f36aeb973a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  grantedAbilities: []
---- !u!4 &364894151
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 364894149}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1173537153}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &436228441
 GameObject:
   m_ObjectHideFlags: 0
@@ -2464,6 +2419,7 @@ GameObject:
   - component: {fileID: 1173537151}
   - component: {fileID: 1173537150}
   - component: {fileID: 1173537149}
+  - component: {fileID: 1173537154}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -2483,13 +2439,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6834a45943135034fbdfda6e59b4a825, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilitySystemComponent: {fileID: 364894150}
+  abilitySystemComponent: {fileID: 1173537154}
   armorType: 1
   abilities:
-  - ability: {fileID: 11400000, guid: 789665ed671035845bc384b19712f854, type: 2}
-    level: 1
-    isPassive: 0
-  - ability: {fileID: 11400000, guid: 8dac5a15c98a2415e96ce0be6194dc14, type: 2}
+  - ability: {fileID: 11400000, guid: 5d697f951eee64f3393e6dfe222f5d3d, type: 2}
     level: 1
     isPassive: 1
   targetRange: 11.13
@@ -2588,10 +2541,22 @@ Transform:
   m_LocalPosition: {x: -23.87, y: 0.98, z: 17.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 364894151}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1173537154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173537148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f584b67cc8e12654291cb0f36aeb973a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grantedAbilities: []
 --- !u!1 &1285510372
 GameObject:
   m_ObjectHideFlags: 0
@@ -4061,7 +4026,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4694688756292592845, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7098978771037612272, guid: 46a53775df32b5e4c81d5b3635ec7590, type: 3}
       propertyPath: m_LocalPosition.x

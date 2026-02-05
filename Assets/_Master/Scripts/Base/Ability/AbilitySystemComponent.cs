@@ -18,7 +18,9 @@ namespace GAS
         private readonly Dictionary<GameplayAbility, GameplayAbilitySpec> specLookup = new Dictionary<GameplayAbility, GameplayAbilitySpec>();
 
         // Runtime data
-        private HashSet<byte> activeTags = new HashSet<byte>();
+        // Tag reference counting: tracks how many effects are granting each tag
+        // Only remove tag when count reaches 0
+        private Dictionary<byte, int> activeTagCounts = new Dictionary<byte, int>();
         private Dictionary<GameplayAbility, float> abilityCooldowns = new Dictionary<GameplayAbility, float>();
         private List<GameplayAbility> activeAbilities = new List<GameplayAbility>();
         private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
@@ -203,7 +205,8 @@ namespace GAS
         #region Tags
 
         /// <summary>
-        /// Add gameplay tags
+        /// Add gameplay tags (with reference counting)
+        /// Multiple effects can grant the same tag - tag will only be removed when all are gone
         /// </summary>
         public void AddTags(params GameplayTag[] tags)
         {
@@ -213,12 +216,23 @@ namespace GAS
             foreach (var tag in tags)
             {
                 if (tag != GameplayTag.None)
-                    activeTags.Add((byte)tag);
+                {
+                    byte tagByte = (byte)tag;
+                    if (activeTagCounts.ContainsKey(tagByte))
+                    {
+                        activeTagCounts[tagByte]++;
+                    }
+                    else
+                    {
+                        activeTagCounts[tagByte] = 1;
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Remove gameplay tags
+        /// Remove gameplay tags (with reference counting)
+        /// Tag is only removed when count reaches 0 (no more effects granting it)
         /// </summary>
         public void RemoveTags(params GameplayTag[] tags)
         {
@@ -227,7 +241,17 @@ namespace GAS
 
             foreach (var tag in tags)
             {
-                activeTags.Remove((byte)tag);
+                byte tagByte = (byte)tag;
+                if (activeTagCounts.ContainsKey(tagByte))
+                {
+                    activeTagCounts[tagByte]--;
+                    
+                    // Remove tag completely when count reaches 0
+                    if (activeTagCounts[tagByte] <= 0)
+                    {
+                        activeTagCounts.Remove(tagByte);
+                    }
+                }
             }
         }
 
@@ -241,7 +265,7 @@ namespace GAS
 
             foreach (var tag in tags)
             {
-                if (activeTags.Contains((byte)tag))
+                if (activeTagCounts.ContainsKey((byte)tag))
                     return true;
             }
             return false;
@@ -257,10 +281,32 @@ namespace GAS
 
             foreach (var tag in tags)
             {
-                if (!activeTags.Contains((byte)tag))
+                if (!activeTagCounts.ContainsKey((byte)tag))
                     return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Get tag count for debugging (how many effects are granting this tag)
+        /// </summary>
+        public int GetTagCount(GameplayTag tag)
+        {
+            byte tagByte = (byte)tag;
+            return activeTagCounts.ContainsKey(tagByte) ? activeTagCounts[tagByte] : 0;
+        }
+
+        /// <summary>
+        /// Get all active tags (for debugging/display)
+        /// </summary>
+        public List<GameplayTag> GetActiveTags()
+        {
+            var tags = new List<GameplayTag>();
+            foreach (var tagByte in activeTagCounts.Keys)
+            {
+                tags.Add((GameplayTag)tagByte);
+            }
+            return tags;
         }
 
         #endregion
@@ -407,8 +453,8 @@ namespace GAS
             }
 
             // Subscribe to expiration
-            activeEffect.OnEffectExpired += OnGameplayEffectExpired;
-            activeEffect.OnEffectRemoved += OnGameplayEffectRemoved;
+            activeEffect.OnEffectExpired += target.OnGameplayEffectExpired;
+            activeEffect.OnEffectRemoved += target.OnGameplayEffectRemoved;
 
             // Add to active effects
             target.activeGameplayEffects.Add(activeEffect);
