@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ff7eafa15209349a4ced771f94c260, type: 3}
+  m_Name: GE_BurningDamage
+  m_EditorClassIdentifier: Assembly-CSharp::GAS.GameplayEffect
+  effectName: Burning Damage
+  description: Burns the target for 20 damage per second
+  durationType: 2
+  durationMagnitude: 0
+  isPeriodic: 1
+  period: 1
+  modifiers:
+  - attribute:
+      attributeType: 0
+    operation: 0
+    calculationType: 0
+    scalableMagnitude:
+      scalingMode: 0
+      flatValue: -20
+      scalingCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 11.111111
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 10
+          value: 100
+          inSlope: 11.111111
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      csvAsset: {fileID: 0}
+      csvColumn: 
+      previewLevel: 1
+      attributeType: 0
+    backingAttribute:
+      attributeType: 0
+    attributeSource: 0
+    snapshotAttribute: 0
+    coefficient: 1
+    preMultiplyAdditiveValue: 0
+    postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 0}
+    setByCallerTag: 
+    magnitude: 0
+  grantedTags: 0c
+  applicationRequiredTags: 
+  applicationBlockedByTags: 
+  removeTagsOnApplication: 
+  allowStacking: 0
+  maxStacks: 1
+  refreshDurationOnStack: 1

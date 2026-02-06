@@ -2442,9 +2442,9 @@ MonoBehaviour:
   abilitySystemComponent: {fileID: 1173537154}
   armorType: 1
   abilities:
-  - ability: {fileID: 11400000, guid: 5d697f951eee64f3393e6dfe222f5d3d, type: 2}
+  - ability: {fileID: 11400000, guid: c2771c54ea81d40ce835684d1d9cad46, type: 2}
     level: 1
-    isPassive: 1
+    isPassive: 0
   targetRange: 11.13
   targetLayerMask:
     serializedVersion: 2
@@ -4628,6 +4628,71 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079041151}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &554675368284346704
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3195278571368639887, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 897736a7ea5dc402182dbcf788ddf087, type: 2}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3363499116891387388, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4326346549293357494, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_Name
+      value: FireAreaPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 4326346549293357494, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 297c24a9df2cb4b3cbf641a631b99111, type: 3}
 --- !u!1001 &5495070495830403292
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4636,6 +4701,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 267269757}
     m_Modifications:
+    - target: {fileID: 3401131035954311743, guid: 8a8a9a08ecab35542bb1a8b7bff1c31d, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 3401131035954311743, guid: 8a8a9a08ecab35542bb1a8b7bff1c31d, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 3626291879446464094, guid: 8a8a9a08ecab35542bb1a8b7bff1c31d, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4822,6 +4895,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HealthTextUI
       objectReference: {fileID: 0}
+    - target: {fileID: 3872067818080450094, guid: 95414297320593c428fff898b91bd714, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 3872067818080450094, guid: 95414297320593c428fff898b91bd714, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4848,3 +4929,4 @@ SceneRoots:
   - {fileID: 728825345}
   - {fileID: 855052821}
   - {fileID: 1845189171}
+  - {fileID: 554675368284346704}
