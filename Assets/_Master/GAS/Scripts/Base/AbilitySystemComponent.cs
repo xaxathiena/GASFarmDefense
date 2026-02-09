@@ -111,7 +111,9 @@ namespace GAS
             var spec = GetAbilitySpec(ability);
             if (spec == null)
             {
+#if UNITY_EDITOR
                 Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {gameObject.name}");
+#endif
                 return false;
             }
 
@@ -125,7 +127,9 @@ namespace GAS
         {
             if (spec == null || spec.Definition == null)
             {
+#if UNITY_EDITOR
                 Debug.LogWarning($"Invalid ability spec on {gameObject.name}");
+#endif
                 return false;
             }
 
@@ -406,7 +410,9 @@ namespace GAS
                 {
                     if (existingEffect.AddStack())
                     {
+#if UNITY_EDITOR
                         Debug.Log($"Stacked {effect.effectName} on {target.gameObject.name} (x{existingEffect.StackCount})");
+#endif
                         return existingEffect;
                     }
                 }
@@ -439,7 +445,6 @@ namespace GAS
                     }
                 }
 
-                Debug.Log($"Applied instant effect {effect.effectName} to {target.gameObject.name}");
                 return activeEffect; // Don't add to active list
             }
 
@@ -459,7 +464,6 @@ namespace GAS
             // Add to active effects
             target.activeGameplayEffects.Add(activeEffect);
 
-            Debug.Log($"Applied {effect.effectName} to {target.gameObject.name} (Duration: {activeEffect.Duration}s)");
             return activeEffect;
         }
 
@@ -485,7 +489,6 @@ namespace GAS
             }
 
             activeGameplayEffects.Remove(activeEffect);
-            Debug.Log($"Removed {activeEffect.Effect.effectName} from {gameObject.name}");
         }
 
         /// <summary>

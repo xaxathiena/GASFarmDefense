@@ -28,7 +28,11 @@ namespace FD.Character
         [SerializeField] private Color rangeGizmoColor = new Color(0.2f, 0.8f, 1f, 0.2f);
         [SerializeField] private Color targetLineColor = new Color(1f, 0.4f, 0.1f, 0.9f);
 
+        [Header("Performance")]
+        [SerializeField] private float targetUpdateInterval = 0.2f; // Update targets 5 times per second
+
         private List<Transform> cachedTargets = new List<Transform>();
+        private float nextTargetUpdateTime;
 
         protected override void InitializeAttributeSet()
         {
@@ -103,8 +107,12 @@ namespace FD.Character
                 return;
             }
 
-            // Get targets first
-            cachedTargets = GetTargets();
+            // Get targets first - but only update periodically
+            if (Time.time >= nextTargetUpdateTime)
+            {
+                cachedTargets = GetTargets();
+                nextTargetUpdateTime = Time.time + targetUpdateInterval;
+            }
 
             // Try to activate each ability that can be activated
             foreach (var abilityInit in abilities)
@@ -148,6 +156,10 @@ namespace FD.Character
             return true;
         }
 
+        // Reusable buffers to avoid allocations
+        private static Collider[] colliderBuffer = new Collider[50];
+        private static List<Transform> candidateBuffer = new List<Transform>(50);
+
         public override List<Transform> GetTargets()
         {
             var targets = new List<Transform>();
@@ -156,41 +168,51 @@ namespace FD.Character
                 return targets;
             }
 
-            var colliders = Physics.OverlapSphere(transform.position, targetRange, targetLayerMask);
-            if (colliders == null || colliders.Length == 0)
+            // Use NonAlloc version to avoid GC allocations
+            int hitCount = Physics.OverlapSphereNonAlloc(transform.position, targetRange, colliderBuffer, targetLayerMask);
+            if (hitCount == 0)
             {
                 return targets;
             }
 
-            var candidates = new List<Transform>();
-            foreach (var col in colliders)
+            candidateBuffer.Clear();
+            for (int i = 0; i < hitCount; i++)
             {
+                var col = colliderBuffer[i];
                 if (col == null)
                 {
                     continue;
                 }
 
-                var enemy = col.GetComponentInParent<EnemyBase>();
-                if (enemy != null)
+                // Try to get component directly first (faster than GetComponentInParent)
+                var enemy = col.GetComponent<EnemyBase>();
+                if (enemy == null)
                 {
-                    candidates.Add(enemy.transform);
+                    enemy = col.GetComponentInParent<EnemyBase>();
+                }
+                
+                if (enemy != null && !candidateBuffer.Contains(enemy.transform))
+                {
+                    candidateBuffer.Add(enemy.transform);
                 }
             }
 
-            candidates.Sort((a, b) =>
+            // Sort by distance (closest first) - using sqrMagnitude to avoid sqrt
+            Vector3 pos = transform.position;
+            candidateBuffer.Sort((a, b) =>
             {
                 if (a == null && b == null) return 0;
                 if (a == null) return 1;
                 if (b == null) return -1;
-                float da = Vector3.Distance(transform.position, a.position);
-                float db = Vector3.Distance(transform.position, b.position);
+                float da = (a.position - pos).sqrMagnitude;
+                float db = (b.position - pos).sqrMagnitude;
                 return da.CompareTo(db);
             });
 
-            int limit = maxTargets <= 0 ? candidates.Count : Mathf.Min(maxTargets, candidates.Count);
+            int limit = maxTargets <= 0 ? candidateBuffer.Count : Mathf.Min(maxTargets, candidateBuffer.Count);
             for (int i = 0; i < limit; i++)
             {
-                targets.Add(candidates[i]);
+                targets.Add(candidateBuffer[i]);
             }
 
             return targets;

@@ -8,6 +8,7 @@ namespace FD.Character
         [Header("Enemy Specific")]
         [SerializeField] protected float detectionRange = 10f;
         [SerializeField] protected float attackRange = 2f;
+        [SerializeField] protected float InitHealth = 1000f;
         [SerializeField] protected Transform target;
         [Header("UI References")]
         [SerializeField] private DamagePopupManager damagePopupManager;
@@ -21,7 +22,7 @@ namespace FD.Character
         protected override void InitializeAttributeSet()
         {
             attributeSet.MoveSpeed.BaseValue = 3f;
-            attributeSet.MaxHealth.BaseValue = 200f;
+            attributeSet.MaxHealth.BaseValue = InitHealth;
             attributeSet.Health.BaseValue = attributeSet.MaxHealth.BaseValue;
             attributeSet.Armor.BaseValue = 5f;
             attributeSet.Mana.BaseValue = 100f;

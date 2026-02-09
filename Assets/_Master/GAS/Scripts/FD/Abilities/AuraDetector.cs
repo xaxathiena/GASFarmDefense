@@ -47,7 +47,9 @@ namespace FD.Ability
 
             isInitialized = true;
 
+#if UNITY_EDITOR
             Debug.Log($"AuraDetector initialized - Radius: {radius}, Duration: {duration}");
+#endif
         }
 
         private void SetupCollider()
@@ -167,7 +169,6 @@ namespace FD.Ability
             // Check if already affected by this aura
             if (affectedTargets.ContainsKey(targetASC))
             {
-                Debug.LogWarning($"Target {targetASC.gameObject.name} already affected by this aura");
                 return;
             }
 
@@ -201,17 +202,6 @@ namespace FD.Ability
             if (activeEffect != null)
             {
                 targetASC.RemoveGameplayEffect(activeEffect);
-#if UNITY_EDITOR
-                Debug.Log($"✗ Removed slow from {targetASC.gameObject.name}");
-
-                // Log restored speed
-                var attrSet = targetASC.AttributeSet;
-                if (attrSet != null)
-                {
-                    float currentSpeed = attrSet.GetAttribute(EGameplayAttributeType.MoveSpeed).CurrentValue;
-                    Debug.Log($"  → Restored MoveSpeed: {currentSpeed:F2}");
-                }
-#endif
             }
 
             affectedTargets.Remove(targetASC);
@@ -219,8 +209,6 @@ namespace FD.Ability
 
         private void DestroyAura()
         {
-            Debug.Log("Aura expired, removing all effects");
-
             // Remove all effects before destroying
             var targets = new List<AbilitySystemComponent>(affectedTargets.Keys);
             foreach (var target in targets)
@@ -235,19 +223,21 @@ namespace FD.Ability
         private void OnDestroy()
         {
             // Cleanup on unexpected destroy
-            var targets = new List<AbilitySystemComponent>(affectedTargets.Keys);
-            foreach (var target in targets)
+            if (affectedTargets.Count > 0)
             {
-                if (target != null)
+                var targets = new List<AbilitySystemComponent>(affectedTargets.Keys);
+                foreach (var target in targets)
                 {
-                    var activeEffect = affectedTargets[target];
-                    if (activeEffect != null)
+                    if (target != null && affectedTargets.TryGetValue(target, out var activeEffect))
                     {
-                        target.RemoveGameplayEffect(activeEffect);
+                        if (activeEffect != null)
+                        {
+                            target.RemoveGameplayEffect(activeEffect);
+                        }
                     }
                 }
+                affectedTargets.Clear();
             }
-            affectedTargets.Clear();
         }
 
         // Debug visualization in Scene view
@@ -264,11 +254,11 @@ namespace FD.Ability
 
             // Draw affected targets
             Gizmos.color = Color.red;
-            foreach (var target in affectedTargets.Keys)
+            foreach (var kvp in affectedTargets)
             {
-                if (target != null)
+                if (kvp.Key != null)
                 {
-                    Gizmos.DrawLine(transform.position, target.transform.position);
+                    Gizmos.DrawLine(transform.position, kvp.Key.transform.position);
                 }
             }
         }
