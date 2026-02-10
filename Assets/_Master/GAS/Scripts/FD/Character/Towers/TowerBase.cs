@@ -157,7 +157,6 @@ namespace FD.Character
         }
 
         // Reusable buffers to avoid allocations
-        private static Collider[] colliderBuffer = new Collider[50];
         private static List<Transform> candidateBuffer = new List<Transform>(50);
 
         public override List<Transform> GetTargets()
@@ -168,33 +167,12 @@ namespace FD.Character
                 return targets;
             }
 
-            // Use NonAlloc version to avoid GC allocations
-            int hitCount = Physics.OverlapSphereNonAlloc(transform.position, targetRange, colliderBuffer, targetLayerMask);
-            if (hitCount == 0)
+            // Use EnemyManager for distance-based queries (no Physics overhead)
+            candidateBuffer = EnemyManager.GetEnemiesInRange(transform.position, targetRange, targetLayerMask);
+            
+            if (candidateBuffer.Count == 0)
             {
                 return targets;
-            }
-
-            candidateBuffer.Clear();
-            for (int i = 0; i < hitCount; i++)
-            {
-                var col = colliderBuffer[i];
-                if (col == null)
-                {
-                    continue;
-                }
-
-                // Try to get component directly first (faster than GetComponentInParent)
-                var enemy = col.GetComponent<EnemyBase>();
-                if (enemy == null)
-                {
-                    enemy = col.GetComponentInParent<EnemyBase>();
-                }
-                
-                if (enemy != null && !candidateBuffer.Contains(enemy.transform))
-                {
-                    candidateBuffer.Add(enemy.transform);
-                }
             }
 
             // Sort by distance (closest first) - using sqrMagnitude to avoid sqrt

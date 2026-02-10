@@ -19,6 +19,18 @@ namespace FD.Character
             ResolveDamagePopupManager();
             // Enemy specific initialization
         }
+
+        protected virtual void OnEnable()
+        {
+            // Register with EnemyManager when enabled
+            EnemyManager.RegisterEnemy(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            // Unregister from EnemyManager when disabled
+            EnemyManager.UnregisterEnemy(this);
+        }
         protected override void InitializeAttributeSet()
         {
             attributeSet.MoveSpeed.BaseValue = 3f;
@@ -94,7 +106,8 @@ namespace FD.Character
 
         protected virtual void OnDeath()
         {
-            Debug.Log($"[EnemyBase] {name} died!");
+            // Unregister before destroying
+            EnemyManager.UnregisterEnemy(this);
             Destroy(gameObject);
         }
         private DamagePopupManager ResolveDamagePopupManager()

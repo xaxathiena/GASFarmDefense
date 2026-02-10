@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6521051210487376367}
   - component: {fileID: 8299845086593343832}
-  - component: {fileID: 2060599304591416843}
   - component: {fileID: 7130750759339006254}
   - component: {fileID: 5890507681844425597}
   - component: {fileID: 5171494716943734804}
@@ -44,27 +43,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3912714553957862480}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &2060599304591416843
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3912714553957862480}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &7130750759339006254
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -141,6 +119,7 @@ MonoBehaviour:
   maxTargets: 1
   rangeGizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.2}
   targetLineColor: {r: 1, g: 0.4, b: 0.1, a: 0.9}
+  targetUpdateInterval: 0.2
 --- !u!114 &5171494716943734804
 MonoBehaviour:
   m_ObjectHideFlags: 0

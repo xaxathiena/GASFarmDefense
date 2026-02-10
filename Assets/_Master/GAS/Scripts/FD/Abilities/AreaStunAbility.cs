@@ -48,12 +48,9 @@ namespace FD.Ability
             
             if (enemiesInRange.Count == 0)
             {
-                Debug.Log($"[AreaStunAbility] No enemies found in range for {owner.name}");
                 EndAbility(asc, spec);
                 return;
             }
-
-            Debug.Log($"[AreaStunAbility] Found {enemiesInRange.Count} enemies in range");
 
             // Apply stun to each enemy
             int stunnedCount = 0;
@@ -70,7 +67,6 @@ namespace FD.Ability
                 // Check if target is immune to stun
                 if (IsImmune(targetASC))
                 {
-                    Debug.Log($"[AreaStunAbility] {enemy.name} is IMMUNE to stun!");
                     immuneCount++;
                     OnStunBlocked(enemy, targetASC);
                     continue;
@@ -80,13 +76,11 @@ namespace FD.Ability
                 if (stunEffect != null)
                 {
                     asc.ApplyGameplayEffectToTarget(stunEffect, targetASC, asc, spec.Level);
-                    Debug.Log($"[AreaStunAbility] {enemy.name} is STUNNED for {stunDuration}s!");
                     stunnedCount++;
                     OnStunApplied(enemy, targetASC);
                 }
             }
 
-            Debug.Log($"[AreaStunAbility] Stunned {stunnedCount} enemies, {immuneCount} were immune");
             EndAbility(asc, spec);
         }
 
@@ -97,20 +91,22 @@ namespace FD.Ability
         {
             var enemies = new List<GameObject>();
             
-            // Use OverlapSphere to find all colliders in range
-            Collider[] colliders = Physics.OverlapSphere(center, detectionRadius, enemyLayerMask);
+            // Use EnemyManager for efficient distance-based queries (no Physics overhead)
+            var enemyTransforms = EnemyManager.GetEnemiesInRange(center, detectionRadius, enemyLayerMask);
             
-            foreach (var collider in colliders)
+            foreach (var transform in enemyTransforms)
             {
+                if (transform == null) continue;
+                
                 // Check if has AbilitySystemComponent (valid target)
-                var asc = collider.GetComponent<AbilitySystemComponent>();
+                var asc = transform.GetComponent<AbilitySystemComponent>();
                 if (asc != null)
                 {
                     // Check if is enemy (has BaseCharacter and is not friendly)
-                    var baseChar = collider.GetComponent<BaseCharacter>();
+                    var baseChar = transform.GetComponent<BaseCharacter>();
                     if (baseChar != null)
                     {
-                        enemies.Add(collider.gameObject);
+                        enemies.Add(transform.gameObject);
                     }
                 }
             }

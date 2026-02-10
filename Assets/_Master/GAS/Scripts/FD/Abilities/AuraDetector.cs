@@ -8,6 +8,7 @@ namespace FD.Ability
     /// <summary>
     /// Detects enemies entering/exiting aura and applies/removes slow effect
     /// Handles effect stacking automatically through GAS system
+    /// Uses distance-based detection via EnemyManager (no Physics)
     /// </summary>
     public class AuraDetector : MonoBehaviour
     {
@@ -21,12 +22,22 @@ namespace FD.Ability
         private Dictionary<AbilitySystemComponent, ActiveGameplayEffect> affectedTargets
             = new Dictionary<AbilitySystemComponent, ActiveGameplayEffect>();
 
-        private SphereCollider triggerCollider;
+        // Track enemies currently in range for enter/exit detection
+        private HashSet<Transform> enemiesInRange = new HashSet<Transform>();
+        
+        // Reusable buffers to avoid allocations
+        private HashSet<Transform> currentEnemiesSet = new HashSet<Transform>();
+        private List<Transform> exitedEnemiesBuffer = new List<Transform>();
+
         private GameObject visualSphere;
         private float timer;
         private bool isInitialized = false;
         private LayerMask enemyLayer;
         private bool removeAuraAfterDuration = true;
+
+        [Header("Performance")]
+        [SerializeField] private float checkInterval = 0.1f; // Check 10 times per second
+        private float nextCheckTime;
 
         /// <summary>
         /// Initialize the aura detector
@@ -42,36 +53,14 @@ namespace FD.Ability
             removeAuraAfterDuration = auraDuration > 0;
             timer = duration;
             this.enemyLayer = enemyLayer;
-            SetupCollider();
             SetupVisuals();
 
             isInitialized = true;
+            nextCheckTime = Time.time;
 
 #if UNITY_EDITOR
             Debug.Log($"AuraDetector initialized - Radius: {radius}, Duration: {duration}");
 #endif
-        }
-
-        private void SetupCollider()
-        {
-            // Create trigger collider for detection
-            triggerCollider = gameObject.GetComponent<SphereCollider>();
-            if (triggerCollider == null)
-            {
-                triggerCollider = gameObject.AddComponent<SphereCollider>();
-            }
-
-            triggerCollider.isTrigger = true;
-            triggerCollider.radius = radius;
-
-            // Add Rigidbody for trigger to work
-            var rb = gameObject.GetComponent<Rigidbody>();
-            if (rb == null)
-            {
-                rb = gameObject.AddComponent<Rigidbody>();
-            }
-            rb.isKinematic = true;
-            rb.useGravity = false;
         }
 
         private void SetupVisuals()
@@ -130,35 +119,88 @@ namespace FD.Ability
                 }
             }
 
+            // Check for enemies in range periodically (no Physics)
+            if (Time.time >= nextCheckTime)
+            {
+                CheckEnemiesInRange();
+                nextCheckTime = Time.time + checkInterval;
+            }
         }
 
-        private void OnTriggerEnter(Collider other)
+        /// <summary>
+        /// Check enemies in range using EnemyManager (distance-based, no Physics)
+        /// </summary>
+        private void CheckEnemiesInRange()
         {
-            if (!isInitialized) return;
-            if (((1 << other.gameObject.layer) & enemyLayer) == 0) return;
-            // Enemy enters aura
-            var character = other.GetComponent<BaseCharacter>();
+            // Get current enemies in range from EnemyManager
+            var currentEnemies = EnemyManager.GetEnemiesInRange(transform.position, radius, enemyLayer);
+            
+            // Reuse HashSet to avoid allocation
+            currentEnemiesSet.Clear();
+            for (int i = 0; i < currentEnemies.Count; i++)
+            {
+                if (currentEnemies[i] != null)
+                {
+                    currentEnemiesSet.Add(currentEnemies[i]);
+                }
+            }
+
+            // Find enemies that entered range (new enemies)
+            foreach (var enemy in currentEnemiesSet)
+            {
+                if (!enemiesInRange.Contains(enemy))
+                {
+                    // Enemy just entered range
+                    OnEnemyEnter(enemy);
+                }
+            }
+
+            // Find enemies that exited range (missing enemies)
+            exitedEnemiesBuffer.Clear();
+            foreach (var enemy in enemiesInRange)
+            {
+                if (enemy == null || !currentEnemiesSet.Contains(enemy))
+                {
+                    exitedEnemiesBuffer.Add(enemy);
+                }
+            }
+
+            for (int i = 0; i < exitedEnemiesBuffer.Count; i++)
+            {
+                OnEnemyExit(exitedEnemiesBuffer[i]);
+            }
+
+            // Swap sets to avoid allocation (just clear and refill)
+            enemiesInRange.Clear();
+            foreach (var enemy in currentEnemiesSet)
+            {
+                enemiesInRange.Add(enemy);
+            }
+        }
+
+        private void OnEnemyEnter(Transform enemyTransform)
+        {
+            var character = enemyTransform.GetComponent<BaseCharacter>();
             if (character == null) return;
 
             var targetASC = character.AbilitySystemComponent;
             if (targetASC == null || targetASC == ownerASC) return;
 
-            // Apply slow effect
+            // Apply effect
             ApplyEffect(targetASC);
         }
 
-        private void OnTriggerExit(Collider other)
+        private void OnEnemyExit(Transform enemyTransform)
         {
-            if (!isInitialized) return;
+            if (enemyTransform == null) return;
 
-            // Enemy exits aura
-            var character = other.GetComponent<BaseCharacter>();
+            var character = enemyTransform.GetComponent<BaseCharacter>();
             if (character == null) return;
 
             var targetASC = character.AbilitySystemComponent;
             if (targetASC == null) return;
 
-            // Remove slow effect
+            // Remove effect
             RemoveEffect(targetASC);
         }
 
@@ -174,24 +216,10 @@ namespace FD.Ability
 
             // Apply effect and store handle
             var activeEffect = targetASC.ApplyGameplayEffectToSelf(effectToApply, ownerASC);
-#if UNITY_EDITOR
             if (activeEffect != null)
             {
                 affectedTargets[targetASC] = activeEffect;
-
-                // Debug info
-                int stackCount = activeEffect.StackCount;
-                Debug.Log($"✓ Applied slow to {targetASC.gameObject.name} (Stack: {stackCount})");
-
-                // Log current move speed
-                var attrSet = targetASC.AttributeSet;
-                if (targetASC.AttributeSet != null)
-                {
-                    float currentSpeed = attrSet.GetAttribute(EGameplayAttributeType.MoveSpeed).CurrentValue;
-                    Debug.Log($"  → Current MoveSpeed: {currentSpeed:F2}");
-                }
             }
-#endif
         }
 
         private void RemoveEffect(AbilitySystemComponent targetASC)
