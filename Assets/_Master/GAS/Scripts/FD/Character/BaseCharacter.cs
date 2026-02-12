@@ -25,7 +25,7 @@ namespace FD.Character
             {
                 abilitySystemComponent = GetComponent<AbilitySystemComponent>();
             }
-            abilitySystemComponent.InitOwner(this.gameObject);
+            abilitySystemComponent.InitOwner(transform);
             Initialize();
         }
 

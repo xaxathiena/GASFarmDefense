@@ -88,7 +88,7 @@ namespace FD.UI
             if (targetASC == null || iconContainer == null || worldCamera == null)
                 return;
 
-            Vector3 worldPos = targetASC.transform.position + worldOffset;
+            Vector3 worldPos = targetASC.GetOwner().position + worldOffset;
             Vector3 screenPos = worldCamera.WorldToScreenPoint(worldPos);
 
             // Check if position is in front of camera

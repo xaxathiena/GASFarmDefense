@@ -4,6 +4,7 @@ using FD.Data;
 using FD.Services;
 using FD.Views;
 using FD.Events;
+using VContainer.Unity;
 
 namespace FD.Controllers
 {
@@ -16,7 +17,7 @@ namespace FD.Controllers
     /// NOTE: Implements ITickable interface - sẽ được VContainer gọi mỗi frame
     /// Tạm thời chưa implement ITickable vì cần VContainer package
     /// </summary>
-    public class EnemyController : IEnemy, IDisposable
+    public class EnemyController : IEnemy, IDisposable, ITickable
     {
         // Dependencies - Injected qua constructor
         private readonly IEnemyMovementService _movementService;
@@ -25,11 +26,11 @@ namespace FD.Controllers
         private readonly IGameplayEventBus _eventBus;
         
         // Data
-        private readonly EnemyData _config;
-        private readonly EnemyState _state;
+        private EnemyData _config;
+        private EnemyState _state;
         
         // View reference
-        private readonly EnemyView _view;
+        private EnemyView _view;
         
         // IEnemy implementation
         public Transform Transform => _view.Transform;
@@ -41,20 +42,24 @@ namespace FD.Controllers
         
         // Constructor - VContainer auto-inject
         public EnemyController(
-            EnemyView view,
-            EnemyData config,
             IEnemyMovementService movementService,
             IEnemyAIService aiService,
             IEnemyRegistry registry,
             IGameplayEventBus eventBus)
         {
-            _view = view ?? throw new ArgumentNullException(nameof(view));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
             _movementService = movementService ?? throw new ArgumentNullException(nameof(movementService));
             _aiService = aiService ?? throw new ArgumentNullException(nameof(aiService));
             _registry = registry ?? throw new ArgumentNullException(nameof(registry));
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
             
+            
+        }
+        public void OnSetup(
+            EnemyView view,
+            EnemyData config)
+        {
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             // Initialize state
             _state = new EnemyState
             {
@@ -68,7 +73,6 @@ namespace FD.Controllers
             _view.OnDespawned += OnViewDespawned;
             _view.OnDestroyed += OnViewDestroyed;
         }
-        
         // Lifecycle handlers
         private void OnViewSpawned(EnemyView view)
         {

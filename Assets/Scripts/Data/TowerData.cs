@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using GAS;
+using static FD.Character.TowerBase;
 
 namespace FD.Data
 {
@@ -32,7 +33,7 @@ namespace FD.Data
         public float ManaRegen { get; set; }
         
         // Abilities
-        public List<AbilityConfig> Abilities { get; set; }
+        public List<AbilityInit> Abilities { get; set; }
         
         // Performance
         public float TargetUpdateInterval { get; set; }
@@ -52,7 +53,7 @@ namespace FD.Data
             MaxMana = 100f;
             ManaRegen = 2f;
             TargetUpdateInterval = 0.2f;
-            Abilities = new List<AbilityConfig>();
+            Abilities = new List<AbilityInit>();
         }
         
         public static TowerData CreateBasic()

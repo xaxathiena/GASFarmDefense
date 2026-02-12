@@ -24,7 +24,7 @@ namespace GAS
         private Dictionary<GameplayAbility, float> abilityCooldowns = new Dictionary<GameplayAbility, float>();
         private List<GameplayAbility> activeAbilities = new List<GameplayAbility>();
         private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
-        private GameObject owner;
+        private Transform owner;
         public AttributeSet AttributeSet => attributeSet;
 
         private void Update()
@@ -41,16 +41,12 @@ namespace GAS
             // Update active gameplay effects
             UpdateGameplayEffects(Time.deltaTime);
         }
-        public void InitOwner(GameObject owner)
+        public void InitOwner(Transform owner)
         {
             this.owner = owner;
         }
-        public virtual GameObject GetOwner()
+        public virtual Transform GetOwner()
         {
-            if(owner == null)
-            {
-                owner = this.gameObject;
-            }
             return owner;
         }
         /// <summary>
@@ -112,7 +108,7 @@ namespace GAS
             if (spec == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {gameObject.name}");
+                Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {owner.name}");
 #endif
                 return false;
             }
@@ -128,7 +124,7 @@ namespace GAS
             if (spec == null || spec.Definition == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Invalid ability spec on {gameObject.name}");
+                Debug.LogWarning($"Invalid ability spec on {owner.name}");
 #endif
                 return false;
             }
@@ -398,7 +394,7 @@ namespace GAS
             // Check if effect can be applied
             if (!effect.CanApplyTo(target))
             {
-                Debug.LogWarning($"Cannot apply {effect.effectName} to {target.gameObject.name}");
+                Debug.LogWarning($"Cannot apply {effect.effectName} to {target.owner.name}");
                 return null;
             }
 
@@ -411,7 +407,7 @@ namespace GAS
                     if (existingEffect.AddStack())
                     {
 #if UNITY_EDITOR
-                        Debug.Log($"Stacked {effect.effectName} on {target.gameObject.name} (x{existingEffect.StackCount})");
+                        Debug.Log($"Stacked {effect.effectName} on {target.owner.name} (x{existingEffect.StackCount})");
 #endif
                         return existingEffect;
                     }

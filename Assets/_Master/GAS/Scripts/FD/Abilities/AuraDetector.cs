@@ -286,7 +286,7 @@ namespace FD.Ability
             {
                 if (kvp.Key != null)
                 {
-                    Gizmos.DrawLine(transform.position, kvp.Key.transform.position);
+                    Gizmos.DrawLine(transform.position, kvp.Key.GetOwner().position);
                 }
             }
         }

@@ -64,13 +64,13 @@ namespace FD.Ability
         
         private void SpawnProjectile(AbilitySystemComponent source, AbilitySystemComponent target)
         {
-            var sourcePos = source.transform.position;
-            var targetPos = target.transform.position;
+            var sourcePos = source.GetOwner().position;
+            var targetPos = target.GetOwner().position;
             
             var projectile = Instantiate(projectilePrefab, sourcePos, Quaternion.identity);
             
             // TODO: Setup projectile movement
-            Debug.Log($"[{abilityName}] Spawned projectile from {source.name} to {target.name}");
+            Debug.Log($"[{abilityName}] Spawned projectile from {source.GetOwner().name} to {target.GetOwner().name}");
         }
     }
 }

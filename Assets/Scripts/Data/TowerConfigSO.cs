@@ -37,44 +37,7 @@ namespace FD.Data
         [Header("Performance")]
         public float targetUpdateInterval = 0.2f;
         
-        /// <summary>
-        /// Convert ScriptableObject to pure data
-        /// </summary>
-        public TowerData ToTowerData()
-        {
-            var data = new TowerData
-            {
-                TowerID = towerID,
-                Level = level,
-                TargetRange = targetRange,
-                MaxTargets = maxTargets,
-                TargetLayerMask = targetLayerMask,
-                BaseDamage = baseDamage,
-                AttackSpeed = attackSpeed,
-                CriticalChance = criticalChance,
-                CriticalMultiplier = criticalMultiplier,
-                MaxHealth = maxHealth,
-                MaxMana = maxMana,
-                ManaRegen = manaRegen,
-                TargetUpdateInterval = targetUpdateInterval,
-                Abilities = new List<AbilityConfig>()
-            };
-            
-            foreach (var entry in abilities)
-            {
-                if (entry.ability != null)
-                {
-                    data.Abilities.Add(new AbilityConfig
-                    {
-                        Ability = entry.ability,
-                        Level = entry.level,
-                        IsPassive = entry.isPassive
-                    });
-                }
-            }
-            
-            return data;
-        }
+        
     }
     
     [System.Serializable]

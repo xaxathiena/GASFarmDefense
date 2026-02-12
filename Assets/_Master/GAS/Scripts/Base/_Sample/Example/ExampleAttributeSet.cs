@@ -60,7 +60,7 @@ namespace GAS
         protected override void OnAttributeSetInitialized()
         {
             base.OnAttributeSetInitialized();
-            Debug.Log($"Attribute Set initialized for {ownerASC.gameObject.name}");
+            Debug.Log($"Attribute Set initialized for {ownerASC.GetOwner().name}");
         }
         
         #region Attribute Change Callbacks
@@ -172,7 +172,7 @@ namespace GAS
         /// </summary>
         private void OnDeath()
         {
-            Debug.Log($"{ownerASC.gameObject.name} has died!");
+            Debug.Log($"{ownerASC.GetOwner().name} has died!");
             
             // Add death tag
             if (ownerASC != null)

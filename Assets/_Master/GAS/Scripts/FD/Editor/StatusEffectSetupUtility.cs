@@ -187,7 +187,7 @@ namespace FD.Editor
             if (selected.GetComponent<GAS.AbilitySystemComponent>() == null)
             {
                 Debug.LogWarning($"{selected.name} does not have an AbilitySystemComponent. Adding it...");
-                selected.AddComponent<GAS.AbilitySystemComponent>();
+                //selected.AddComponent<GAS.AbilitySystemComponent>();
             }
 
             // Add StatusEffectDisplayHandler

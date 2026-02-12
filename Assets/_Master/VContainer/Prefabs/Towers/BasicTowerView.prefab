@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 198515662311356075}
   - component: {fileID: 2738380980540287935}
   - component: {fileID: 5486520259656544282}
+  - component: {fileID: 726127446783063787}
+  - component: {fileID: 262692202238582304}
   m_Layer: 0
   m_Name: BasicTowerView
   m_TagString: Untagged
@@ -128,3 +130,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FD.Views.TowerView
   towerVisual: {fileID: 0}
   weaponPoint: {fileID: 0}
+--- !u!114 &726127446783063787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3140343686010148418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6834a45943135034fbdfda6e59b4a825, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FD.Character.TowerBase
+  abilitySystemComponent: {fileID: 262692202238582304}
+  armorType: 1
+  abilities:
+  - ability: {fileID: 11400000, guid: 789665ed671035845bc384b19712f854, type: 2}
+    level: 1
+    isPassive: 0
+  targetRange: 6
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxTargets: 1
+  rangeGizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.2}
+  targetLineColor: {r: 1, g: 0.4, b: 0.1, a: 0.9}
+  targetUpdateInterval: 0.2
+--- !u!114 &262692202238582304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3140343686010148418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f584b67cc8e12654291cb0f36aeb973a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GAS.AbilitySystemComponent
+  grantedAbilities: []

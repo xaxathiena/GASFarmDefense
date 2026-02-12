@@ -210,7 +210,7 @@ namespace GAS
 
         protected GameObject GetAbilityOwner(AbilitySystemComponent asc)
         {
-            return asc?.GetOwner();
+            return asc?.GetOwner().gameObject;
         }
     }
 }

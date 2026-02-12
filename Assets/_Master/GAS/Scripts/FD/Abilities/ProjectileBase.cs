@@ -199,7 +199,7 @@ namespace FD.Projectiles
 
             elapsed = 0f;
             target = null;
-            PoolManager.Destroy(gameObject);
+            //oolManager.Despawn(this);
         }
     }
 }

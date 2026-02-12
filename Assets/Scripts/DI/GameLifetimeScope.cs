@@ -7,6 +7,7 @@ using FD.Controllers;
 using FD.Data;
 using FD.Views;
 using FD.Spawners;
+using GAS;
 
 namespace FD.DI
 {
@@ -45,7 +46,9 @@ namespace FD.DI
             
             // Enemy controller factory - sử dụng delegate để tạo controller với view và data
             builder.Register<EnemyControllerFactory>(Lifetime.Singleton);
-            
+            builder.Register<EnemyController>(Lifetime.Transient);
+            builder.Register<TowerController>(Lifetime.Transient);
+            builder.Register<AbilitySystemComponent>(Lifetime.Transient);
             // ===== MONOBEHAVIOURS IN SCENE =====
             
             // Tự động inject vào tất cả MonoBehaviour components trong scene
@@ -72,13 +75,15 @@ namespace FD.DI
         private readonly IEnemyAIService _aiService;
         private readonly IEnemyRegistry _registry;
         private readonly IGameplayEventBus _eventBus;
+        private readonly IObjectResolver container;
         
-        public EnemyControllerFactory(
+        public EnemyControllerFactory(IObjectResolver container,
             IEnemyMovementService movementService,
             IEnemyAIService aiService,
             IEnemyRegistry registry,
             IGameplayEventBus eventBus)
         {
+            this.container = container;
             _movementService = movementService;
             _aiService = aiService;
             _registry = registry;
@@ -87,14 +92,9 @@ namespace FD.DI
         
         public EnemyController Create(EnemyView view, EnemyData config)
         {
-            return new EnemyController(
-                view,
-                config,
-                _movementService,
-                _aiService,
-                _registry,
-                _eventBus
-            );
+            var enemy = container.Resolve<EnemyController>();
+            enemy.OnSetup(view, config);
+            return enemy;
         }
     }
     

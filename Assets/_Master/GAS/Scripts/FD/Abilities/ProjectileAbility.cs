@@ -80,14 +80,14 @@ namespace FD.Ability
                     AudioSource.PlayClipAtPoint(onSpawn, firePoint.position);
                 }
 
-                var projectileObject = PoolManager.Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-                var projectile = projectileObject.GetComponent<ProjectileBase>();
-                if (projectile == null)
-                {
-                    projectile = projectileObject.AddComponent<ProjectileBase>();
-                }
+                // var projectileObject = PoolManager.Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+                // var projectile = projectileObject.GetComponent<ProjectileBase>();
+                // if (projectile == null)
+                // {
+                //     projectile = projectileObject.AddComponent<ProjectileBase>();
+                // }
 
-                projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect, spec, effectLevel, this);
+                // projectile.Initialize(target, speed, movementType, arcHeight, hitRadius, lifeTime, impactVfx, onTravel, onHit, asc, gameplayEffect, spec, effectLevel, this);
             }
 
             EndAbility(asc);

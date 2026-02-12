@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace GAS.Editor
 {
-    [CustomEditor(typeof(AbilitySystemComponent))]
+    //[CustomEditor(typeof(AbilitySystemComponent))]
     public class AbilitySystemComponentEditor : UnityEditor.Editor
     {
         private AbilitySystemComponent asc;
@@ -15,7 +15,7 @@ namespace GAS.Editor
 
         private void OnEnable()
         {
-            asc = (AbilitySystemComponent)target;
+            //asc = (AbilitySystemComponent)target;
         }
 
         public override void OnInspectorGUI()

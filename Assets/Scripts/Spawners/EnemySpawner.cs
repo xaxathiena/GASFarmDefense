@@ -31,8 +31,6 @@ namespace FD.Spawners
         // Track spawned controllers để update manually
         // NOTE: Controllers implement ITickable sẽ được VContainer tự động tick
         // nhưng vì controllers được tạo runtime, chúng ta cần register manually
-        private System.Collections.Generic.List<EnemyController> _activeControllers = 
-            new System.Collections.Generic.List<EnemyController>();
         
         [Inject]
         public void Construct(EnemyControllerFactory enemyFactory)
@@ -41,23 +39,6 @@ namespace FD.Spawners
             
             if (logSpawns)
                 Debug.Log("[EnemySpawner] Constructed with VContainer injection!");
-        }
-        
-        private void Update()
-        {
-            // Manual tick cho controllers
-            // TODO: Có thể optimize bằng cách dùng VContainer's ITickable registration
-            for (int i = _activeControllers.Count - 1; i >= 0; i--)
-            {
-                var controller = _activeControllers[i];
-                if (controller == null || !controller.IsAlive)
-                {
-                    _activeControllers.RemoveAt(i);
-                    continue;
-                }
-                
-                controller.Tick();
-            }
         }
         
         public EnemyController SpawnEnemy()
@@ -108,8 +89,6 @@ namespace FD.Spawners
                 controller.SetPath(pathPoints);
             }
             
-            // Track controller
-            _activeControllers.Add(controller);
             
             if (logSpawns)
             {
@@ -145,16 +124,6 @@ namespace FD.Spawners
         private void SpawnTestWave()
         {
             SpawnWave(5, 1f);
-        }
-        
-        private void OnDestroy()
-        {
-            // Cleanup controllers
-            foreach (var controller in _activeControllers)
-            {
-                controller?.Dispose();
-            }
-            _activeControllers.Clear();
         }
     }
 }
