@@ -1,3 +1,4 @@
+using FD.Abilities;
 using FD.Controllers;
 using FD.Data;
 using GAS;
@@ -12,13 +13,24 @@ namespace FD
             builder.Register<PoolManager>(Lifetime.Singleton).As<IPoolManager>();
             builder.Register<FDTowerFactory>(Lifetime.Singleton);
             builder.Register<TowerController>(Lifetime.Transient);
+            
+            // GAS System - Logic is Singleton (shared), Data is per-instance
+            builder.Register<AbilitySystemLogic>(Lifetime.Singleton);
+            builder.Register<GameplayAbilityLogic>(Lifetime.Singleton);
+            builder.Register<AbilityBehaviourRegistry>(Lifetime.Singleton);
+            builder.Register<LegacyAbilityBehaviour>(Lifetime.Singleton).As<IAbilityBehaviour>();
             builder.Register<AbilitySystemComponent>(Lifetime.Transient);
+            
+            // Ability Behaviours - Register all custom ability behaviours here
+            builder.Register<FireballAbilityBehaviour>(Lifetime.Singleton).As<IAbilityBehaviour>();
+            
             builder.Register<IEventBus, EventBus>(Lifetime.Singleton);
 
             builder.RegisterComponentInHierarchy<FDBattleSceneSetting>();
 
             builder.RegisterEntryPoint<FDBattleManager>(Lifetime.Singleton);
             builder.RegisterEntryPoint<DebugService>(Lifetime.Singleton).As<IDebugService>();
+            builder.RegisterEntryPoint<GASInitializer>(Lifetime.Singleton);
             
         }
     }

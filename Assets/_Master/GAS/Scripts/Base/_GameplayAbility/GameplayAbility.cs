@@ -3,24 +3,34 @@ using UnityEngine;
 namespace GAS
 {
     /// <summary>
-    /// Base class for all gameplay abilities (similar to UE's GameplayAbility)
+    /// Legacy GameplayAbility class - now acts as an adapter to the new Data + Behaviour architecture.
+    /// For backward compatibility with existing abilities.
+    /// New abilities should inherit from GameplayAbilityData + implement IAbilityBehaviour.
     /// </summary>
-    [CreateAssetMenu(fileName = "NewGameplayAbility", menuName = "GAS/Base/Gameplay Ability")]
-    public class GameplayAbility : ScriptableObject
+    [CreateAssetMenu(fileName = "NewGameplayAbility", menuName = "GAS/Base/Gameplay Ability (Legacy)")]
+    public class GameplayAbility : GameplayAbilityData
     {
-        [Header("Ability Info")]
-        public string abilityName;
-        public string description;
-
-        [Header("Ability Properties")]
-        public ScalableFloat cooldownDuration = new ScalableFloat();
-        public ScalableFloat costAmount = new ScalableFloat();
-        public bool canActivateWhileActive = false;
-
-        [Header("Tags")]
-        public GameplayTag[] abilityTags;
-        public GameplayTag[] cancelAbilitiesWithTags;
-        public GameplayTag[] blockAbilitiesWithTags;
+        // Static logic accessor (set by VContainer initialization)
+        private static GameplayAbilityLogic _logic;
+        private static AbilityBehaviourRegistry _registry;
+        
+        public static void SetLogic(GameplayAbilityLogic logic) => _logic = logic;
+        public static void SetRegistry(AbilityBehaviourRegistry registry) => _registry = registry;
+        
+        // Public accessors for logic
+        protected GameplayAbilityLogic Logic => _logic;
+        public static GameplayAbilityLogic GetLogic() => _logic;
+        
+        // Legacy properties are now in GameplayAbilityData base class
+        
+        /// <summary>
+        /// Override to return custom behaviour type.
+        /// Default returns LegacyAbilityBehaviour which uses the old virtual method pattern.
+        /// </summary>
+        public override System.Type GetBehaviourType()
+        {
+            return typeof(LegacyAbilityBehaviour);
+        }
 
         /// <summary>
         /// Check if the ability can be activated using its resolved spec.
@@ -33,31 +43,19 @@ namespace GAS
 
         public virtual bool CanActivateAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
-            if (asc == null || spec == null)
-                return false;
-
-            if (spec.IsActive && !canActivateWhileActive)
-                return false;
-
-            if (asc.IsAbilityOnCooldown(this))
-                return false;
-
-            float abilityLevel = GetAbilityLevel(spec);
-
-            float cost = costAmount.GetValueAtLevel(abilityLevel, asc);
-            if (cost > 0f)
+            if (_registry == null)
             {
-                var manaAttr = asc.AttributeSet?.GetAttribute(EGameplayAttributeType.Mana);
-                if (manaAttr == null || manaAttr.CurrentValue < cost)
-                {
-                    return false;
-                }
+                // Fallback to old logic if registry not initialized
+                return Logic.CanActivateAbility(this, asc, spec);
             }
-
-            if (asc.HasAnyTags(blockAbilitiesWithTags))
-                return false;
-
-            return true;
+            
+            var behaviour = _registry.GetBehaviour(this);
+            if (behaviour != null)
+            {
+                return behaviour.CanActivate(this, asc, spec);
+            }
+            
+            return Logic.CanActivateAbility(this, asc, spec);
         }
 
         /// <summary>
@@ -71,32 +69,21 @@ namespace GAS
 
         public virtual void ActivateAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
-            if (!CanActivateAbility(asc, spec))
-                return;
-
-            spec.SetActiveState(true);
-
-            asc.CancelAbilitiesWithTags(cancelAbilitiesWithTags);
-            asc.AddTags(abilityTags);
-
-            float abilityLevel = GetAbilityLevel(spec);
-
-            float cost = costAmount.GetValueAtLevel(abilityLevel, asc);
-            if (cost > 0f && asc.AttributeSet != null)
+            // Delegate to logic for base activation (cost, cooldown, tags)
+            Logic.ActivateAbility(this, asc, spec);
+            
+            // Call behaviour or legacy hook
+            if (_registry != null)
             {
-                var manaAttr = asc.AttributeSet.GetAttribute(EGameplayAttributeType.Mana);
-                if (manaAttr != null)
+                var behaviour = _registry.GetBehaviour(this);
+                if (behaviour != null)
                 {
-                    manaAttr.ModifyCurrentValue(-cost);
+                    behaviour.OnActivated(this, asc, spec);
+                    return;
                 }
             }
-
-            float cooldown = cooldownDuration.GetValueAtLevel(abilityLevel, asc);
-            if (cooldown > 0)
-            {
-                asc.StartCooldown(this, cooldown);
-            }
-
+            
+            // Fallback to legacy virtual method
             OnAbilityActivated(asc, spec);
         }
 
@@ -115,13 +102,21 @@ namespace GAS
 
         public virtual void EndAbility(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
-            if (asc == null || spec == null || !spec.IsActive)
-                return;
-
-            spec.SetActiveState(false);
-            asc.RemoveTags(abilityTags);
-            asc.NotifyAbilityEnded(this);
-
+            // Delegate to logic for base cleanup
+            Logic.EndAbility(this, asc, spec);
+            
+            // Call behaviour or legacy hook
+            if (_registry != null)
+            {
+                var behaviour = _registry.GetBehaviour(this);
+                if (behaviour != null)
+                {
+                    behaviour.OnEnded(this, asc, spec);
+                    return;
+                }
+            }
+            
+            // Fallback to legacy virtual method
             OnAbilityEnded(asc, spec);
         }
 
@@ -134,8 +129,21 @@ namespace GAS
             if (asc == null || spec == null || !spec.IsActive)
                 return;
 
+            // Call behaviour or legacy hook
+            if (_registry != null)
+            {
+                var behaviour = _registry.GetBehaviour(this);
+                if (behaviour != null)
+                {
+                    behaviour.OnCancelled(this, asc, spec);
+                    Logic.CancelAbility(this, asc, spec);
+                    return;
+                }
+            }
+            
+            // Fallback to legacy virtual method
             OnAbilityCancelled(asc, spec);
-            EndAbility(asc, spec);
+            Logic.CancelAbility(this, asc, spec);
         }
 
         protected virtual void OnAbilityCancelled(AbilitySystemComponent asc, GameplayAbilitySpec spec)
@@ -153,48 +161,23 @@ namespace GAS
 
         protected float GetAbilityLevel(GameplayAbilitySpec spec)
         {
-            return spec?.Level ?? 1f;
+            return Logic.GetAbilityLevel(spec);
         }
+
         /// <summary>
         /// Public helper for non-ability classes (e.g., projectiles) to apply effects using FD context.
         /// </summary>
         public void ApplyEffectToTarget(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
         {
-            ApplyEffectWithContext(effect, source, target, spec);
+            Logic.ApplyEffectToTarget(effect, source, target, this, spec);
         }
+
         /// <summary>
         /// Apply effect with FD context
         /// </summary>
         protected void ApplyEffectWithContext(GameplayEffect effect, AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
         {
-            if (effect == null)
-            {
-                Debug.LogWarning($"[{abilityName}] No effect to apply!");
-                return;
-            }
-
-            // Create FD context
-            var context = CreateFDContext(source, target, spec);
-
-            // Set as current context for calculation pipeline
-            context.MakeCurrent();
-
-            try
-            {
-                // Apply effect with context
-                effect.ApplyModifiers(
-                    target.AttributeSet,
-                    source,
-                    target,
-                    context.Level,
-                    context.StackCount
-                );
-            }
-            finally
-            {
-                // Always clear context
-                GameplayEffectContext.ClearCurrent();
-            }
+            Logic.ApplyEffectToTarget(effect, source, target, this, spec);
         }
 
         protected virtual GameplayEffectContext CreateFDContext(AbilitySystemComponent source, AbilitySystemComponent target, GameplayAbilitySpec spec)
@@ -210,7 +193,7 @@ namespace GAS
 
         protected GameObject GetAbilityOwner(AbilitySystemComponent asc)
         {
-            return asc?.GetOwner().gameObject;
+            return Logic.GetAbilityOwner(asc);
         }
     }
 }

@@ -8,85 +8,60 @@ namespace GAS
 {
     /// <summary>
     /// Component that manages abilities for a GameObject (similar to UE's AbilitySystemComponent)
+    /// Refactored to use Data (state) + Logic (behavior) separation for better DI and testability.
     /// </summary>
     public class AbilitySystemComponent
     {
+        // Dependencies
         private readonly IDebugService debug;
-        private AttributeSet attributeSet;
+        private readonly AbilitySystemLogic logic;
 
-        private List<GameplayAbility> grantedAbilities = new List<GameplayAbility>();
+        // Data (all state is here)
+        private readonly AbilitySystemData data;
 
-        private readonly List<GameplayAbilitySpec> abilitySpecs = new List<GameplayAbilitySpec>();
-        private readonly Dictionary<GameplayAbility, GameplayAbilitySpec> specLookup = new Dictionary<GameplayAbility, GameplayAbilitySpec>();
+        // Public properties
+        public AttributeSet AttributeSet => data.AttributeSet;
+        public string Id => data.Id;
 
-        // Runtime data
-        // Tag reference counting: tracks how many effects are granting each tag
-        // Only remove tag when count reaches 0
-        private Dictionary<byte, int> activeTagCounts = new Dictionary<byte, int>();
-        private Dictionary<GameplayAbility, float> abilityCooldowns = new Dictionary<GameplayAbility, float>();
-        private List<GameplayAbility> activeAbilities = new List<GameplayAbility>();
-        private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
-        private Transform owner;
-        public AttributeSet AttributeSet => attributeSet;
-        public readonly string Id;
-
-        public AbilitySystemComponent(IDebugService debug)
+        public AbilitySystemComponent(IDebugService debug, AbilitySystemLogic logic)
         {
             this.debug = debug;
-            Id = Guid.NewGuid().ToString();
+            this.logic = logic;
+            this.data = new AbilitySystemData
+            {
+                Id = Guid.NewGuid().ToString()
+            };
         }
-        bool isShow = false;
+
         public void Tick()
         {
-            // Update cooldowns
-            var cooldownKeys = abilityCooldowns.Keys.ToList();
-            foreach (var ability in cooldownKeys)
-            {
-                abilityCooldowns[ability] -= Time.deltaTime;
-                if (abilityCooldowns[ability] <= 0)
-                    abilityCooldowns.Remove(ability);
-            }
-
-            // Update active gameplay effects
-            UpdateGameplayEffects(Time.deltaTime);
-            debug.Log("AbilitySystemComponent Tick called " + Id, Color.yellow);
-            //            debug.Log("AbilitySystemComponent Tick called " + Id, Color.yellow);
+            // Delegate all logic to the logic service
+            logic.UpdateCooldowns(data, Time.deltaTime);
+            logic.UpdateGameplayEffects(data, Time.deltaTime);
+            debug.Log("AbilitySystemComponent Tick called " + data.Id, Color.yellow);
         }
+
         public void InitOwner(Transform owner)
         {
-            this.owner = owner;
+            data.Owner = owner;
         }
+
         public virtual Transform GetOwner()
         {
-            return owner;
+            return data.Owner;
         }
+
+        // Internal accessor for logic layer
+        internal AbilitySystemData GetData() => data;
+
+        #region Abilities
+
         /// <summary>
         /// Grant an ability to this component with a specific starting level.
         /// </summary>
         public GameplayAbilitySpec GiveAbility(GameplayAbility ability, float level = 1f)
         {
-            if (ability == null)
-            {
-                Debug.LogWarning("Cannot grant a null ability.");
-                return null;
-            }
-
-            if (specLookup.TryGetValue(ability, out var existingSpec))
-            {
-                existingSpec.SetLevel(level);
-                return existingSpec;
-            }
-
-            var spec = new GameplayAbilitySpec(ability, level);
-            abilitySpecs.Add(spec);
-            specLookup[ability] = spec;
-
-            if (!grantedAbilities.Contains(ability))
-            {
-                grantedAbilities.Add(ability);
-            }
-
-            return spec;
+            return logic.GiveAbility(data, ability, level);
         }
 
         /// <summary>
@@ -94,11 +69,7 @@ namespace GAS
         /// </summary>
         public GameplayAbilitySpec GetAbilitySpec(GameplayAbility ability)
         {
-            if (ability == null)
-                return null;
-
-            specLookup.TryGetValue(ability, out var spec);
-            return spec;
+            return logic.GetAbilitySpec(data, ability);
         }
 
         /// <summary>
@@ -106,8 +77,7 @@ namespace GAS
         /// </summary>
         public void SetAbilityLevel(GameplayAbility ability, float level)
         {
-            var spec = GetAbilitySpec(ability);
-            spec?.SetLevel(level);
+            logic.SetAbilityLevel(data, ability, level);
         }
 
         /// <summary>
@@ -115,16 +85,7 @@ namespace GAS
         /// </summary>
         public bool TryActivateAbility(GameplayAbility ability)
         {
-            var spec = GetAbilitySpec(ability);
-            if (spec == null)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {owner.name}");
-#endif
-                return false;
-            }
-
-            return TryActivateAbility(spec);
+            return logic.TryActivateAbility(data, this, ability);
         }
 
         /// <summary>
@@ -132,27 +93,7 @@ namespace GAS
         /// </summary>
         public bool TryActivateAbility(GameplayAbilitySpec spec)
         {
-            if (spec == null || spec.Definition == null)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning($"Invalid ability spec on {owner.name}");
-#endif
-                return false;
-            }
-
-            var ability = spec.Definition;
-
-            if (ability.CanActivateAbility(this, spec))
-            {
-                ability.ActivateAbility(this, spec);
-                if (!activeAbilities.Contains(ability))
-                {
-                    activeAbilities.Add(ability);
-                }
-                return true;
-            }
-
-            return false;
+            return logic.TryActivateAbility(data, this, spec);
         }
 
         /// <summary>
@@ -160,10 +101,7 @@ namespace GAS
         /// </summary>
         public bool TryActivateAbilityByIndex(int index)
         {
-            if (index < 0 || index >= abilitySpecs.Count)
-                return false;
-
-            return TryActivateAbility(abilitySpecs[index]);
+            return logic.TryActivateAbilityByIndex(data, this, index);
         }
 
         /// <summary>
@@ -171,16 +109,33 @@ namespace GAS
         /// </summary>
         public void CancelAbility(GameplayAbility ability)
         {
-            if (ability == null)
-                return;
+            logic.CancelAbility(data, this, ability);
+        }
 
+        /// <summary>
+        /// End an ability (complete it normally)
+        /// </summary>
+        public void EndAbility(GameplayAbility ability)
+        {
             var spec = GetAbilitySpec(ability);
-            if (spec == null)
-                return;
-
-            if (spec.IsActive)
+            if (spec != null)
             {
-                ability.CancelAbility(this, spec);
+                var abilityLogic = GameplayAbility.GetLogic();
+                if (abilityLogic != null)
+                {
+                    abilityLogic.EndAbility(ability, this, spec);
+                }
+            }
+        }
+
+        /// <summary>
+        /// End an ability using GameplayAbilityData (for new data-driven abilities)
+        /// </summary>
+        public void EndAbility(GameplayAbilityData abilityData)
+        {
+            if (abilityData is GameplayAbility ability)
+            {
+                EndAbility(ability);
             }
         }
 
@@ -189,29 +144,15 @@ namespace GAS
         /// </summary>
         public void CancelAbilitiesWithTags(GameplayTag[] tags)
         {
-            if (tags == null || tags.Length == 0)
-                return;
-
-            var abilitiesToCancel = activeAbilities
-                .Where(a => a.abilityTags != null && a.abilityTags.Any(abilityTag => tags.Contains(abilityTag)))
-                .ToList();
-
-            foreach (var ability in abilitiesToCancel)
-            {
-                CancelAbility(ability);
-            }
+            logic.CancelAbilitiesWithTags(data, this, tags);
         }
 
         internal void NotifyAbilityEnded(GameplayAbility ability)
         {
-            if (ability == null)
-                return;
-
-            if (activeAbilities.Contains(ability))
-            {
-                activeAbilities.Remove(ability);
-            }
+            logic.NotifyAbilityEnded(data, ability);
         }
+
+        #endregion
 
         #region Tags
 
@@ -221,24 +162,7 @@ namespace GAS
         /// </summary>
         public void AddTags(params GameplayTag[] tags)
         {
-            if (tags == null)
-                return;
-
-            foreach (var tag in tags)
-            {
-                if (tag != GameplayTag.None)
-                {
-                    byte tagByte = (byte)tag;
-                    if (activeTagCounts.ContainsKey(tagByte))
-                    {
-                        activeTagCounts[tagByte]++;
-                    }
-                    else
-                    {
-                        activeTagCounts[tagByte] = 1;
-                    }
-                }
-            }
+            logic.AddTags(data, tags);
         }
 
         /// <summary>
@@ -247,23 +171,7 @@ namespace GAS
         /// </summary>
         public void RemoveTags(params GameplayTag[] tags)
         {
-            if (tags == null)
-                return;
-
-            foreach (var tag in tags)
-            {
-                byte tagByte = (byte)tag;
-                if (activeTagCounts.ContainsKey(tagByte))
-                {
-                    activeTagCounts[tagByte]--;
-
-                    // Remove tag completely when count reaches 0
-                    if (activeTagCounts[tagByte] <= 0)
-                    {
-                        activeTagCounts.Remove(tagByte);
-                    }
-                }
-            }
+            logic.RemoveTags(data, tags);
         }
 
         /// <summary>
@@ -271,15 +179,7 @@ namespace GAS
         /// </summary>
         public bool HasAnyTags(params GameplayTag[] tags)
         {
-            if (tags == null || tags.Length == 0)
-                return false;
-
-            foreach (var tag in tags)
-            {
-                if (activeTagCounts.ContainsKey((byte)tag))
-                    return true;
-            }
-            return false;
+            return logic.HasAnyTags(data, tags);
         }
 
         /// <summary>
@@ -287,15 +187,7 @@ namespace GAS
         /// </summary>
         public bool HasAllTags(params GameplayTag[] tags)
         {
-            if (tags == null || tags.Length == 0)
-                return false;
-
-            foreach (var tag in tags)
-            {
-                if (!activeTagCounts.ContainsKey((byte)tag))
-                    return false;
-            }
-            return true;
+            return logic.HasAllTags(data, tags);
         }
 
         /// <summary>
@@ -303,8 +195,7 @@ namespace GAS
         /// </summary>
         public int GetTagCount(GameplayTag tag)
         {
-            byte tagByte = (byte)tag;
-            return activeTagCounts.ContainsKey(tagByte) ? activeTagCounts[tagByte] : 0;
+            return logic.GetTagCount(data, tag);
         }
 
         /// <summary>
@@ -312,12 +203,7 @@ namespace GAS
         /// </summary>
         public List<GameplayTag> GetActiveTags()
         {
-            var tags = new List<GameplayTag>();
-            foreach (var tagByte in activeTagCounts.Keys)
-            {
-                tags.Add((GameplayTag)tagByte);
-            }
-            return tags;
+            return logic.GetActiveTags(data);
         }
 
         #endregion
@@ -329,7 +215,7 @@ namespace GAS
         /// </summary>
         public void InitializeAttributeSet(AttributeSet attributeSet)
         {
-            this.attributeSet = attributeSet;
+            data.AttributeSet = attributeSet;
             if (attributeSet == null)
             {
                 Debug.LogError("AttributeSet is null!");
@@ -343,7 +229,7 @@ namespace GAS
         /// </summary>
         public T GetAttributeSet<T>() where T : AttributeSet
         {
-            return attributeSet as T;
+            return data.AttributeSet as T;
         }
 
         #endregion
@@ -355,7 +241,7 @@ namespace GAS
         /// </summary>
         public void StartCooldown(GameplayAbility ability, float duration)
         {
-            abilityCooldowns[ability] = duration;
+            logic.StartCooldown(data, ability, duration);
         }
 
         /// <summary>
@@ -363,10 +249,7 @@ namespace GAS
         /// </summary>
         public bool IsAbilityOnCooldown(GameplayAbility ability)
         {
-            if (ability == null)
-                return false;
-
-            return abilityCooldowns.ContainsKey(ability) && abilityCooldowns[ability] > 0;
+            return logic.IsAbilityOnCooldown(data, ability);
         }
 
         /// <summary>
@@ -374,12 +257,7 @@ namespace GAS
         /// </summary>
         public float GetAbilityCooldownRemaining(GameplayAbility ability)
         {
-            if (ability == null)
-                return 0f;
-
-            if (abilityCooldowns.TryGetValue(ability, out float remaining))
-                return remaining;
-            return 0f;
+            return logic.GetAbilityCooldownRemaining(data, ability);
         }
 
         #endregion
@@ -399,79 +277,7 @@ namespace GAS
         /// </summary>
         public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source, float effectLevel = 1f)
         {
-            if (effect == null || target == null)
-                return null;
-
-            // Check if effect can be applied
-            if (!effect.CanApplyTo(target))
-            {
-                Debug.LogWarning($"Cannot apply {effect.effectName} to {target.owner.name}");
-                return null;
-            }
-
-            // Handle stacking
-            if (effect.allowStacking)
-            {
-                var existingEffect = target.activeGameplayEffects.FirstOrDefault(e => e.Effect == effect);
-                if (existingEffect != null)
-                {
-                    if (existingEffect.AddStack())
-                    {
-#if UNITY_EDITOR
-                        Debug.Log($"Stacked {effect.effectName} on {target.owner.name} (x{existingEffect.StackCount})");
-#endif
-                        return existingEffect;
-                    }
-                }
-            }
-
-            // Create active effect
-            var activeEffect = new ActiveGameplayEffect(effect, source, target, effectLevel);
-
-            // Apply tags
-            if (effect.grantedTags != null && effect.grantedTags.Length > 0)
-            {
-                target.AddTags(effect.grantedTags);
-            }
-
-            // Remove tags
-            if (effect.removeTagsOnApplication != null && effect.removeTagsOnApplication.Length > 0)
-            {
-                target.RemoveTags(effect.removeTagsOnApplication);
-            }
-
-            // Apply modifiers for instant effects
-            if (effect.durationType == EGameplayEffectDurationType.Instant)
-            {
-                if (target.AttributeSet != null)
-                {
-                    // Instant effects: Apply directly to BaseValue using aggregation system
-                    foreach (var modifier in effect.modifiers)
-                    {
-                        effect.ApplyModifierWithAggregation(target.AttributeSet, modifier, source, target, effectLevel, activeEffect.StackCount, activeEffect, true);
-                    }
-                }
-
-                return activeEffect; // Don't add to active list
-            }
-
-            // Apply initial modifiers for non-periodic duration/infinite effects using aggregation
-            if (!effect.isPeriodic && target.AttributeSet != null)
-            {
-                foreach (var modifier in effect.modifiers)
-                {
-                    effect.ApplyModifierWithAggregation(target.AttributeSet, modifier, source, target, effectLevel, activeEffect.StackCount, activeEffect, false);
-                }
-            }
-
-            // Subscribe to expiration
-            activeEffect.OnEffectExpired += target.OnGameplayEffectExpired;
-            activeEffect.OnEffectRemoved += target.OnGameplayEffectRemoved;
-
-            // Add to active effects
-            target.activeGameplayEffects.Add(activeEffect);
-
-            return activeEffect;
+            return logic.ApplyGameplayEffectToTarget(effect, target, source, effectLevel);
         }
 
         /// <summary>
@@ -479,23 +285,7 @@ namespace GAS
         /// </summary>
         public void RemoveGameplayEffect(ActiveGameplayEffect activeEffect)
         {
-            if (activeEffect == null || !activeGameplayEffects.Contains(activeEffect))
-                return;
-
-            // Remove modifiers from all affected attributes (triggers recalculation)
-            var affectedAttributes = activeEffect.GetAffectedAttributes();
-            foreach (var attribute in affectedAttributes)
-            {
-                attribute.RemoveModifiersFromEffect(activeEffect);
-            }
-
-            // Remove tags
-            if (activeEffect.Effect.grantedTags != null)
-            {
-                RemoveTags(activeEffect.Effect.grantedTags);
-            }
-
-            activeGameplayEffects.Remove(activeEffect);
+            logic.RemoveGameplayEffect(data, activeEffect);
         }
 
         /// <summary>
@@ -503,17 +293,7 @@ namespace GAS
         /// </summary>
         public void RemoveGameplayEffectsWithTags(params GameplayTag[] tags)
         {
-            if (tags == null || tags.Length == 0)
-                return;
-
-            var effectsToRemove = activeGameplayEffects
-                .Where(e => e.Effect.grantedTags != null && e.Effect.grantedTags.Any(effectTag => tags.Contains(effectTag)))
-                .ToList();
-
-            foreach (var effect in effectsToRemove)
-            {
-                RemoveGameplayEffect(effect);
-            }
+            logic.RemoveGameplayEffectsWithTags(data, tags);
         }
 
         /// <summary>
@@ -521,11 +301,7 @@ namespace GAS
         /// </summary>
         public void RemoveAllGameplayEffects()
         {
-            var effects = activeGameplayEffects.ToList();
-            foreach (var effect in effects)
-            {
-                RemoveGameplayEffect(effect);
-            }
+            logic.RemoveAllGameplayEffects(data);
         }
 
         /// <summary>
@@ -533,7 +309,7 @@ namespace GAS
         /// </summary>
         public List<ActiveGameplayEffect> GetActiveGameplayEffects()
         {
-            return new List<ActiveGameplayEffect>(activeGameplayEffects);
+            return new List<ActiveGameplayEffect>(data.ActiveGameplayEffects);
         }
 
         /// <summary>
@@ -541,27 +317,13 @@ namespace GAS
         /// </summary>
         public bool HasActiveEffect(GameplayEffect effect)
         {
-            return activeGameplayEffects.Any(e => e.Effect == effect);
-        }
-
-        /// <summary>
-        /// Update all active gameplay effects
-        /// </summary>
-        private void UpdateGameplayEffects(float deltaTime)
-        {
-            for (int i = activeGameplayEffects.Count - 1; i >= 0; i--)
-            {
-                if (i < activeGameplayEffects.Count)
-                {
-                    activeGameplayEffects[i].Update(deltaTime);
-                }
-            }
+            return logic.HasActiveEffect(data, effect);
         }
 
         /// <summary>
         /// Called when a gameplay effect expires
         /// </summary>
-        private void OnGameplayEffectExpired(ActiveGameplayEffect effect)
+        internal void OnGameplayEffectExpired(ActiveGameplayEffect effect)
         {
             RemoveGameplayEffect(effect);
         }
@@ -569,7 +331,7 @@ namespace GAS
         /// <summary>
         /// Called when a gameplay effect is removed
         /// </summary>
-        private void OnGameplayEffectRemoved(ActiveGameplayEffect effect)
+        internal void OnGameplayEffectRemoved(ActiveGameplayEffect effect)
         {
             RemoveGameplayEffect(effect);
         }
