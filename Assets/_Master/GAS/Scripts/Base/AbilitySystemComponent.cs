@@ -1,18 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using VContainer.Unity;
 
 namespace GAS
 {
     /// <summary>
     /// Component that manages abilities for a GameObject (similar to UE's AbilitySystemComponent)
     /// </summary>
-    public class AbilitySystemComponent : MonoBehaviour
+    public class AbilitySystemComponent
     {
+        private readonly IDebugService debug;
         private AttributeSet attributeSet;
 
-        [Header("Abilities")]
-        [SerializeField] private List<GameplayAbility> grantedAbilities = new List<GameplayAbility>();
+        private List<GameplayAbility> grantedAbilities = new List<GameplayAbility>();
 
         private readonly List<GameplayAbilitySpec> abilitySpecs = new List<GameplayAbilitySpec>();
         private readonly Dictionary<GameplayAbility, GameplayAbilitySpec> specLookup = new Dictionary<GameplayAbility, GameplayAbilitySpec>();
@@ -26,8 +28,15 @@ namespace GAS
         private List<ActiveGameplayEffect> activeGameplayEffects = new List<ActiveGameplayEffect>();
         private Transform owner;
         public AttributeSet AttributeSet => attributeSet;
+        public readonly string Id;
 
-        private void Update()
+        public AbilitySystemComponent(IDebugService debug)
+        {
+            this.debug = debug;
+            Id = Guid.NewGuid().ToString();
+        }
+        bool isShow = false;
+        public void Tick()
         {
             // Update cooldowns
             var cooldownKeys = abilityCooldowns.Keys.ToList();
@@ -40,6 +49,8 @@ namespace GAS
 
             // Update active gameplay effects
             UpdateGameplayEffects(Time.deltaTime);
+            debug.Log("AbilitySystemComponent Tick called " + Id, Color.yellow);
+            //            debug.Log("AbilitySystemComponent Tick called " + Id, Color.yellow);
         }
         public void InitOwner(Transform owner)
         {
@@ -245,7 +256,7 @@ namespace GAS
                 if (activeTagCounts.ContainsKey(tagByte))
                 {
                     activeTagCounts[tagByte]--;
-                    
+
                     // Remove tag completely when count reaches 0
                     if (activeTagCounts[tagByte] <= 0)
                     {

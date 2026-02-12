@@ -1,50 +1,52 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool; // Thư viện Pool chuẩn của Unity 2021+
+using UnityEngine.Pool;
 using VContainer;
 using VContainer.Unity;
+
 namespace FD
 {
     public class PoolManager : IPoolManager
     {
         readonly IObjectResolver _resolver;
-        readonly Transform _root; // Một GameObject cha để gom tất cả pool vào cho gọn Scene
+        readonly Transform _root;
 
-        // Dictionary map từ "Prefab ID" sang "Object Pool tương ứng"
-        // Key: InstanceID của Prefab (int)
-        // Value: IObjectPool (Interface chung của các pool)
-        private Dictionary<int, object> _pools = new Dictionary<int, object>();
-
-        // Dictionary phụ để biết 1 instance đang thuộc về pool nào (để Despawn cho đúng)
+        // --- KHO 1: UNITY POOLS ---
+        // Key: Prefab InstanceID (int)
+        private Dictionary<int, object> _unityPools = new Dictionary<int, object>();
         private Dictionary<int, int> _instanceToPrefabID = new Dictionary<int, int>();
+
+        // --- KHO 2: C# CLASS POOLS ---
+        // Key: System.Type (Loại class)
+        private Dictionary<Type, object> _classPools = new Dictionary<Type, object>();
 
         public PoolManager(IObjectResolver resolver)
         {
             _resolver = resolver;
-            // Tạo một object rỗng trong scene để chứa các object được spawn
             _root = new GameObject("[Pool_Root]").transform;
-            Object.DontDestroyOnLoad(_root);
+            UnityEngine.Object.DontDestroyOnLoad(_root);
         }
+
+        #region --- UNITY OBJECTS SECTION ---
 
         public T Spawn<T>(T prefab, Vector3 pos, Quaternion rot, Transform parent = null) where T : Component
         {
             int prefabID = prefab.gameObject.GetInstanceID();
 
-            // 1. Nếu chưa có pool cho prefab này thì tạo mới
-            if (!_pools.ContainsKey(prefabID))
+            if (!_unityPools.ContainsKey(prefabID))
             {
-                _pools[prefabID] = CreateNewPool(prefab);
+                _unityPools[prefabID] = CreateUnityPool(prefab);
             }
 
-            // 2. Lấy Pool ra và xin object
-            var pool = (ObjectPool<T>)_pools[prefabID];
+            var pool = (ObjectPool<T>)_unityPools[prefabID];
             var instance = pool.Get();
 
-            // 3. Setup vị trí
+            // Setup Transform
             instance.transform.SetPositionAndRotation(pos, rot);
             instance.transform.SetParent(parent);
-
-            // 4. Lưu dấu vết để sau này Despawn
+            
+            // Map instance ID ngược lại prefab ID để phục vụ Despawn
             _instanceToPrefabID[instance.gameObject.GetInstanceID()] = prefabID;
 
             return instance;
@@ -52,39 +54,104 @@ namespace FD
 
         public void Despawn<T>(T instance) where T : Component
         {
+            if (instance == null) return;
+
             int instanceID = instance.gameObject.GetInstanceID();
 
-            // Tìm xem object này thuộc pool nào
             if (_instanceToPrefabID.TryGetValue(instanceID, out int prefabID))
             {
-                if (_pools.TryGetValue(prefabID, out object poolObj))
+                if (_unityPools.TryGetValue(prefabID, out object poolObj))
                 {
                     var pool = (ObjectPool<T>)poolObj;
-                    pool.Release(instance); // Trả về hồ
+                    pool.Release(instance);
                     return;
                 }
             }
-
-            // Nếu không tìm thấy pool (lỗi logic), thì destroy luôn cho sạch
-            Object.Destroy(instance.gameObject);
+            
+            // Fallback: Nếu không thuộc pool nào thì destroy thường
+            UnityEngine.Object.Destroy(instance.gameObject);
         }
 
-        // Hàm tạo Pool mới chuẩn VContainer
-        private ObjectPool<T> CreateNewPool<T>(T prefab) where T : Component
+        public void Prewarm<T>(T prefab, int count) where T : Component
+        {
+             int prefabID = prefab.gameObject.GetInstanceID();
+             if (!_unityPools.ContainsKey(prefabID)) _unityPools[prefabID] = CreateUnityPool(prefab);
+             
+             var pool = (ObjectPool<T>)_unityPools[prefabID];
+             var temp = new List<T>(count);
+             for(int i=0; i<count; i++) temp.Add(pool.Get());
+             foreach(var item in temp) pool.Release(item);
+        }
+
+        private ObjectPool<T> CreateUnityPool<T>(T prefab) where T : Component
         {
             return new ObjectPool<T>(
-                createFunc: () =>
-                {
-                    // QUAN TRỌNG NHẤT: Dùng VContainer để tạo object
-                    // Để object sinh ra được Inject đầy đủ Dependency
-                    return _resolver.Instantiate(prefab, _root);
-                },
+                createFunc: () => _resolver.Instantiate(prefab, _root), // VContainer Inject
                 actionOnGet: (obj) => obj.gameObject.SetActive(true),
                 actionOnRelease: (obj) => obj.gameObject.SetActive(false),
-                actionOnDestroy: (obj) => Object.Destroy(obj.gameObject),
+                actionOnDestroy: (obj) => UnityEngine.Object.Destroy(obj.gameObject),
                 defaultCapacity: 10,
                 maxSize: 100
             );
         }
+
+        #endregion
+
+        #region --- PURE C# CLASSES SECTION ---
+
+        public T SpawnClass<T>() where T : class
+        {
+            var type = typeof(T);
+
+            if (!_classPools.ContainsKey(type))
+            {
+                _classPools[type] = CreateClassPool<T>();
+            }
+
+            var pool = (ObjectPool<T>)_classPools[type];
+            return pool.Get();
+        }
+
+        public void DespawnClass<T>(T instance) where T : class
+        {
+            if (instance == null) return;
+            
+            var type = typeof(T);
+            if (_classPools.TryGetValue(type, out object poolObj))
+            {
+                var pool = (ObjectPool<T>)poolObj;
+                pool.Release(instance);
+            }
+        }
+
+        private ObjectPool<T> CreateClassPool<T>() where T : class
+        {
+            return new ObjectPool<T>(
+                // 1. Tạo mới: Dùng VContainer để nó tự Inject Dependencies nếu có
+                createFunc: () => _resolver.Resolve<T>(), 
+
+                // 2. Lấy ra: Gọi OnSpawn nếu có cài đặt interface
+                actionOnGet: (obj) => 
+                {
+                    if (obj is IPoolable p) p.OnSpawn();
+                },
+
+                // 3. Trả về: QUAN TRỌNG - Gọi OnDespawn để Reset data
+                actionOnRelease: (obj) => 
+                {
+                    if (obj is IPoolable p) p.OnDespawn();
+                },
+                
+                // 4. Hủy pool: Dispose nếu có
+                actionOnDestroy: (obj) => 
+                {
+                    if (obj is IDisposable d) d.Dispose();
+                },
+                defaultCapacity: 20,
+                maxSize: 200
+            );
+        }
+
+        #endregion
     }
 }

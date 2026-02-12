@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FD.Data;
 using UnityEngine;
 using VContainer;
 using static FD.Character.TowerBase;
@@ -8,6 +9,7 @@ namespace FD
     public class FDBattleSceneSetting : MonoBehaviour
     {
         public TowerView TowerPrefab;
+        public TowerData DefaultTowerData;
         [SerializeField] private Transform towerSpawnPoint;
         [SerializeField] private Transform enemySpawnPoint;
         public Transform TowerSpawnPoint => towerSpawnPoint;
