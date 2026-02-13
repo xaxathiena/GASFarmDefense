@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using FD.Views;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -12,14 +13,21 @@ namespace FD
         private readonly IPoolManager poolManager;
         private readonly IDebugService debug;
         private readonly FDTowerFactory towerFactory;
+        private readonly FDEnemyFactory enemyFactory;
+        private readonly EnemyManager enemyManager;
         private readonly IEventBus eventBus;
         private readonly Queue<TowerController> _towersToRemove = new Queue<TowerController>();
         private readonly List<TowerController> _activeTowers = new List<TowerController>();
+        private readonly Queue<EnemyController> _enemiesToRemove = new Queue<EnemyController>();
+        private readonly List<EnemyController> _activeEnemies = new List<EnemyController>();
+        
         public FDBattleManager(
         FDBattleSceneSetting fDBattleSetting,
         IPoolManager poolManager,
         IDebugService debug,
         FDTowerFactory towerFactory,
+        FDEnemyFactory enemyFactory,
+        EnemyManager enemyManager,
         IEventBus eventBus)
         {
             // Constructor logic here
@@ -27,8 +35,11 @@ namespace FD
             this.poolManager = poolManager;
             this.debug = debug;
             this.towerFactory = towerFactory;
+            this.enemyFactory = enemyFactory;
+            this.enemyManager = enemyManager;
             this.eventBus = eventBus;
             this.eventBus.Subscribe<EventTowerDestroyed>(OnTowerDestroyed);
+            this.eventBus.Subscribe<EventEnemyDestroyed>(OnEnemyDestroyed);
         }
         private void OnTowerDestroyed(EventTowerDestroyed destroyed)
         {
@@ -41,12 +52,24 @@ namespace FD
                 _towersToRemove.Enqueue(tower);
             }
         }
+        
+        private void OnEnemyDestroyed(EventEnemyDestroyed destroyed)
+        {
+            debug.Log($"Enemy {destroyed.EnemyId} destroyed at position {destroyed.Position}", Color.yellow);
+            var enemy = _activeEnemies.Find(e => e.Id == destroyed.EnemyId);
+            if (enemy != null)
+            {
+                _enemiesToRemove.Enqueue(enemy);
+                enemyManager.UnregisterEnemy(enemy);
+            }
+        }
 
         public void Start()
         {
             CreateNewTower();
-            CreateNewTower();
-            debug.Log("FDBattleManager started and tower spawned!", Color.green);
+            CreateNewEnemy();
+            CreateNewEnemy();
+            debug.Log("FDBattleManager started - towers and enemies spawned!", Color.green);
         }
 
         private void CreateNewTower()
@@ -55,31 +78,51 @@ namespace FD
             var towerController = towerFactory.Create(tower, fDBattleSetting.DefaultTowerData);
             _activeTowers.Add(towerController);
         }
+        
+        private void CreateNewEnemy()
+        {
+            var enemy = poolManager.Spawn<EnemyView>(fDBattleSetting.EnemyPrefab, fDBattleSetting.EnemySpawnPoint.position, Quaternion.identity);
+            var enemyController = enemyFactory.Create(enemy, fDBattleSetting.DefaultEnemyData);
+            _activeEnemies.Add(enemyController);
+            enemyManager.RegisterEnemy(enemyController);
+        }
 
         public void Tick()
         {
-            // Tạo bản copy để tránh lỗi "Collection was modified"
+            // Tick towers
             for (int i = 0; i < _activeTowers.Count; i++)
             {
                 _activeTowers[i].Tick();
             }
-            // 2. Cleanup Logic (Run this AFTER the update loop)
+            
+            // Tick enemies
+            for (int i = 0; i < _activeEnemies.Count; i++)
+            {
+                _activeEnemies[i].Tick();
+            }
+            
+            // Cleanup
             ProcessPendingRemovals();
         }
         private void ProcessPendingRemovals()
         {
-            // If the queue is empty, do nothing (Optimization)
-            if (_towersToRemove.Count == 0) return;
-
-            while (_towersToRemove.Count > 0)
+            // Remove towers
+            if (_towersToRemove.Count > 0)
             {
-                var tower = _towersToRemove.Dequeue();
-                
-                // Remove from the main logic list
-                if (_activeTowers.Remove(tower))
+                while (_towersToRemove.Count > 0)
                 {
-                    // If TowerController implements IDisposable, call it here
-                    // tower.Dispose(); 
+                    var tower = _towersToRemove.Dequeue();
+                    _activeTowers.Remove(tower);
+                }
+            }
+            
+            // Remove enemies
+            if (_enemiesToRemove.Count > 0)
+            {
+                while (_enemiesToRemove.Count > 0)
+                {
+                    var enemy = _enemiesToRemove.Dequeue();
+                    _activeEnemies.Remove(enemy);
                 }
             }
         }

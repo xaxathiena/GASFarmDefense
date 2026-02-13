@@ -12,31 +12,32 @@ namespace FD.Data
     [System.Serializable]
     public class TowerData
     {
+        public int helloWorld;
         // Identification
-        public string TowerID { get; set; }
-        public int Level { get; set; }
+        public string TowerID;
+        public int Level;
         
         // Targeting
-        public float TargetRange { get; set; }
-        public int MaxTargets { get; set; }
-        public LayerMask TargetLayerMask { get; set; }
+        public float TargetRange;
+        public int MaxTargets;
+        public LayerMask TargetLayerMask;
         
         // Combat Stats
-        public float BaseDamage { get; set; }
-        public float AttackSpeed { get; set; }
-        public float CriticalChance { get; set; }
-        public float CriticalMultiplier { get; set; }
+        public float BaseDamage;
+        public float AttackSpeed;
+        public float CriticalChance;
+        public float CriticalMultiplier;
         
         // Resources
-        public float MaxHealth { get; set; }
-        public float MaxMana { get; set; }
-        public float ManaRegen { get; set; }
+        public float MaxHealth;
+        public float MaxMana;
+        public float ManaRegen;
         
         // Abilities
-        public List<AbilityInit> Abilities { get; set; }
+        public List<AbilityInit> Abilities;
         
         // Performance
-        public float TargetUpdateInterval { get; set; }
+        public float TargetUpdateInterval;
         
         public TowerData()
         {

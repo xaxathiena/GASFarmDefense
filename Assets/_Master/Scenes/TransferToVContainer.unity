@@ -223,7 +223,7 @@ Transform:
   m_GameObject: {fileID: 805199514}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -20, y: 0, z: -0.4}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -396,9 +396,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FD.FDBattleSceneSetting
   TowerPrefab: {fileID: 2131484701797755185, guid: ad005c34cb568408989f1763067ff0ea, type: 3}
+  defaultTowerData:
+    helloWorld: 0
+    TowerID: Tower_Basic
+    Level: 1
+    TargetRange: 6
+    MaxTargets: 1
+    TargetLayerMask:
+      serializedVersion: 2
+      m_Bits: 64
+    BaseDamage: 15
+    AttackSpeed: 1
+    CriticalChance: 0.1
+    CriticalMultiplier: 2
+    MaxHealth: 200
+    MaxMana: 100
+    ManaRegen: 2
+    Abilities:
+    - ability: {fileID: 11400000, guid: cff07b80d431f4be6b4540e3e6a36a8f, type: 2}
+      level: 1
+      isPassive: 1
+    TargetUpdateInterval: 0.2
+  EnemyPrefab: {fileID: 6925998653370126261, guid: 2c1f9dcd7ba5945c8851de24cec90ae8, type: 3}
   towerSpawnPoint: {fileID: 805199515}
   enemySpawnPoint: {fileID: 81077407}
-  DefaultTowerAbilities: []
 --- !u!4 &1224373677
 Transform:
   m_ObjectHideFlags: 0

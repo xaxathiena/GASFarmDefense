@@ -6,20 +6,30 @@ using VContainer;
 namespace GAS
 {
     /// <summary>
-    /// Registry for ability behaviours. Resolves and caches behaviour instances.
+    /// Registry for ability behaviours. Manages type mappings and caches behaviour instances.
     /// Behaviours are created once and reused (Singleton pattern).
-    /// Uses GameplayAbilityLogic to determine behaviour types.
+    /// This is the ONLY place where ability type mappings are stored.
     /// </summary>
     public class AbilityBehaviourRegistry
     {
         private readonly IObjectResolver container;
-        private readonly GameplayAbilityLogic abilityLogic;
+        private readonly Dictionary<string, Type> typeMap = new Dictionary<string, Type>(); // Use FullName as key for reliable comparison
         private readonly Dictionary<Type, IAbilityBehaviour> behaviourCache = new Dictionary<Type, IAbilityBehaviour>();
 
-        public AbilityBehaviourRegistry(IObjectResolver container, GameplayAbilityLogic abilityLogic)
+        public AbilityBehaviourRegistry(IObjectResolver container)
         {
             this.container = container;
-            this.abilityLogic = abilityLogic;
+        }
+        
+        /// <summary>
+        /// Register a mapping between data type and behaviour type.
+        /// REQUIRED for all abilities to work.
+        /// </summary>
+        public void RegisterBehaviourType(Type dataType, Type behaviourType)
+        {
+            var key = dataType.FullName;
+            typeMap[key] = behaviourType;
+            Debug.Log($"[AbilityBehaviourRegistry] Registered {dataType.Name} ({key}) -> {behaviourType.Name}");
         }
 
         /// <summary>
@@ -34,11 +44,37 @@ namespace GAS
                 return null;
             }
 
-            // Use logic to get behaviour type instead of calling data.GetBehaviourType()
-            var behaviourType = abilityLogic.GetBehaviourType(data);
+            var dataType = data.GetType();
+            var key = dataType.FullName;
+            
+            Debug.Log($"[AbilityBehaviourRegistry] Looking up behaviour for {data.abilityName} (Type: {key})");
+            
+            // Check if we have an explicit mapping
+            if (!typeMap.TryGetValue(key, out Type behaviourType))
+            {
+                Debug.LogWarning($"[AbilityBehaviourRegistry] No explicit mapping for {key}. Attempting auto-detection...");
+                
+                // Auto-detect by convention (DataName -> DataNameBehaviour)
+                string dataTypeName = dataType.Name;
+                if (dataTypeName.EndsWith("Data"))
+                {
+                    string behaviourTypeName = dataTypeName.Replace("Data", "Behaviour");
+                    behaviourType = Type.GetType($"{dataType.Namespace}.{behaviourTypeName}");
+                    if (behaviourType != null)
+                    {
+                        typeMap[key] = behaviourType; // Cache it
+                        Debug.Log($"[AbilityBehaviourRegistry] Auto-detected: {behaviourTypeName}");
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log($"[AbilityBehaviourRegistry] Found mapping: {behaviourType.Name}");
+            }
+            
             if (behaviourType == null)
             {
-                Debug.LogError($"AbilityData {data.abilityName} has no behaviour type mapping!");
+                Debug.LogError($"[AbilityBehaviourRegistry] No behaviour type found for {data.abilityName} ({key})! Registered types: {string.Join(", ", typeMap.Keys)}");
                 return null;
             }
 

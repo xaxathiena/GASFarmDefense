@@ -132,50 +132,50 @@ namespace FD.Ability
         /// </summary>
         private void CheckEnemiesInRange()
         {
-            // Get current enemies in range from EnemyManager
-            var currentEnemies = EnemyManager.GetEnemiesInRange(transform.position, radius, enemyLayer);
+            // // Get current enemies in range from EnemyManager
+            // var currentEnemies = EnemyManager.GetEnemiesInRange(transform.position, radius, enemyLayer);
             
-            // Reuse HashSet to avoid allocation
-            currentEnemiesSet.Clear();
-            for (int i = 0; i < currentEnemies.Count; i++)
-            {
-                if (currentEnemies[i] != null)
-                {
-                    currentEnemiesSet.Add(currentEnemies[i]);
-                }
-            }
+            // // Reuse HashSet to avoid allocation
+            // currentEnemiesSet.Clear();
+            // for (int i = 0; i < currentEnemies.Count; i++)
+            // {
+            //     if (currentEnemies[i] != null)
+            //     {
+            //         currentEnemiesSet.Add(currentEnemies[i]);
+            //     }
+            // }
 
-            // Find enemies that entered range (new enemies)
-            foreach (var enemy in currentEnemiesSet)
-            {
-                if (!enemiesInRange.Contains(enemy))
-                {
-                    // Enemy just entered range
-                    OnEnemyEnter(enemy);
-                }
-            }
+            // // Find enemies that entered range (new enemies)
+            // foreach (var enemy in currentEnemiesSet)
+            // {
+            //     if (!enemiesInRange.Contains(enemy))
+            //     {
+            //         // Enemy just entered range
+            //         OnEnemyEnter(enemy);
+            //     }
+            // }
 
-            // Find enemies that exited range (missing enemies)
-            exitedEnemiesBuffer.Clear();
-            foreach (var enemy in enemiesInRange)
-            {
-                if (enemy == null || !currentEnemiesSet.Contains(enemy))
-                {
-                    exitedEnemiesBuffer.Add(enemy);
-                }
-            }
+            // // Find enemies that exited range (missing enemies)
+            // exitedEnemiesBuffer.Clear();
+            // foreach (var enemy in enemiesInRange)
+            // {
+            //     if (enemy == null || !currentEnemiesSet.Contains(enemy))
+            //     {
+            //         exitedEnemiesBuffer.Add(enemy);
+            //     }
+            // }
 
-            for (int i = 0; i < exitedEnemiesBuffer.Count; i++)
-            {
-                OnEnemyExit(exitedEnemiesBuffer[i]);
-            }
+            // for (int i = 0; i < exitedEnemiesBuffer.Count; i++)
+            // {
+            //     OnEnemyExit(exitedEnemiesBuffer[i]);
+            // }
 
-            // Swap sets to avoid allocation (just clear and refill)
-            enemiesInRange.Clear();
-            foreach (var enemy in currentEnemiesSet)
-            {
-                enemiesInRange.Add(enemy);
-            }
+            // // Swap sets to avoid allocation (just clear and refill)
+            // enemiesInRange.Clear();
+            // foreach (var enemy in currentEnemiesSet)
+            // {
+            //     enemiesInRange.Add(enemy);
+            // }
         }
 
         private void OnEnemyEnter(Transform enemyTransform)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FD.Data;
+using FD.Views;
 using GAS;
 using UnityEngine;
 using VContainer;
@@ -16,14 +17,23 @@ namespace FD
         }
     public class FDBattleSceneSetting : MonoBehaviour
     {
+        [Header("Tower Settings")]
         public TowerView TowerPrefab;
-        public TowerData DefaultTowerData;
+        [SerializeField] private TowerData defaultTowerData = new TowerData();
+        
+        [Header("Enemy Settings")]
+        public EnemyView EnemyPrefab;
+        [SerializeField] private EnemyData defaultEnemyData = new EnemyData();
+        
+        [Header("Spawn Points")]
         [SerializeField] private Transform towerSpawnPoint;
         [SerializeField] private Transform enemySpawnPoint;
+        
+        // Public accessors
+        public TowerData DefaultTowerData => defaultTowerData;
+        public EnemyData DefaultEnemyData => defaultEnemyData;
         public Transform TowerSpawnPoint => towerSpawnPoint;
         public Transform EnemySpawnPoint => enemySpawnPoint;
-        [Header("Tower Settings")]
-        public List<AbilityInit> DefaultTowerAbilities;
         private IDebugService _debug;
         [Inject]
         public void Contruct(IDebugService debug)

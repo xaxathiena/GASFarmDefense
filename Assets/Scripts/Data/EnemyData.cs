@@ -10,22 +10,22 @@ namespace FD.Data
     public class EnemyData
     {
         // Movement config
-        public float MoveSpeed { get; set; } = 3f;
-        public float WaypointThreshold { get; set; } = 0.1f;
+        public float MoveSpeed  = 3f;
+        public float WaypointThreshold  = 0.1f;
         
         // Combat config
-        public float DetectionRange { get; set; } = 10f;
-        public float AttackRange { get; set; } = 2f;
-        public float AttackCooldown { get; set; } = 1f;
+        public float DetectionRange  = 10f;
+        public float AttackRange  = 2f;
+        public float AttackCooldown  = 1f;
         
         // Stats
-        public float InitialHealth { get; set; } = 1000f;
-        public float InitialArmor { get; set; } = 5f;
-        public EArmorType ArmorType { get; set; } = EArmorType.Medium;
+        public float InitialHealth  = 1000f;
+        public float InitialArmor  = 5f;
+        public EArmorType ArmorType  = EArmorType.Medium;
         
         // Identification
-        public string EnemyID { get; set; }
-        public int EnemyLevel { get; set; } = 1;
+        public string EnemyID;
+        public int EnemyLevel  = 1;
         
         // Constructor cho dễ khởi tạo
         public EnemyData() { }

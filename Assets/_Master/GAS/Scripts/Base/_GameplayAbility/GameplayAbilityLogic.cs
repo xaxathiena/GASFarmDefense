@@ -7,56 +7,17 @@ namespace GAS
     /// <summary>
     /// Business logic for GameplayAbility operations.
     /// Stateless service that operates on GameplayAbility data and AbilitySystemComponent.
-    /// Contains ALL ability logic including behaviour type resolution.
     /// Can be registered as Singleton in VContainer.
     /// </summary>
     public class GameplayAbilityLogic
     {
-        // Mapping of data types to behaviour types
-        private readonly Dictionary<Type, Type> _behaviourTypeMap = new Dictionary<Type, Type>();
+        private readonly AbilityBehaviourRegistry _behaviourRegistry;
+        private readonly IDebugService debug;
         
-        /// <summary>
-        /// Register a mapping between data type and behaviour type.
-        /// REQUIRED for all abilities to work.
-        /// </summary>
-        public void RegisterBehaviourType(Type dataType, Type behaviourType)
+        public GameplayAbilityLogic(AbilityBehaviourRegistry behaviourRegistry, IDebugService debug)
         {
-            _behaviourTypeMap[dataType] = behaviourType;
-        }
-        
-        /// <summary>
-        /// Get the behaviour type for a given ability data.
-        /// This replaces the old abstract GetBehaviourType() method on data classes.
-        /// </summary>
-        public Type GetBehaviourType(GameplayAbilityData data)
-        {
-            if (data == null) return null;
-            
-            var dataType = data.GetType();
-            
-            // Check if we have an explicit mapping
-            if (_behaviourTypeMap.TryGetValue(dataType, out Type behaviourType))
-            {
-                return behaviourType;
-            }
-            
-            // Auto-detect by convention (DataName -> DataNameBehaviour)
-            // e.g., FireballAbilityData -> FireballAbilityBehaviour
-            string dataTypeName = dataType.Name;
-            if (dataTypeName.EndsWith("Data"))
-            {
-                string behaviourTypeName = dataTypeName.Replace("Data", "Behaviour");
-                behaviourType = Type.GetType($"{dataType.Namespace}.{behaviourTypeName}");
-                if (behaviourType != null)
-                {
-                    _behaviourTypeMap[dataType] = behaviourType; // Cache it
-                    return behaviourType;
-                }
-            }
-            
-            // Error: No mapping found
-            Debug.LogError($"No behaviour type mapping found for {dataTypeName}! Register it in GASInitializer.");
-            return null;
+            _behaviourRegistry = behaviourRegistry;
+            this.debug = debug;
         }
         
         #region Activation Checks
@@ -78,7 +39,12 @@ namespace GAS
             if (cost > 0f)
             {
                 var manaAttr = asc.AttributeSet?.GetAttribute(EGameplayAttributeType.Mana);
-                if (manaAttr == null || manaAttr.CurrentValue < cost)
+                if(manaAttr == null)
+                {
+                    debug.Log($"No Mana attribute found in AttributeSet for ASC {asc.Id}.");
+                    return false;
+                }
+                if (manaAttr.CurrentValue < cost)
                 {
                     return false;
                 }
@@ -114,6 +80,25 @@ namespace GAS
 
             // Apply cooldown
             ApplyCooldown(ability, asc, abilityLevel);
+            
+            // Call behaviour OnActivated
+            var behaviour = _behaviourRegistry.GetBehaviour(ability);
+            if (behaviour != null)
+            {
+                Debug.Log($"[GAL] Executing behaviour for {ability.abilityName} - Type: {behaviour.GetType().Name}");
+                behaviour.OnActivated(ability, asc, spec);
+            }
+            else
+            {
+                Debug.LogWarning($"[GAL] No behaviour found for {ability.abilityName}! Check registration in GASInitializer.");
+            }
+            
+            // Auto-end instant abilities (fire-and-forget type abilities)
+            // For abilities that need manual end (channeling, duration-based), set canActivateWhileActive = true
+            if (!ability.canActivateWhileActive)
+            {
+                EndAbility(ability, asc, spec);
+            }
         }
 
         private void ApplyCost(GameplayAbilityData ability, AbilitySystemComponent asc, float abilityLevel)
@@ -150,6 +135,10 @@ namespace GAS
             spec.SetActiveState(false);
             asc.RemoveTags(ability.abilityTags);
             asc.NotifyAbilityEnded(ability);
+            
+            // Call behaviour OnEnded
+            var behaviour = _behaviourRegistry.GetBehaviour(ability);
+            behaviour?.OnEnded(ability, asc, spec);
         }
 
         public void CancelAbility(GameplayAbilityData ability, AbilitySystemComponent asc, GameplayAbilitySpec spec)
@@ -157,6 +146,10 @@ namespace GAS
             if (asc == null || spec == null || !spec.IsActive || ability == null)
                 return;
 
+            // Call behaviour OnCancelled
+            var behaviour = _behaviourRegistry.GetBehaviour(ability);
+            behaviour?.OnCancelled(ability, asc, spec);
+            
             // EndAbility will handle cleanup
             EndAbility(ability, asc, spec);
         }

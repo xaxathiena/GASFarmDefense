@@ -1,5 +1,6 @@
 using VContainer.Unity;
 using FD.Abilities;
+using UnityEngine;
 
 namespace GAS
 {
@@ -9,25 +10,26 @@ namespace GAS
     /// </summary>
     public class GASInitializer : IStartable
     {
-        private readonly GameplayAbilityLogic abilityLogic;
-        private readonly AbilityBehaviourRegistry behaviourRegistry;
+        private readonly AbilityBehaviourRegistry _registry;
 
-        public GASInitializer(GameplayAbilityLogic abilityLogic, AbilityBehaviourRegistry behaviourRegistry)
+        public GASInitializer(AbilityBehaviourRegistry registry)
         {
-            this.abilityLogic = abilityLogic;
-            this.behaviourRegistry = behaviourRegistry;
+            _registry = registry;
         }
 
         public void Start()
         {
             // Register ALL ability behaviour type mappings here
-            // Format: abilityLogic.RegisterBehaviourType(typeof(DataClass), typeof(BehaviourClass));
+            // Format: _registry.RegisterBehaviourType(typeof(DataClass), typeof(BehaviourClass));
             
-            abilityLogic.RegisterBehaviourType(typeof(FireballAbilityData), typeof(FireballAbilityBehaviour));
-            abilityLogic.RegisterBehaviourType(typeof(SlowData), typeof(SlowBehaviour));
+            _registry.RegisterBehaviourType(typeof(FireballAbilityData), typeof(FireballAbilityBehaviour));
+            _registry.RegisterBehaviourType(typeof(SlowData), typeof(SlowBehaviour));
+            _registry.RegisterBehaviourType(typeof(TowerNormalAttackData), typeof(TowerNormalAttackBehaviour));
+            
+            Debug.Log("[GASInitializer] Registered 3 ability behaviours");
             
             // Add more abilities here as you create them
-            // abilityLogic.RegisterBehaviourType(typeof(HealAbilityData), typeof(HealAbilityBehaviour));
+            // _registry.RegisterBehaviourType(typeof(HealAbilityData), typeof(HealAbilityBehaviour));
         }
     }
 }

@@ -11,11 +11,11 @@ namespace GAS
     /// </summary>
     public class AbilitySystemLogic
     {
-        private readonly GameplayAbilityLogic abilityLogic;
+        private readonly GameplayAbilityLogic _abilityLogic;
 
         public AbilitySystemLogic(GameplayAbilityLogic abilityLogic)
         {
-            this.abilityLogic = abilityLogic;
+            this._abilityLogic = abilityLogic;
         }
         #region Cooldowns
 
@@ -39,7 +39,6 @@ namespace GAS
         {
             if (ability == null)
                 return false;
-
             return data.AbilityCooldowns.ContainsKey(ability) && data.AbilityCooldowns[ability] > 0;
         }
 
@@ -213,9 +212,9 @@ namespace GAS
             var ability = spec.Definition;
 
             // Use GameplayAbilityLogic to check and activate
-            if (abilityLogic.CanActivateAbility(ability, asc, spec))
+            if (_abilityLogic.CanActivateAbility(ability, asc, spec))
             {
-                abilityLogic.ActivateAbility(ability, asc, spec);
+                _abilityLogic.ActivateAbility(ability, asc, spec);
                 if (!data.ActiveAbilities.Contains(ability))
                 {
                     data.ActiveAbilities.Add(ability);
@@ -245,7 +244,7 @@ namespace GAS
 
             if (spec.IsActive)
             {
-                abilityLogic.CancelAbility(ability, asc, spec);
+                _abilityLogic.CancelAbility(ability, asc, spec);
             }
         }
 
