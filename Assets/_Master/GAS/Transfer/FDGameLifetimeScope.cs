@@ -33,10 +33,12 @@ namespace FD
 
             builder.RegisterComponentInHierarchy<FDBattleSceneSetting>();
 
+            // IMPORTANT: GASInitializer MUST run before FDBattleManager
+            // to register ability behaviours before towers are created
+            builder.RegisterEntryPoint<GASInitializer>(Lifetime.Singleton);
             builder.RegisterEntryPoint<FDBattleManager>(Lifetime.Singleton);
             
             builder.RegisterEntryPoint<DebugService>(Lifetime.Singleton).As<IDebugService>();
-            builder.RegisterEntryPoint<GASInitializer>(Lifetime.Singleton);
             
         }
     }

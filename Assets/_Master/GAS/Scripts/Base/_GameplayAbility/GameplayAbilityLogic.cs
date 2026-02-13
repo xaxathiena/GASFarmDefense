@@ -13,13 +13,13 @@ namespace GAS
     {
         private readonly AbilityBehaviourRegistry _behaviourRegistry;
         private readonly IDebugService debug;
-        
+
         public GameplayAbilityLogic(AbilityBehaviourRegistry behaviourRegistry, IDebugService debug)
         {
             _behaviourRegistry = behaviourRegistry;
             this.debug = debug;
         }
-        
+
         #region Activation Checks
 
         public bool CanActivateAbility(GameplayAbilityData ability, AbilitySystemComponent asc, GameplayAbilitySpec spec)
@@ -27,7 +27,8 @@ namespace GAS
             if (asc == null || spec == null || ability == null)
                 return false;
 
-            if (spec.IsActive && !ability.canActivateWhileActive)
+            // InstantEnd abilities cannot re-activate while already active
+            if (spec.IsActive && ability.endPolicy == EAbilityEndPolicy.InstantEnd)
                 return false;
 
             if (asc.IsAbilityOnCooldown(ability))
@@ -39,7 +40,7 @@ namespace GAS
             if (cost > 0f)
             {
                 var manaAttr = asc.AttributeSet?.GetAttribute(EGameplayAttributeType.Mana);
-                if(manaAttr == null)
+                if (manaAttr == null)
                 {
                     debug.Log($"No Mana attribute found in AttributeSet for ASC {asc.Id}.");
                     return false;
@@ -53,6 +54,18 @@ namespace GAS
             if (asc.HasAnyTags(ability.blockAbilitiesWithTags))
                 return false;
 
+            // Check behaviour-specific conditions (e.g., enemies in range)
+            var behaviour = _behaviourRegistry.GetBehaviour(ability);
+            if (behaviour != null)
+            {
+                bool behaviourCanActivate = behaviour.CanActivate(ability, asc, spec);
+                if (!behaviourCanActivate)
+                {
+                    // Debug.Log($"[GAL] Behaviour CanActivate returned false for {ability.GetType().Name}");
+                    return false;
+                }
+            }
+
             return true;
         }
 
@@ -62,40 +75,34 @@ namespace GAS
 
         public void ActivateAbility(GameplayAbilityData ability, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
+
             if (!CanActivateAbility(ability, asc, spec))
                 return;
-
             spec.SetActiveState(true);
-
             // Cancel conflicting abilities
             asc.CancelAbilitiesWithTags(ability.cancelAbilitiesWithTags);
-            
             // Add ability tags
             asc.AddTags(ability.abilityTags);
-
             float abilityLevel = GetAbilityLevel(spec);
-
             // Apply cost
             ApplyCost(ability, asc, abilityLevel);
-
             // Apply cooldown
             ApplyCooldown(ability, asc, abilityLevel);
-            
             // Call behaviour OnActivated
             var behaviour = _behaviourRegistry.GetBehaviour(ability);
             if (behaviour != null)
             {
-                Debug.Log($"[GAL] Executing behaviour for {ability.abilityName} - Type: {behaviour.GetType().Name}");
+                string abilityNameDisplay = string.IsNullOrEmpty(ability.abilityName) ? ability.GetType().Name : ability.abilityName;
                 behaviour.OnActivated(ability, asc, spec);
             }
             else
             {
-                Debug.LogWarning($"[GAL] No behaviour found for {ability.abilityName}! Check registration in GASInitializer.");
+                string abilityNameDisplay = string.IsNullOrEmpty(ability.abilityName) ? ability.GetType().Name : ability.abilityName;
             }
-            
-            // Auto-end instant abilities (fire-and-forget type abilities)
-            // For abilities that need manual end (channeling, duration-based), set canActivateWhileActive = true
-            if (!ability.canActivateWhileActive)
+
+            // Auto-end abilities with InstantEnd policy (fire-and-forget)
+            // ManualEnd abilities stay active until EndAbility() is called explicitly
+            if (ability.endPolicy == EAbilityEndPolicy.InstantEnd)
             {
                 EndAbility(ability, asc, spec);
             }
@@ -135,7 +142,7 @@ namespace GAS
             spec.SetActiveState(false);
             asc.RemoveTags(ability.abilityTags);
             asc.NotifyAbilityEnded(ability);
-            
+
             // Call behaviour OnEnded
             var behaviour = _behaviourRegistry.GetBehaviour(ability);
             behaviour?.OnEnded(ability, asc, spec);
@@ -149,7 +156,7 @@ namespace GAS
             // Call behaviour OnCancelled
             var behaviour = _behaviourRegistry.GetBehaviour(ability);
             behaviour?.OnCancelled(ability, asc, spec);
-            
+
             // EndAbility will handle cleanup
             EndAbility(ability, asc, spec);
         }

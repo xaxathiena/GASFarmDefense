@@ -39,7 +39,6 @@ namespace FD
         public void Contruct(IDebugService debug)
         {
             _debug = debug;
-            Debug.Log("FDBattleSceneSetting constructed and injected successfully!" + (_debug == null));
         }
         public void Start()
         {

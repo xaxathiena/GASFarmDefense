@@ -16,7 +16,6 @@ namespace FD.Controllers
         public readonly IEnemyRegistry enemyRegistry;
         private List<GameplayAbilitySpec> abilitySpecs = new List<GameplayAbilitySpec>();
         private TowerData towerData;
-        private IReadOnlyList<IEnemy> cachedTargets;
         [SerializeField] private float targetUpdateInterval = 0.2f; // Update targets 5 times per second
 
 
@@ -90,14 +89,6 @@ namespace FD.Controllers
             {
                 return;
             }
-
-            // Get targets first - but only update periodically
-            if (Time.time >= nextTargetUpdateTime)
-            {
-                cachedTargets = GetTargets();
-                nextTargetUpdateTime = Time.time + targetUpdateInterval;
-            }
-
             // Try to activate each ability that can be activated
             foreach (var abilityInit in towerData.Abilities)
             {
@@ -112,11 +103,6 @@ namespace FD.Controllers
                 {
                     continue;
                 }
-                if (cachedTargets == null || cachedTargets.Count == 0)
-                {
-                    continue;
-                }
-
                 // Check if ability can be activated (off cooldown and has enough mana)
                 if (CanActivateAbility(abilityInit.ability))
                 {

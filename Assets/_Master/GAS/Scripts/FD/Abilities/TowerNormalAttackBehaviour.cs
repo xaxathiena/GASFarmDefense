@@ -25,7 +25,7 @@ namespace FD.Abilities
             var attackData = data as TowerNormalAttackData;
             if (attackData == null)
             {
-                Debug.LogError("Invalid data type for TowerNormalAttackBehaviour");
+                debug.Log("Invalid data type for TowerNormalAttackBehaviour", Color.red);
                 return false;
             }
 
@@ -48,6 +48,7 @@ namespace FD.Abilities
 
         public void OnActivated(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
+            debug.Log("Tower Normal Attack activated!", Color.red);
             var attackData = data as TowerNormalAttackData;
             if (attackData == null) return;
 

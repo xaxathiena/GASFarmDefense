@@ -29,7 +29,6 @@ namespace GAS
         {
             var key = dataType.FullName;
             typeMap[key] = behaviourType;
-            Debug.Log($"[AbilityBehaviourRegistry] Registered {dataType.Name} ({key}) -> {behaviourType.Name}");
         }
 
         /// <summary>
@@ -51,9 +50,7 @@ namespace GAS
             
             // Check if we have an explicit mapping
             if (!typeMap.TryGetValue(key, out Type behaviourType))
-            {
-                Debug.LogWarning($"[AbilityBehaviourRegistry] No explicit mapping for {key}. Attempting auto-detection...");
-                
+            {                
                 // Auto-detect by convention (DataName -> DataNameBehaviour)
                 string dataTypeName = dataType.Name;
                 if (dataTypeName.EndsWith("Data"))
@@ -74,7 +71,6 @@ namespace GAS
             
             if (behaviourType == null)
             {
-                Debug.LogError($"[AbilityBehaviourRegistry] No behaviour type found for {data.abilityName} ({key})! Registered types: {string.Join(", ", typeMap.Keys)}");
                 return null;
             }
 

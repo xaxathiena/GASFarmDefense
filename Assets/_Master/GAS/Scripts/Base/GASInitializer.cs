@@ -25,9 +25,7 @@ namespace GAS
             _registry.RegisterBehaviourType(typeof(FireballAbilityData), typeof(FireballAbilityBehaviour));
             _registry.RegisterBehaviourType(typeof(SlowData), typeof(SlowBehaviour));
             _registry.RegisterBehaviourType(typeof(TowerNormalAttackData), typeof(TowerNormalAttackBehaviour));
-            
-            Debug.Log("[GASInitializer] Registered 3 ability behaviours");
-            
+                        
             // Add more abilities here as you create them
             // _registry.RegisterBehaviourType(typeof(HealAbilityData), typeof(HealAbilityBehaviour));
         }

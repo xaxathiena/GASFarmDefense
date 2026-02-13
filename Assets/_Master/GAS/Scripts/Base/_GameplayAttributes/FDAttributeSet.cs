@@ -11,26 +11,25 @@ namespace FD.Ability
         public EArmorType armorType = EArmorType.Medium;
 
         // Runtime attributes
-        public GameplayAttribute Health { get; protected set; }
-        public GameplayAttribute Mana { get; private set; }
-        public GameplayAttribute MaxHealth { get; private set; }
-        public GameplayAttribute MaxMana { get; private set; }
-        public GameplayAttribute ManaRegen { get; private set; }
-        public GameplayAttribute Armor { get; private set; }
-        public GameplayAttribute CriticalChance { get; private set; }
-        public GameplayAttribute CriticalMultiplier { get; private set; }
-        public GameplayAttribute BaseDamage { get; private set; }
-        public GameplayAttribute MoveSpeed { get; private set; }
-
+        public readonly GameplayAttribute Health = new GameplayAttribute();
+        public readonly GameplayAttribute Mana = new GameplayAttribute();
+        public readonly GameplayAttribute MaxHealth = new GameplayAttribute();
+        public readonly GameplayAttribute MaxMana = new GameplayAttribute();
+        public readonly GameplayAttribute ManaRegen = new GameplayAttribute();
+        public readonly GameplayAttribute Armor = new GameplayAttribute();
+        public readonly GameplayAttribute CriticalChance = new GameplayAttribute();
+        public readonly GameplayAttribute CriticalMultiplier = new GameplayAttribute();
+        public readonly GameplayAttribute BaseDamage = new GameplayAttribute();
+        public readonly GameplayAttribute MoveSpeed = new GameplayAttribute();
         public FDAttributeSet()
         {
             // Initialize primary attributes
-            Health = new GameplayAttribute();
-            Mana = new GameplayAttribute();
-            MaxHealth = new GameplayAttribute();
-            MaxMana = new GameplayAttribute();
-            ManaRegen = new GameplayAttribute();
-            Armor = new GameplayAttribute();
+            Health = new GameplayAttribute(100);
+            Mana = new GameplayAttribute(1000);
+            MaxHealth = new GameplayAttribute(100);
+            MaxMana = new GameplayAttribute(1000);
+            ManaRegen = new GameplayAttribute(2);
+            Armor = new GameplayAttribute(10);
             CriticalChance = new GameplayAttribute();
             CriticalMultiplier = new GameplayAttribute();
             BaseDamage = new GameplayAttribute();
@@ -61,15 +60,12 @@ namespace FD.Ability
         protected override void OnAttributeSetInitialized()
         {
             base.OnAttributeSetInitialized();
-            Debug.Log($"Attribute Set initialized for {ownerASC.GetOwner().name}");
         }
 
         #region Attribute Change Callbacks
 
         private void OnHealthChanged(float oldValue, float newValue)
         {
-            Debug.Log($"Health changed: {oldValue} -> {newValue}");
-
             // Check for death
             if (newValue <= 0)
             {
@@ -79,18 +75,17 @@ namespace FD.Ability
 
         private void OnManaChanged(float oldValue, float newValue)
         {
-            Debug.Log($"Mana changed: {oldValue} -> {newValue}");
+            
         }
 
         private void OnStaminaChanged(float oldValue, float newValue)
         {
-            Debug.Log($"Stamina changed: {oldValue} -> {newValue}");
+           
         }
 
         private void OnArmorChanged(float oldValue, float newValue)
         {
             float reduction = CalculateArmorReduction(newValue);
-            Debug.Log($"Armor changed: {oldValue} -> {newValue} (Reduction: {reduction * 100f:F1}%)");
         }
 
         #endregion

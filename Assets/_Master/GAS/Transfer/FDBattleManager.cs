@@ -9,6 +9,11 @@ namespace FD
 {
     public class FDBattleManager : IStartable, ITickable
     {
+#if UNITY_EDITOR
+        // Singleton for Editor/Debug tools ONLY - not available in builds
+        public static FDBattleManager Instance { get; private set; }
+#endif
+        
         private readonly FDBattleSceneSetting fDBattleSetting;
         private readonly IPoolManager poolManager;
         private readonly IDebugService debug;
@@ -30,6 +35,10 @@ namespace FD
         EnemyManager enemyManager,
         IEventBus eventBus)
         {
+#if UNITY_EDITOR
+            Instance = this; // Set singleton for Editor tools
+#endif
+            
             // Constructor logic here
             this.fDBattleSetting = fDBattleSetting;
             this.poolManager = poolManager;
@@ -126,5 +135,11 @@ namespace FD
                 }
             }
         }
+        
+#if UNITY_EDITOR
+        // Public API for Editor/Debug tools
+        public List<TowerController> GetAllTowers() => _activeTowers;
+        public List<EnemyController> GetAllEnemies() => _activeEnemies;
+#endif
     }
 }

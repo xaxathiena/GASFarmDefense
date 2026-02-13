@@ -1,3 +1,4 @@
+using FD.Ability;
 using FD.Data;
 using GAS;
 using System.Collections.Generic;
@@ -19,30 +20,38 @@ namespace FD
     public class TowerController
     {
         // TowerController implementation
-        private readonly AbilitySystemComponent acs;
+        private readonly AbilitySystemComponent asc;
         private readonly IDebugService debug;
         private readonly IEventBus eventBus;
         private readonly IPoolManager poolManager;
         private readonly EnemyManager enemyManager;
+        private readonly FDAttributeSet attributeSet = new FDAttributeSet();
         private TowerData towerData;
         private TowerView towerView;
         private string id;
         private bool isShow = false;
-        
+
         // Ability management
         private List<GameplayAbilitySpec> abilitySpecs = new List<GameplayAbilitySpec>();
-        
+
         private float nextTargetUpdateTime;
-        
+
         public string Id => id;
+        
+#if UNITY_EDITOR
+        // Public API for Editor debug tools
+        public AbilitySystemComponent AbilitySystemComponent => asc;
+        public Transform Transform => towerView?.transform;
+        public string DisplayName => $"Tower #{currentCount} ({id.Substring(0, 8)})";
+#endif
         public TowerController(IDebugService debug,
-        AbilitySystemComponent acs,
+        AbilitySystemComponent asc,
         IEventBus eventBus,
         IPoolManager poolManager,
         EnemyManager enemyManager)
         {
             this.debug = debug;
-            this.acs = acs;
+            this.asc = asc;
             this.eventBus = eventBus;
             this.poolManager = poolManager;
             this.enemyManager = enemyManager;
@@ -54,6 +63,8 @@ namespace FD
             this.towerData = towerData;
             this.towerView = towerView;
             currentCount = ++count;
+            this.asc.InitOwner(this.towerView.transform); // Set owner later if needed
+            this.asc.InitializeAttributeSet(attributeSet);
             GrantAbilities();
         }
         private static int count;
@@ -61,7 +72,7 @@ namespace FD
         public void Tick()
         {
             isShow = true;
-            acs.Tick();
+            asc.Tick();
             TryActivateAbilities();
         }
         public void Destroy()
@@ -70,10 +81,10 @@ namespace FD
             poolManager.Despawn(towerView); // Pass the actual TowerView instance if available˝
             eventBus.Publish(new EventTowerDestroyed(id, Vector3.zero)); // You can set the actual position if needed
         }
-        
+
         private void GrantAbilities()
         {
-            if (acs == null || towerData == null || towerData.Abilities == null)
+            if (asc == null || towerData == null || towerData.Abilities == null)
             {
                 return;
             }
@@ -83,25 +94,25 @@ namespace FD
             {
                 if (abilityInit.ability != null)
                 {
-                    var spec = acs.GiveAbility(abilityInit.ability, Mathf.Max(1, abilityInit.level));
+                    var spec = asc.GiveAbility(abilityInit.ability, Mathf.Max(1, abilityInit.level));
                     abilitySpecs.Add(spec);
                 }
             }
-            
+
             // Activate passive abilities first (auras, buffs, etc.)
             // These don't require targets and should be reactivated after cooldown
             foreach (var abilityInit in towerData.Abilities)
             {
                 if (abilityInit.isPassive && abilityInit.ability != null && CanActivateAbility(abilityInit.ability))
                 {
-                    acs.TryActivateAbility(abilityInit.ability);
+                    asc.TryActivateAbility(abilityInit.ability);
                 }
             }
         }
-        
+
         public void UpgradeAbility(int abilityIndex, int deltaLevel)
         {
-            if (deltaLevel == 0 || acs == null || abilityIndex < 0)
+            if (deltaLevel == 0 || asc == null || abilityIndex < 0)
             {
                 return;
             }
@@ -113,21 +124,21 @@ namespace FD
 
             abilitySpecs[abilityIndex]?.AddLevels(deltaLevel);
         }
-        
+
         private void TryActivateAbilities()
         {
-            if (towerData == null || towerData.Abilities == null || acs == null)
-            {
-                return;
-            }
-            
-            // Check if can perform actions (not stunned, not disabled, not silenced)
-            if (acs.HasAnyTags(GameplayTag.State_Disabled, GameplayTag.State_Silenced, GameplayTag.State_Stunned))
+            if (towerData == null || towerData.Abilities == null || asc == null)
             {
                 return;
             }
 
-           
+            // Check if can perform actions (not stunned, not disabled, not silenced)
+            if (asc.HasAnyTags(GameplayTag.State_Disabled, GameplayTag.State_Silenced, GameplayTag.State_Stunned))
+            {
+                return;
+            }
+
+
 
             // Try to activate each ability that can be activated
             foreach (var abilityInit in towerData.Abilities)
@@ -139,7 +150,7 @@ namespace FD
 
                 // Passive abilities can activate without targets
                 // Non-passive abilities need targets
-                if (abilityInit.isPassive)
+                if (!abilityInit.isPassive)
                 {
                     continue;
                 }
@@ -147,26 +158,26 @@ namespace FD
                 // Check if ability can be activated (off cooldown and has enough mana)
                 if (CanActivateAbility(abilityInit.ability))
                 {
-                    acs.TryActivateAbility(abilityInit.ability);
+                    asc.TryActivateAbility(abilityInit.ability);
                 }
             }
         }
-        
+
         private bool CanActivateAbility(GameplayAbilityData ability)
         {
-            if (ability == null || acs == null)
+            if (ability == null || asc == null)
             {
                 return false;
             }
 
-            if (acs.IsAbilityOnCooldown(ability))
+            if (asc.IsAbilityOnCooldown(ability))
             {
                 return false;
             }
 
             return true;
         }
-        
+
         private List<Transform> GetTargets()
         {
             var targets = new List<Transform>();
@@ -177,7 +188,7 @@ namespace FD
 
             // Use EnemyManager service for distance-based queries (no Physics overhead)
             var candidateBuffer = enemyManager.GetEnemiesInRange(towerView.transform.position, towerData.TargetRange, towerData.TargetLayerMask);
-            
+
             if (candidateBuffer.Count == 0)
             {
                 return targets;

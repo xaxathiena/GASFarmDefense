@@ -1,3 +1,4 @@
+using FD.Ability;
 using FD.Data;
 using FD.Views;
 using GAS;
@@ -23,6 +24,7 @@ namespace FD
         private readonly IDebugService debug;
         private readonly IEventBus eventBus;
         private readonly IPoolManager poolManager;
+        private readonly FDAttributeSet attributeSet = new FDAttributeSet();
         private EnemyData enemyData;
         private EnemyView enemyView;
         private string id;
@@ -37,6 +39,12 @@ namespace FD
         public GameObject GameObject => enemyView != null ? enemyView.GameObject : null;
         public int Layer => enemyView != null ? enemyView.Layer : 0;
         public bool IsActive => enemyView != null && enemyView.IsActive;
+        
+#if UNITY_EDITOR
+        // Public API for Editor debug tools
+        public AbilitySystemComponent AbilitySystemComponent => acs;
+        public string DisplayName => $"Enemy #{currentCount} ({id.Substring(0, 8)})";
+#endif
 
         private static int count;
         private int currentCount;
@@ -59,8 +67,9 @@ namespace FD
             this.enemyData = enemyData;
             this.enemyView = enemyView;
             currentCount = ++count;
-            
+            acs.InitOwner(this.enemyView.transform);
             // Initialize ASC with enemy stats if needed
+            acs.InitializeAttributeSet(attributeSet);
             // GrantAbilities() if enemies have abilities
         }
 
