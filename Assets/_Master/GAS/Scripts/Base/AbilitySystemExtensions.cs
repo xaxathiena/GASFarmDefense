@@ -11,16 +11,16 @@ namespace  GAS
         public static AbilitySystemComponent GetAbilitySystemComponent(this GameObject target)
         {
             if (target == null) return null;
+            if (target.TryGetComponent(out IAbilitySystemComponent interfaceAsc))
+            {
+                return interfaceAsc.AbilitySystemComponent;
+            }
 
             if (target.TryGetComponent(out AbilitySystemComponent directAsc))
             {
                 return directAsc;
             }
 
-            if (target.TryGetComponent(out IAbilitySystemComponent interfaceAsc))
-            {
-                return interfaceAsc.AbilitySystemComponent;
-            }
 
             return null;
         }
@@ -28,13 +28,14 @@ namespace  GAS
         {
             if (target == null) return null;
 
-            if (target.TryGetComponent(out AbilitySystemComponent directAsc))
-            {
-                return directAsc;
-            }
             if (target.TryGetComponent(out IAbilitySystemComponent interfaceAsc))
             {
                 return interfaceAsc.AbilitySystemComponent;
+            }
+
+            if (target.TryGetComponent(out AbilitySystemComponent directAsc))
+            {
+                return directAsc;
             }
 
             return null;

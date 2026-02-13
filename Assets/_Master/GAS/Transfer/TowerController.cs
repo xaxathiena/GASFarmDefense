@@ -41,6 +41,7 @@ namespace FD
 #if UNITY_EDITOR
         // Public API for Editor debug tools
         public AbilitySystemComponent AbilitySystemComponent => asc;
+        
         public Transform Transform => towerView?.transform;
         public string DisplayName => $"Tower #{currentCount} ({id.Substring(0, 8)})";
 #endif
@@ -63,6 +64,7 @@ namespace FD
             this.towerData = towerData;
             this.towerView = towerView;
             currentCount = ++count;
+            this.towerView.ownerASC = this.asc; // Set owner for AbilitySystemComponent access
             this.asc.InitOwner(this.towerView.transform); // Set owner later if needed
             this.asc.InitializeAttributeSet(attributeSet);
             GrantAbilities();

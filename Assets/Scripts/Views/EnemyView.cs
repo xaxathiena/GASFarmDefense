@@ -1,4 +1,5 @@
 using System;
+using GAS;
 using UnityEngine;
 
 namespace FD.Views
@@ -9,9 +10,10 @@ namespace FD.Views
     /// ✅ Không có static calls
     /// ✅ Chỉ expose Unity properties và lifecycle events
     /// </summary>
-    public class EnemyView : MonoBehaviour
+    public class EnemyView : MonoBehaviour, IAbilitySystemComponent
     {
-        // Unity component references (optional)
+        public AbilitySystemComponent ownerASC;
+        // Unity compnent references (optional)
         [SerializeField] private Animator animator;
         [SerializeField] private Renderer meshRenderer;
         
@@ -21,7 +23,9 @@ namespace FD.Views
         public int Layer => gameObject.layer;
         public bool IsActive => gameObject.activeInHierarchy;
         public Vector3 Position => transform.position;
-        
+
+        public AbilitySystemComponent AbilitySystemComponent => ownerASC;
+
         // Lifecycle events - Controller sẽ subscribe
         public event Action<EnemyView> OnSpawned;
         public event Action<EnemyView> OnDespawned;

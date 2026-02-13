@@ -23,6 +23,10 @@ namespace FD
             builder.Register<AbilityBehaviourRegistry>(Lifetime.Singleton);
             builder.Register<AbilitySystemComponent>(Lifetime.Transient);
             builder.Register<EnemyManager>(Lifetime.Singleton);
+            
+            // GameplayEffect Services - Stateless logic for effect calculation and application
+            builder.Register<GameplayEffectCalculationService>(Lifetime.Singleton);
+            builder.Register<GameplayEffectService>(Lifetime.Singleton);
 
             // Ability Behaviours - Register all custom ability behaviours here
             builder.Register<FireballAbilityBehaviour>(Lifetime.Singleton).AsSelf().As<IAbilityBehaviour>();

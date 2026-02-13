@@ -2,6 +2,6 @@ namespace GAS
 {
     public interface IAbilitySystemComponent
     {
-        public  AbilitySystemComponent AbilitySystemComponent { get; }
+        public AbilitySystemComponent AbilitySystemComponent { get; }
     }
 }

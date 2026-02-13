@@ -18,7 +18,7 @@ namespace FD
         }
     }
 
-    public class EnemyController
+    public class EnemyController: IAbilitySystemComponent
     {
         private readonly AbilitySystemComponent acs;
         private readonly IDebugService debug;
@@ -39,10 +39,10 @@ namespace FD
         public GameObject GameObject => enemyView != null ? enemyView.GameObject : null;
         public int Layer => enemyView != null ? enemyView.Layer : 0;
         public bool IsActive => enemyView != null && enemyView.IsActive;
-        
+        public AbilitySystemComponent AbilitySystemComponent => acs;
 #if UNITY_EDITOR
         // Public API for Editor debug tools
-        public AbilitySystemComponent AbilitySystemComponent => acs;
+        
         public string DisplayName => $"Enemy #{currentCount} ({id.Substring(0, 8)})";
 #endif
 
@@ -67,6 +67,7 @@ namespace FD
             this.enemyData = enemyData;
             this.enemyView = enemyView;
             currentCount = ++count;
+            this.enemyView.ownerASC = this.acs; // Set owner for AbilitySystemComponent access
             acs.InitOwner(this.enemyView.transform);
             // Initialize ASC with enemy stats if needed
             acs.InitializeAttributeSet(attributeSet);

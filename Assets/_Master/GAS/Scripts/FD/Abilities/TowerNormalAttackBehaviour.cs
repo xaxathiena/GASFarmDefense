@@ -70,15 +70,16 @@ namespace FD.Abilities
                 var target = targets[i];
                 if (target == null) continue;
 
-                FireAtTarget(owner, target, attackData, asc);
+                FireAtTarget(asc, target, attackData, spec);
             }
 
             // NOTE: Don't end ability here - let the system handle it after cooldown is applied
             // asc.EndAbility(attackData);
         }
 
-        private void FireAtTarget(Transform owner, Transform target, TowerNormalAttackData attackData, AbilitySystemComponent asc)
+        private void FireAtTarget(AbilitySystemComponent asc, Transform target, TowerNormalAttackData attackData, GameplayAbilitySpec spec)
         {
+            var owner = asc.GetOwner();
             // Spawn muzzle effect
             if (attackData.muzzleEffect != null)
             {
@@ -110,7 +111,11 @@ namespace FD.Abilities
             {
                 // If no projectile, apply damage instantly
                 // TODO: Get target's AbilitySystemComponent and apply damage effect
-                debug.Log($"Hit target {target.name} for {attackData.damage} damage!", Color.red);
+                var targetASC = target.GetAbilitySystemComponent();
+                if(targetASC != null) {
+                    targetASC.ApplyGameplayEffectToSelf(attackData.damageEffect, asc, spec.Level);
+                    debug.Log($"Hit target {target.name} for {attackData.damageEffect} damage!", Color.red);
+                }
             }
         }
 

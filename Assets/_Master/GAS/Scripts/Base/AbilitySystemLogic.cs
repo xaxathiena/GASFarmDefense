@@ -12,10 +12,12 @@ namespace GAS
     public class AbilitySystemLogic
     {
         private readonly GameplayAbilityLogic _abilityLogic;
+        private readonly GameplayEffectService _effectService;
 
-        public AbilitySystemLogic(GameplayAbilityLogic abilityLogic)
+        public AbilitySystemLogic(GameplayAbilityLogic abilityLogic, GameplayEffectService effectService)
         {
             this._abilityLogic = abilityLogic;
+            this._effectService = effectService;
         }
         #region Cooldowns
 
@@ -301,7 +303,7 @@ namespace GAS
             var targetData = target.GetData();
 
             // Check if effect can be applied
-            if (!effect.CanApplyTo(target))
+            if (!_effectService.CanApplyTo(effect, target))
             {
                 Debug.LogWarning($"Cannot apply {effect.effectName} to {targetData.Owner.name}");
                 return null;
@@ -324,7 +326,7 @@ namespace GAS
             }
 
             // Create active effect
-            var activeEffect = new ActiveGameplayEffect(effect, source, target, effectLevel);
+            var activeEffect = new ActiveGameplayEffect(effect, source, target, effectLevel, _effectService);
 
             // Apply tags
             if (effect.grantedTags != null && effect.grantedTags.Length > 0)
@@ -345,7 +347,16 @@ namespace GAS
                 {
                     foreach (var modifier in effect.modifiers)
                     {
-                        effect.ApplyModifierWithAggregation(targetData.AttributeSet, modifier, source, target, effectLevel, activeEffect.StackCount, activeEffect, true);
+                        _effectService.ApplyModifierWithAggregation(
+                            effect,
+                            modifier,
+                            source,
+                            target,
+                            effectLevel,
+                            1f,
+                            null,
+                            true,
+                            null);
                     }
                 }
 
@@ -357,7 +368,16 @@ namespace GAS
             {
                 foreach (var modifier in effect.modifiers)
                 {
-                    effect.ApplyModifierWithAggregation(targetData.AttributeSet, modifier, source, target, effectLevel, activeEffect.StackCount, activeEffect, false);
+                    _effectService.ApplyModifierWithAggregation(
+                        effect,
+                        modifier,
+                        source,
+                        target,
+                        effectLevel,
+                        1f,
+                        activeEffect,
+                        false,
+                        null);
                 }
             }
 

@@ -13,7 +13,7 @@ namespace FD.Abilities
     {
         [Header("Attack Settings")]
         [Tooltip("Damage dealt to each target")]
-        public float damage = 20f;
+        public GameplayEffect damageEffect;
         
         [Tooltip("Maximum number of targets to hit (default: 2)")]
         public int maxTargets = 2;
@@ -36,5 +36,6 @@ namespace FD.Abilities
         
         [Tooltip("Hit effect on target")]
         public GameObject hitEffect;
+
     }
 }

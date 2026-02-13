@@ -13,11 +13,14 @@ namespace GAS
     {
         private readonly AbilityBehaviourRegistry _behaviourRegistry;
         private readonly IDebugService debug;
+        private readonly GameplayEffectService effectService;
 
-        public GameplayAbilityLogic(AbilityBehaviourRegistry behaviourRegistry, IDebugService debug)
+        public GameplayAbilityLogic(AbilityBehaviourRegistry behaviourRegistry, 
+        IDebugService debug, GameplayEffectService effectService)
         {
             _behaviourRegistry = behaviourRegistry;
             this.debug = debug;
+            this.effectService = effectService;
         }
 
         #region Activation Checks
@@ -187,12 +190,14 @@ namespace GAS
             try
             {
                 // Apply effect with context
-                effect.ApplyModifiers(
-                    target.AttributeSet,
+                effectService.ApplyModifiers(
+                    effect,
                     source,
                     target,
                     context.Level,
-                    context.StackCount
+                    context.StackCount,
+                    null,
+                    context
                 );
             }
             finally
