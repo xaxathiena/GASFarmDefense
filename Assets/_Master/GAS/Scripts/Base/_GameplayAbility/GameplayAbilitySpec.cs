@@ -8,15 +8,15 @@ namespace GAS
     [System.Serializable]
     public class GameplayAbilitySpec
     {
-        public GameplayAbility Definition => definition;
+        public GameplayAbilityData Definition => definition;
         public float Level => level;
         public bool IsActive => isActive;
 
-        private readonly GameplayAbility definition;
+        private readonly GameplayAbilityData definition;
         private float level;
         private bool isActive;
 
-        public GameplayAbilitySpec(GameplayAbility definition, float level)
+        public GameplayAbilitySpec(GameplayAbilityData definition, float level)
         {
             this.definition = definition;
             SetLevel(level);

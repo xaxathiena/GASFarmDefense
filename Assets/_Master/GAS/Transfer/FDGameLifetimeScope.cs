@@ -18,11 +18,11 @@ namespace FD
             builder.Register<AbilitySystemLogic>(Lifetime.Singleton);
             builder.Register<GameplayAbilityLogic>(Lifetime.Singleton);
             builder.Register<AbilityBehaviourRegistry>(Lifetime.Singleton);
-            builder.Register<LegacyAbilityBehaviour>(Lifetime.Singleton).As<IAbilityBehaviour>();
             builder.Register<AbilitySystemComponent>(Lifetime.Transient);
             
             // Ability Behaviours - Register all custom ability behaviours here
             builder.Register<FireballAbilityBehaviour>(Lifetime.Singleton).As<IAbilityBehaviour>();
+            builder.Register<SlowBehaviour>(Lifetime.Singleton).As<IAbilityBehaviour>();
             
             builder.Register<IEventBus, EventBus>(Lifetime.Singleton);
 

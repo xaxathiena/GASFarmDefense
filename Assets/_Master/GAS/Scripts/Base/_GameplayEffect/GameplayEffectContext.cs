@@ -21,7 +21,7 @@ namespace GAS
         /// <summary>
         /// The ability that spawned this effect (optional)
         /// </summary>
-        public GameplayAbility SourceAbility { get; set; }
+        public GameplayAbilityData SourceAbility { get; set; }
         
         /// <summary>
         /// Level of the effect or ability

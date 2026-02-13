@@ -15,6 +15,7 @@ namespace GAS
         // Dependencies
         private readonly IDebugService debug;
         private readonly AbilitySystemLogic logic;
+        private readonly GameplayAbilityLogic abilityLogic;
 
         // Data (all state is here)
         private readonly AbilitySystemData data;
@@ -23,10 +24,11 @@ namespace GAS
         public AttributeSet AttributeSet => data.AttributeSet;
         public string Id => data.Id;
 
-        public AbilitySystemComponent(IDebugService debug, AbilitySystemLogic logic)
+        public AbilitySystemComponent(IDebugService debug, AbilitySystemLogic logic, GameplayAbilityLogic abilityLogic)
         {
             this.debug = debug;
             this.logic = logic;
+            this.abilityLogic = abilityLogic;
             this.data = new AbilitySystemData
             {
                 Id = Guid.NewGuid().ToString()
@@ -59,7 +61,7 @@ namespace GAS
         /// <summary>
         /// Grant an ability to this component with a specific starting level.
         /// </summary>
-        public GameplayAbilitySpec GiveAbility(GameplayAbility ability, float level = 1f)
+        public GameplayAbilitySpec GiveAbility(GameplayAbilityData ability, float level = 1f)
         {
             return logic.GiveAbility(data, ability, level);
         }
@@ -67,7 +69,7 @@ namespace GAS
         /// <summary>
         /// Try to fetch an existing runtime spec for the provided ability definition.
         /// </summary>
-        public GameplayAbilitySpec GetAbilitySpec(GameplayAbility ability)
+        public GameplayAbilitySpec GetAbilitySpec(GameplayAbilityData ability)
         {
             return logic.GetAbilitySpec(data, ability);
         }
@@ -75,7 +77,7 @@ namespace GAS
         /// <summary>
         /// Force-set the level for an already granted ability.
         /// </summary>
-        public void SetAbilityLevel(GameplayAbility ability, float level)
+        public void SetAbilityLevel(GameplayAbilityData ability, float level)
         {
             logic.SetAbilityLevel(data, ability, level);
         }
@@ -83,7 +85,7 @@ namespace GAS
         /// <summary>
         /// Try to activate an ability
         /// </summary>
-        public bool TryActivateAbility(GameplayAbility ability)
+        public bool TryActivateAbility(GameplayAbilityData ability)
         {
             return logic.TryActivateAbility(data, this, ability);
         }
@@ -107,7 +109,7 @@ namespace GAS
         /// <summary>
         /// Cancel an ability
         /// </summary>
-        public void CancelAbility(GameplayAbility ability)
+        public void CancelAbility(GameplayAbilityData ability)
         {
             logic.CancelAbility(data, this, ability);
         }
@@ -115,27 +117,12 @@ namespace GAS
         /// <summary>
         /// End an ability (complete it normally)
         /// </summary>
-        public void EndAbility(GameplayAbility ability)
+        public void EndAbility(GameplayAbilityData ability)
         {
             var spec = GetAbilitySpec(ability);
-            if (spec != null)
+            if (spec != null && abilityLogic != null)
             {
-                var abilityLogic = GameplayAbility.GetLogic();
-                if (abilityLogic != null)
-                {
-                    abilityLogic.EndAbility(ability, this, spec);
-                }
-            }
-        }
-
-        /// <summary>
-        /// End an ability using GameplayAbilityData (for new data-driven abilities)
-        /// </summary>
-        public void EndAbility(GameplayAbilityData abilityData)
-        {
-            if (abilityData is GameplayAbility ability)
-            {
-                EndAbility(ability);
+                abilityLogic.EndAbility(ability, this, spec);
             }
         }
 
@@ -147,7 +134,7 @@ namespace GAS
             logic.CancelAbilitiesWithTags(data, this, tags);
         }
 
-        internal void NotifyAbilityEnded(GameplayAbility ability)
+        internal void NotifyAbilityEnded(GameplayAbilityData ability)
         {
             logic.NotifyAbilityEnded(data, ability);
         }
@@ -239,7 +226,7 @@ namespace GAS
         /// <summary>
         /// Start cooldown for an ability
         /// </summary>
-        public void StartCooldown(GameplayAbility ability, float duration)
+        public void StartCooldown(GameplayAbilityData ability, float duration)
         {
             logic.StartCooldown(data, ability, duration);
         }
@@ -247,7 +234,7 @@ namespace GAS
         /// <summary>
         /// Check if ability is on cooldown
         /// </summary>
-        public bool IsAbilityOnCooldown(GameplayAbility ability)
+        public bool IsAbilityOnCooldown(GameplayAbilityData ability)
         {
             return logic.IsAbilityOnCooldown(data, ability);
         }
@@ -255,7 +242,7 @@ namespace GAS
         /// <summary>
         /// Get remaining cooldown time
         /// </summary>
-        public float GetAbilityCooldownRemaining(GameplayAbility ability)
+        public float GetAbilityCooldownRemaining(GameplayAbilityData ability)
         {
             return logic.GetAbilityCooldownRemaining(data, ability);
         }

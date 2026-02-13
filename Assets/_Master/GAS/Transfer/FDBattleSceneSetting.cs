@@ -1,11 +1,19 @@
 using System.Collections.Generic;
 using FD.Data;
+using GAS;
 using UnityEngine;
 using VContainer;
-using static FD.Character.TowerBase;
 
 namespace FD
 {
+    [System.Serializable]
+        public class AbilityInit
+        {
+            public GameplayAbilityData ability;
+            public int level = 1;
+            [Tooltip("Passive abilities will be continuously activated (e.g., aura effects)")]
+            public bool isPassive = false;
+        }
     public class FDBattleSceneSetting : MonoBehaviour
     {
         public TowerView TowerPrefab;

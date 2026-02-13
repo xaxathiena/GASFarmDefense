@@ -43,7 +43,7 @@ namespace FD.Data
     [System.Serializable]
     public class TowerAbilityEntry
     {
-        public GameplayAbility ability;
+        public GameplayAbilityData ability;
         public int level = 1;
         public bool isPassive = false;
     }

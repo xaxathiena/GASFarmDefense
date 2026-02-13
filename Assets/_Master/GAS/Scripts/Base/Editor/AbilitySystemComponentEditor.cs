@@ -160,7 +160,7 @@ namespace GAS.Editor
             EditorGUI.indentLevel++;
 
             var grantedAbilitiesField = typeof(AbilitySystemComponent).GetField("grantedAbilities", BindingFlags.NonPublic | BindingFlags.Instance);
-            var grantedAbilities = grantedAbilitiesField?.GetValue(asc) as System.Collections.Generic.List<GameplayAbility>;
+            var grantedAbilities = grantedAbilitiesField?.GetValue(asc) as System.Collections.Generic.List<GameplayAbilityData>;
 
             if (grantedAbilities == null || grantedAbilities.Count == 0)
             {

@@ -8,15 +8,18 @@ namespace GAS
     /// <summary>
     /// Registry for ability behaviours. Resolves and caches behaviour instances.
     /// Behaviours are created once and reused (Singleton pattern).
+    /// Uses GameplayAbilityLogic to determine behaviour types.
     /// </summary>
     public class AbilityBehaviourRegistry
     {
         private readonly IObjectResolver container;
+        private readonly GameplayAbilityLogic abilityLogic;
         private readonly Dictionary<Type, IAbilityBehaviour> behaviourCache = new Dictionary<Type, IAbilityBehaviour>();
 
-        public AbilityBehaviourRegistry(IObjectResolver container)
+        public AbilityBehaviourRegistry(IObjectResolver container, GameplayAbilityLogic abilityLogic)
         {
             this.container = container;
+            this.abilityLogic = abilityLogic;
         }
 
         /// <summary>
@@ -31,10 +34,11 @@ namespace GAS
                 return null;
             }
 
-            var behaviourType = data.GetBehaviourType();
+            // Use logic to get behaviour type instead of calling data.GetBehaviourType()
+            var behaviourType = abilityLogic.GetBehaviourType(data);
             if (behaviourType == null)
             {
-                Debug.LogError($"AbilityData {data.abilityName} returned null behaviour type!");
+                Debug.LogError($"AbilityData {data.abilityName} has no behaviour type mapping!");
                 return null;
             }
 

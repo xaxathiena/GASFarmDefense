@@ -47,7 +47,7 @@ namespace GAS.Editor
 
         private static bool IsGameplayAbilityType(System.Type type)
         {
-            return typeof(GameplayAbility).IsAssignableFrom(type);
+            return typeof(GameplayAbilityData).IsAssignableFrom(type);
         }
 
         private static bool IsGameplayEffectType(System.Type type)

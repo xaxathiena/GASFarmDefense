@@ -68,7 +68,7 @@ namespace FD.Controllers
             }
         }
 
-        private bool CanActivateAbility(GameplayAbility ability)
+        private bool CanActivateAbility(GameplayAbilityData ability)
         {
             if (ability == null || acs == null)
             {

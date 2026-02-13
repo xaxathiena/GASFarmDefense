@@ -96,8 +96,9 @@ using GAS;
 namespace FD.Abilities
 {{
     /// <summary>
-    /// Data configuration for {name} ability.
+    /// Data configuration for {name} ability - PURE DATA ONLY.
     /// Add custom fields here for ability-specific parameters.
+    /// Behaviour type mapping is handled by GameplayAbilityLogic (auto-detected by convention).
     /// </summary>
     [CreateAssetMenu(fileName = ""{name}"", menuName = ""GAS/Abilities/{name}"")]
     public class {name}Data : GameplayAbilityData
@@ -108,11 +109,6 @@ namespace FD.Abilities
         // public float damage = 50f;
         // public GameObject projectilePrefab;
         // public float projectileSpeed = 20f;
-
-        public override System.Type GetBehaviourType()
-        {{
-            return typeof({name}Behaviour);
-        }}
     }}
 }}
 ";

@@ -11,10 +11,10 @@ namespace GAS.Sample
     {
         [Header("Abilities")]
         [Tooltip("Normal attack ability")]
-        public GameplayAbility normalAttackAbility;
+        public GameplayAbilityData normalAttackAbility;
         
         [Tooltip("Heal skill ability (10s cooldown)")]
-        public GameplayAbility healSkillAbility;
+        public GameplayAbilityData healSkillAbility;
         
         [Header("AI Settings")]
         [Tooltip("Detection range for enemies")]
@@ -141,12 +141,6 @@ namespace GAS.Sample
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, detectionRange);
             
-            // Draw attack range (if normal attack ability exists)
-            if (normalAttackAbility != null && normalAttackAbility is NormalAttackAbility normalAttack)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(transform.position, normalAttack.attackRange);
-            }
         }
     }
 }

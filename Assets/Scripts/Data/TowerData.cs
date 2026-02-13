@@ -94,7 +94,7 @@ namespace FD.Data
     [System.Serializable]
     public class AbilityConfig
     {
-        public GameplayAbility Ability { get; set; }
+        public GameplayAbilityData Ability { get; set; }
         public int Level { get; set; }
         public bool IsPassive { get; set; }
         

@@ -4,8 +4,9 @@ using GAS;
 namespace FD.Abilities
 {
     /// <summary>
-    /// Data configuration for Fireball ability.
+    /// Data configuration for Fireball ability - PURE DATA ONLY.
     /// This is a ScriptableObject that designers can create and configure in Unity Editor.
+    /// Behaviour type mapping is handled by GameplayAbilityLogic.
     /// </summary>
     [CreateAssetMenu(fileName = "Fireball", menuName = "GAS/Abilities/Fireball")]
     public class FireballAbilityData : GameplayAbilityData
@@ -19,10 +20,5 @@ namespace FD.Abilities
         [Header("Visual Effects")]
         public GameObject castEffect;
         public GameObject hitEffect;
-
-        public override System.Type GetBehaviourType()
-        {
-            return typeof(FireballAbilityBehaviour);
-        }
     }
 }

@@ -11,6 +11,12 @@ namespace GAS
     /// </summary>
     public class AbilitySystemLogic
     {
+        private readonly GameplayAbilityLogic abilityLogic;
+
+        public AbilitySystemLogic(GameplayAbilityLogic abilityLogic)
+        {
+            this.abilityLogic = abilityLogic;
+        }
         #region Cooldowns
 
         public void UpdateCooldowns(AbilitySystemData data, float deltaTime)
@@ -24,12 +30,12 @@ namespace GAS
             }
         }
 
-        public void StartCooldown(AbilitySystemData data, GameplayAbility ability, float duration)
+        public void StartCooldown(AbilitySystemData data, GameplayAbilityData ability, float duration)
         {
             data.AbilityCooldowns[ability] = duration;
         }
 
-        public bool IsAbilityOnCooldown(AbilitySystemData data, GameplayAbility ability)
+        public bool IsAbilityOnCooldown(AbilitySystemData data, GameplayAbilityData ability)
         {
             if (ability == null)
                 return false;
@@ -37,7 +43,7 @@ namespace GAS
             return data.AbilityCooldowns.ContainsKey(ability) && data.AbilityCooldowns[ability] > 0;
         }
 
-        public float GetAbilityCooldownRemaining(AbilitySystemData data, GameplayAbility ability)
+        public float GetAbilityCooldownRemaining(AbilitySystemData data, GameplayAbilityData ability)
         {
             if (ability == null)
                 return 0f;
@@ -139,7 +145,7 @@ namespace GAS
 
         #region Abilities
 
-        public GameplayAbilitySpec GiveAbility(AbilitySystemData data, GameplayAbility ability, float level = 1f)
+        public GameplayAbilitySpec GiveAbility(AbilitySystemData data, GameplayAbilityData ability, float level = 1f)
         {
             if (ability == null)
             {
@@ -165,7 +171,7 @@ namespace GAS
             return spec;
         }
 
-        public GameplayAbilitySpec GetAbilitySpec(AbilitySystemData data, GameplayAbility ability)
+        public GameplayAbilitySpec GetAbilitySpec(AbilitySystemData data, GameplayAbilityData ability)
         {
             if (ability == null)
                 return null;
@@ -174,13 +180,13 @@ namespace GAS
             return spec;
         }
 
-        public void SetAbilityLevel(AbilitySystemData data, GameplayAbility ability, float level)
+        public void SetAbilityLevel(AbilitySystemData data, GameplayAbilityData ability, float level)
         {
             var spec = GetAbilitySpec(data, ability);
             spec?.SetLevel(level);
         }
 
-        public bool TryActivateAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbility ability)
+        public bool TryActivateAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbilityData ability)
         {
             var spec = GetAbilitySpec(data, ability);
             if (spec == null)
@@ -206,9 +212,10 @@ namespace GAS
 
             var ability = spec.Definition;
 
-            if (ability.CanActivateAbility(asc, spec))
+            // Use GameplayAbilityLogic to check and activate
+            if (abilityLogic.CanActivateAbility(ability, asc, spec))
             {
-                ability.ActivateAbility(asc, spec);
+                abilityLogic.ActivateAbility(ability, asc, spec);
                 if (!data.ActiveAbilities.Contains(ability))
                 {
                     data.ActiveAbilities.Add(ability);
@@ -227,7 +234,7 @@ namespace GAS
             return TryActivateAbility(data, asc, data.AbilitySpecs[index]);
         }
 
-        public void CancelAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbility ability)
+        public void CancelAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbilityData ability)
         {
             if (ability == null)
                 return;
@@ -238,7 +245,7 @@ namespace GAS
 
             if (spec.IsActive)
             {
-                ability.CancelAbility(asc, spec);
+                abilityLogic.CancelAbility(ability, asc, spec);
             }
         }
 
@@ -257,7 +264,7 @@ namespace GAS
             }
         }
 
-        public void NotifyAbilityEnded(AbilitySystemData data, GameplayAbility ability)
+        public void NotifyAbilityEnded(AbilitySystemData data, GameplayAbilityData ability)
         {
             if (ability == null)
                 return;

@@ -124,7 +124,7 @@ namespace GAS
             foreach (string guid in abilityGuids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                GameplayAbility ability = AssetDatabase.LoadAssetAtPath<GameplayAbility>(path);
+                GameplayAbilityData ability = AssetDatabase.LoadAssetAtPath<GameplayAbilityData>(path);
                 
                 if (ability != null)
                 {
@@ -156,7 +156,7 @@ namespace GAS
             migratedEffects++;
         }
 
-        private void MigrateGameplayAbility(GameplayAbility ability, string path)
+        private void MigrateGameplayAbility(GameplayAbilityData ability, string path)
         {
             SerializedObject so = new SerializedObject(ability);
 

@@ -6,14 +6,7 @@ namespace FD.Character
 {
     public class TowerBase : BaseCharacter
     {
-        [System.Serializable]
-        public class AbilityInit
-        {
-            public GameplayAbility ability;
-            public int level = 1;
-            [Tooltip("Passive abilities will be continuously activated (e.g., aura effects)")]
-            public bool isPassive = false;
-        }
+        
 
         [Header("Abilities")]
         [SerializeField] private List<AbilityInit> abilities = new List<AbilityInit>();
@@ -141,7 +134,7 @@ namespace FD.Character
             }
         }
 
-        private bool CanActivateAbility(GameplayAbility ability)
+        private bool CanActivateAbility(GameplayAbilityData ability)
         {
             if (ability == null || abilitySystemComponent == null)
             {

@@ -17,16 +17,16 @@ namespace GAS
         public AttributeSet AttributeSet { get; set; }
 
         // Abilities
-        public List<GameplayAbility> GrantedAbilities { get; set; } = new List<GameplayAbility>();
+        public List<GameplayAbilityData> GrantedAbilities { get; set; } = new List<GameplayAbilityData>();
         public List<GameplayAbilitySpec> AbilitySpecs { get; set; } = new List<GameplayAbilitySpec>();
-        public Dictionary<GameplayAbility, GameplayAbilitySpec> SpecLookup { get; set; } = new Dictionary<GameplayAbility, GameplayAbilitySpec>();
-        public List<GameplayAbility> ActiveAbilities { get; set; } = new List<GameplayAbility>();
+        public Dictionary<GameplayAbilityData, GameplayAbilitySpec> SpecLookup { get; set; } = new Dictionary<GameplayAbilityData, GameplayAbilitySpec>();
+        public List<GameplayAbilityData> ActiveAbilities { get; set; } = new List<GameplayAbilityData>();
 
         // Tags (reference counting)
         public Dictionary<byte, int> ActiveTagCounts { get; set; } = new Dictionary<byte, int>();
 
         // Cooldowns
-        public Dictionary<GameplayAbility, float> AbilityCooldowns { get; set; } = new Dictionary<GameplayAbility, float>();
+        public Dictionary<GameplayAbilityData, float> AbilityCooldowns { get; set; } = new Dictionary<GameplayAbilityData, float>();
 
         // Gameplay Effects
         public List<ActiveGameplayEffect> ActiveGameplayEffects { get; set; } = new List<ActiveGameplayEffect>();
