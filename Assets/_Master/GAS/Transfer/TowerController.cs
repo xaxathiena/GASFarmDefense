@@ -43,16 +43,15 @@ namespace FD
         {
             this.towerData = towerData;
             this.towerView = towerView;
+            currentCount = ++count;
         }
-
+        private static int count;
+        private int currentCount;
         public void Tick()
         {
-            if (!isShow)
-            {
-                isShow = true;
-                debug.Log($"TowerController {id} setup with TowerView and TowerData: {this.acs.Id}, {towerData}", Color.magenta);
-                acs.Tick();
-            }
+            isShow = true;
+            debug.Log($"TowerController {id} setup with TowerView and acs: {this.acs.Id}, {towerData}", Color.magenta, currentCount);
+            acs.Tick();
         }
         public void Destroy()
         {

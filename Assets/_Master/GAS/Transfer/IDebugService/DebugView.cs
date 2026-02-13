@@ -4,7 +4,8 @@ using System.Collections.Generic;
 public class DebugView : MonoBehaviour
 {
     // Dữ liệu sẽ được Service bơm vào
-    private Queue<string> _logs = new Queue<string>();
+    private List<string> _logs = new List<string>(); // Continuous logs
+    private Dictionary<int, string> _indexedLogs = new Dictionary<int, string>(); // Indexed logs (Unreal-style)
     private Dictionary<string, System.Action> _commands = new Dictionary<string, System.Action>();
     
     private bool _isVisible = false;
@@ -35,9 +36,10 @@ public class DebugView : MonoBehaviour
             _isVisible = !_isVisible;
     }
 
-    public void UpdateData(Queue<string> logs, Dictionary<string, System.Action> commands)
+    public void UpdateData(List<string> logs, Dictionary<int, string> indexedLogs, Dictionary<string, System.Action> commands)
     {
         _logs = logs;
+        _indexedLogs = indexedLogs;
         _commands = commands;
     }
 
@@ -58,6 +60,16 @@ public class DebugView : MonoBehaviour
 
         // 2. Logs Area (Chiếm 70% màn hình)
         _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(Screen.height * 0.6f));
+        
+        // Hiển thị indexed logs trước (sorted by key)
+        var sortedIndexes = new List<int>(_indexedLogs.Keys);
+        sortedIndexes.Sort();
+        foreach (var index in sortedIndexes)
+        {
+            GUILayout.Label($"[{index}] {_indexedLogs[index]}", _style);
+        }
+        
+        // Sau đó hiển thị continuous logs
         foreach (var log in _logs)
         {
             GUILayout.Label(log, _style);

@@ -40,7 +40,6 @@ namespace GAS
             // Delegate all logic to the logic service
             logic.UpdateCooldowns(data, Time.deltaTime);
             logic.UpdateGameplayEffects(data, Time.deltaTime);
-            debug.Log("AbilitySystemComponent Tick called " + data.Id, Color.yellow);
         }
 
         public void InitOwner(Transform owner)
