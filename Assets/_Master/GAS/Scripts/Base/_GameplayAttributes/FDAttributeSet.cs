@@ -67,7 +67,7 @@ namespace FD.Ability
         private void OnHealthChanged(float oldValue, float newValue)
         {
             // Check for death
-            if (newValue <= 0)
+            if (newValue <= 0 && oldValue > 0)
             {
                 OnDeath();
             }
@@ -181,7 +181,7 @@ namespace FD.Ability
         /// </summary>
         private void OnDeath()
         {
-            Debug.Log($"{ownerASC.GetOwner().name} has died!");
+            //Debug.Log($"{ownerASC.GetOwner().name} has died!");
 
             // Add death tag
             if (ownerASC != null)

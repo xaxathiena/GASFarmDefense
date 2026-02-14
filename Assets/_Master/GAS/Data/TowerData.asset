@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b07db246e7cb47c5a05b2f5368dbcb5, type: 3}
+  m_Name: TowerData
+  m_EditorClassIdentifier: Assembly-CSharp::FD.Data.TowerData
+  helloWorld: 0
+  TowerID: Tower_Basic
+  Level: 1
+  TargetRange: 6
+  MaxTargets: 1
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  BaseDamage: 15
+  AttackSpeed: 1
+  CriticalChance: 0.1
+  CriticalMultiplier: 2
+  MaxHealth: 200
+  MaxMana: 100
+  ManaRegen: 2
+  Abilities:
+  - ability: {fileID: 11400000, guid: cff07b80d431f4be6b4540e3e6a36a8f, type: 2}
+    level: 1
+    isPassive: 1
+  TargetUpdateInterval: 0.2

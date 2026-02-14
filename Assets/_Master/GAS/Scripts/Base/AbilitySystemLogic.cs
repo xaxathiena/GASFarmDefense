@@ -150,7 +150,7 @@ namespace GAS
         {
             if (ability == null)
             {
-                Debug.LogWarning("Cannot grant a null ability.");
+                //Debug.LogWarning("Cannot grant a null ability.");
                 return null;
             }
 
@@ -193,7 +193,7 @@ namespace GAS
             if (spec == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {data.Owner.name}");
+                //Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {data.Owner.name}");
 #endif
                 return false;
             }
@@ -206,7 +206,7 @@ namespace GAS
             if (spec == null || spec.Definition == null)
             {
 #if UNITY_EDITOR
-                Debug.LogWarning($"Invalid ability spec on {data.Owner.name}");
+                //Debug.LogWarning($"Invalid ability spec on {data.Owner.name}");
 #endif
                 return false;
             }
@@ -305,7 +305,7 @@ namespace GAS
             // Check if effect can be applied
             if (!_effectService.CanApplyTo(effect, target))
             {
-                Debug.LogWarning($"Cannot apply {effect.effectName} to {targetData.Owner.name}");
+                //Debug.LogWarning($"Cannot apply {effect.effectName} to {targetData.Owner.name}");
                 return null;
             }
 
@@ -318,7 +318,7 @@ namespace GAS
                     if (existingEffect.AddStack())
                     {
 #if UNITY_EDITOR
-                        Debug.Log($"Stacked {effect.effectName} on {targetData.Owner.name} (x{existingEffect.StackCount})");
+                        //Debug.Log($"Stacked {effect.effectName} on {targetData.Owner.name} (x{existingEffect.StackCount})");
 #endif
                         return existingEffect;
                     }

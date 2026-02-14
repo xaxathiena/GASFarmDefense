@@ -45,7 +45,7 @@ namespace GAS
         {
             if (string.IsNullOrEmpty(name))
             {
-                Debug.LogWarning("Cannot register attribute with null or empty name!");
+                //LogWarning("Cannot register attribute with null or empty name!");
                 return;
             }
             

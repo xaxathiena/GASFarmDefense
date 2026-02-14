@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using GAS;
-using static FD.Character.TowerBase;
 
 namespace FD.Data
 {
@@ -9,8 +8,8 @@ namespace FD.Data
     /// Pure data class cho Tower configuration
     /// Immutable, serializable, testable
     /// </summary>
-    [System.Serializable]
-    public class TowerData
+    [CreateAssetMenu(fileName = "TowerData", menuName = "FD/Tower Data", order = 1)]
+    public class TowerData : ScriptableObject
     {
         public int helloWorld;
         // Identification

@@ -90,7 +90,7 @@ namespace GAS
             if (HasAttribute(EMyCustomAttributes.Shield))
             {
                 var shield = GetAttribute(EMyCustomAttributes.Shield);
-                Debug.Log($"Shield: {shield.CurrentValue}");
+                //Debug.Log($"Shield: {shield.CurrentValue}");
             }
         }
     }

@@ -211,7 +211,7 @@ namespace GAS
             data.AttributeSet = attributeSet;
             if (attributeSet == null)
             {
-                Debug.LogError("AttributeSet is null!");
+                //Debug.LogError("AttributeSet is null!");
                 return;
             }
             attributeSet.InitAttributeSet(this);

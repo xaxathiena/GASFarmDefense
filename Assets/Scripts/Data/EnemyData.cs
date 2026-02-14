@@ -7,7 +7,8 @@ namespace FD.Data
     /// Configuration data cho enemy - Không có logic!
     /// Có thể tạo từ ScriptableObject hoặc khởi tạo runtime
     /// </summary>
-    public class EnemyData
+    [CreateAssetMenu(fileName = "EnemyData", menuName = "FD/Enemy Data", order = 2)]
+    public class EnemyData : ScriptableObject
     {
         // Movement config
         public float MoveSpeed  = 3f;

@@ -39,14 +39,14 @@ namespace GAS
         {
             if (data == null)
             {
-                Debug.LogError("AbilityData is null!");
+                //Debug.LogError("AbilityData is null!");
                 return null;
             }
 
             var dataType = data.GetType();
             var key = dataType.FullName;
             
-            Debug.Log($"[AbilityBehaviourRegistry] Looking up behaviour for {data.abilityName} (Type: {key})");
+            // Debug.Log($"[AbilityBehaviourRegistry] Looking up behaviour for {data.abilityName} (Type: {key})");
             
             // Check if we have an explicit mapping
             if (!typeMap.TryGetValue(key, out Type behaviourType))
@@ -60,13 +60,13 @@ namespace GAS
                     if (behaviourType != null)
                     {
                         typeMap[key] = behaviourType; // Cache it
-                        Debug.Log($"[AbilityBehaviourRegistry] Auto-detected: {behaviourTypeName}");
+                        //Log($"[AbilityBehaviourRegistry] Auto-detected: {behaviourTypeName}");
                     }
                 }
             }
             else
             {
-                Debug.Log($"[AbilityBehaviourRegistry] Found mapping: {behaviourType.Name}");
+                //Debug.Log($"[AbilityBehaviourRegistry] Found mapping: {behaviourType.Name}");
             }
             
             if (behaviourType == null)
@@ -81,14 +81,14 @@ namespace GAS
                     behaviour = container.Resolve(behaviourType) as IAbilityBehaviour;
                     if (behaviour == null)
                     {
-                        Debug.LogError($"Resolved type {behaviourType.Name} is not an IAbilityBehaviour!");
+                        //Debug.LogError($"Resolved type {behaviourType.Name} is not an IAbilityBehaviour!");
                         return null;
                     }
                     behaviourCache[behaviourType] = behaviour;
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Failed to resolve behaviour {behaviourType.Name}: {e.Message}");
+                    //Debug.LogError($"Failed to resolve behaviour {behaviourType.Name}: {e.Message}");
                     return null;
                 }
             }
