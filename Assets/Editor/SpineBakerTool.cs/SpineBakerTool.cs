@@ -3,6 +3,15 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 
+/// <summary>
+/// Spine Baker PRO - Tool bake animation thành Texture2DArray
+/// ✅ ĐÃ SỬA LỖI ĐỨNG HÌNH: Dùng AnimationMode.SampleAnimationClip() thay vì clip.SampleAnimation()
+/// 
+/// Cách dùng:
+/// 1. Mở Scene có "BakingCam"
+/// 2. Chọn GameObject có Animator + AnimationClips
+/// 3. Chạy tool và nhấn "BAKE & CREATE DATA NGAY"
+/// </summary>
 public class SpineBakerPro : EditorWindow
 {
     // --- CẤU HÌNH CAPTURE ---
@@ -151,6 +160,10 @@ public class SpineBakerPro : EditorWindow
         List<UnitAnimData.AnimInfo> animDataList = new List<UnitAnimData.AnimInfo>();
         int currentSlice = 0;
 
+        // --- BẮT ĐẦU ANIMATION MODE (QUAN TRỌNG ĐỂ CÓ CHUYỂN ĐỘNG) ---
+        if (!AnimationMode.InAnimationMode())
+            AnimationMode.StartAnimationMode();
+
         try 
         {
             for (int i = 0; i < clips.Length; i++)
@@ -175,9 +188,35 @@ public class SpineBakerPro : EditorWindow
                     float time = f / targetFPS;
                     if (time > clip.length) time = clip.length;
 
-                    // 1. Render (FIXED: ĐÃ XÓA LỆNH BakeMesh GÂY LỖI)
-                    clip.SampleAnimation(selected, time);
-                    // Không cần BakeMesh thủ công, Camera.Render sẽ tự xử lý SkinnedMesh
+                    // 1. Kích hoạt AnimationMode để ép SkinnedMesh cập nhật
+                    AnimationMode.BeginSampling();
+                    AnimationMode.SampleAnimationClip(selected, clip, time);
+                    AnimationMode.EndSampling();
+
+                    // 2. CRITICAL: Force update ALL child transforms & renderers
+                    // Với skeleton có nhiều children bones, cần multiple repaint
+                    SceneView.RepaintAll();
+                    UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+                    
+                    // Force update tất cả SkinnedMesh trong children
+                    SkinnedMeshRenderer[] skinRenderers = selected.GetComponentsInChildren<SkinnedMeshRenderer>();
+                    foreach (var skr in skinRenderers)
+                    {
+                        if (skr.enabled && skr.gameObject.activeInHierarchy)
+                        {
+                            skr.forceMatrixRecalculationPerRender = true;
+                        }
+                    }
+
+                    // 3. Force Update VFX (Particle System nếu có)
+                    ParticleSystem[] particles = selected.GetComponentsInChildren<ParticleSystem>();
+                    foreach (var ps in particles)
+                    {
+                        ps.Simulate(time, true, true);
+                    }
+
+                    // 4. Final repaint để đảm bảo tất cả đã update
+                    SceneView.RepaintAll();
                     
                     bakingCam.Render();
 
@@ -243,6 +282,9 @@ public class SpineBakerPro : EditorWindow
         }
         finally
         {
+            // --- KẾT THÚC ANIMATION MODE ---
+            AnimationMode.StopAnimationMode();
+            
             EditorUtility.ClearProgressBar();
             bakingCam.targetTexture = null;
             bakeRT.Release();

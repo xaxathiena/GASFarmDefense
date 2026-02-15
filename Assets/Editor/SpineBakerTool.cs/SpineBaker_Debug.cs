@@ -11,22 +11,21 @@ public class SpineBaker_Debug : EditorWindow
     private bool useManualPosition = false;
     private float vfxThreshold = 0.2f;
     
-    // Size cố định để test cho nhanh
     private int targetSize = 512; 
 
-    [MenuItem("Tools/Abel/Spine Baker (DEBUG PNG)")]
+    [MenuItem("Tools/Abel/Spine Baker (DEBUG FIX MESH)")]
     static void Init()
     {
         SpineBaker_Debug window = GetWindow<SpineBaker_Debug>();
-        window.titleContent = new GUIContent("Baker DEBUG");
-        window.minSize = new Vector2(350, 400);
+        window.titleContent = new GUIContent("Baker Debug Fixed");
+        window.minSize = new Vector2(350, 450);
         window.Show();
     }
 
     void OnGUI()
     {
-        GUILayout.Label("CHẾ ĐỘ DEBUG: XUẤT ẢNH PNG", EditorStyles.boldLabel);
-        EditorGUILayout.HelpBox("Tool này sẽ xuất từng frame ra file ảnh để kiểm tra chuyển động.", MessageType.Info);
+        GUILayout.Label("DEBUG MODE: SỬA LỖI ĐỨNG HÌNH", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("Sử dụng AnimationMode để ép SkinnedMesh cập nhật theo xương.", MessageType.Info);
 
         GUILayout.Space(10);
         targetFPS = EditorGUILayout.Slider("FPS", targetFPS, 1, 60);
@@ -39,7 +38,7 @@ public class SpineBaker_Debug : EditorWindow
 
         GUILayout.Space(20);
 
-        if (GUILayout.Button("CHỤP TỪNG TẤM PNG NGAY", GUILayout.Height(40)))
+        if (GUILayout.Button("CHỤP PNG (FIXED MESH)", GUILayout.Height(40)))
         {
             CaptureFrames();
         }
@@ -58,11 +57,11 @@ public class SpineBaker_Debug : EditorWindow
         RenderTexture bakeRT = new RenderTexture(targetSize, targetSize, 24, RenderTextureFormat.ARGB32);
         bakingCam.targetTexture = bakeRT;
         bakingCam.clearFlags = CameraClearFlags.SolidColor;
-        bakingCam.backgroundColor = new Color(0,0,0,0); // Trong suốt
+        bakingCam.backgroundColor = new Color(0,0,0,0);
 
-        // Setup Animation
+        // Chuẩn bị Animation
         bool wasAnimatorEnabled = animator.enabled;
-        animator.enabled = false; // Tắt Animator để điều khiển thủ công
+        animator.enabled = false; 
         
         Vector3 originalPos = selected.transform.position;
         Quaternion originalRot = selected.transform.rotation;
@@ -72,16 +71,18 @@ public class SpineBaker_Debug : EditorWindow
             selected.transform.rotation = Quaternion.identity;
         }
 
-        // Tạo folder lưu ảnh
         string folderPath = $"Assets/BakedSpine_Debug/{selected.name}";
-        if (Directory.Exists(folderPath)) Directory.Delete(folderPath, true); // Xóa cũ
+        if (Directory.Exists(folderPath)) Directory.Delete(folderPath, true);
         Directory.CreateDirectory(folderPath);
 
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
 
+        // --- BẮT ĐẦU CHẾ ĐỘ ANIMATION MODE (QUAN TRỌNG) ---
+        if (!AnimationMode.InAnimationMode())
+            AnimationMode.StartAnimationMode();
+
         try 
         {
-            // Duyệt từng Clip
             foreach (var clip in clips)
             {
                 int frameCount = Mathf.FloorToInt(clip.length * targetFPS);
@@ -92,22 +93,48 @@ public class SpineBaker_Debug : EditorWindow
                     float time = i / targetFPS;
                     if (time > clip.length) time = clip.length;
 
-                    // --- BƯỚC QUAN TRỌNG NHẤT ---
-                    // 1. Đặt animation vào thời điểm 'time'
-                    clip.SampleAnimation(selected, time); 
+                    // 1. Kích hoạt Animation Mode
+                    AnimationMode.BeginSampling();
                     
-                    // 2. Ép hệ thống vật lý/transform cập nhật (đề phòng bone bị lag)
-                    Physics.SyncTransforms(); 
+                    // 2. Sample bằng AnimationMode (Thay cho clip.SampleAnimation)
+                    // Hàm này ép Unity cập nhật Scene View và SkinnedMesh ngay lập tức
+                    AnimationMode.SampleAnimationClip(selected, clip, time);
+                    
+                    AnimationMode.EndSampling();
 
-                    // 3. Render Camera (Tuyệt đối KHÔNG dùng BakeMesh)
+                    // 3. CRITICAL: Force update ALL child transforms & renderers
+                    // Với skeleton có nhiều children bones, cần multiple repaint
+                    SceneView.RepaintAll();
+                    UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+                    
+                    // Force update tất cả SkinnedMesh và MeshRenderer trong children
+                    SkinnedMeshRenderer[] skinRenderers = selected.GetComponentsInChildren<SkinnedMeshRenderer>();
+                    foreach (var skr in skinRenderers)
+                    {
+                        if (skr.enabled && skr.gameObject.activeInHierarchy)
+                        {
+                            skr.forceMatrixRecalculationPerRender = true;
+                        }
+                    }
+
+                    // 4. Force Update VFX (Particle System nếu có)
+                    ParticleSystem[] particles = selected.GetComponentsInChildren<ParticleSystem>();
+                    foreach (var ps in particles)
+                    {
+                        ps.Simulate(time, true, true);
+                    }
+
+                    // 5. Final repaint để đảm bảo tất cả đã update
+                    SceneView.RepaintAll();
+                    
+                    // 6. Render
                     bakingCam.Render();
 
-                    // 4. Lưu ảnh
+                    // 5. Lưu ảnh
                     Texture2D tempTex = new Texture2D(targetSize, targetSize, TextureFormat.ARGB32, false);
                     RenderTexture.active = bakeRT;
                     tempTex.ReadPixels(new Rect(0, 0, targetSize, targetSize), 0, 0);
                     
-                    // Fix VFX (Lọc viền đen)
                     Color[] pixels = tempTex.GetPixels();
                     for (int p = 0; p < pixels.Length; p++)
                     {
@@ -118,7 +145,6 @@ public class SpineBaker_Debug : EditorWindow
                     tempTex.SetPixels(pixels);
                     tempTex.Apply();
 
-                    // Xuất ra file
                     byte[] bytes = tempTex.EncodeToPNG();
                     File.WriteAllBytes($"{folderPath}/{clip.name}_{i:D3}.png", bytes);
                     DestroyImmediate(tempTex);
@@ -126,8 +152,8 @@ public class SpineBaker_Debug : EditorWindow
             }
             
             AssetDatabase.Refresh();
-            Debug.Log($"<color=green>Đã xuất xong ảnh vào: {folderPath}</color>");
-            EditorUtility.RevealInFinder(folderPath); // Tự mở thư mục lên cho anh xem
+            Debug.Log($"<color=green>Đã xuất xong! Kiểm tra folder: {folderPath}</color>");
+            EditorUtility.RevealInFinder(folderPath);
         }
         catch (System.Exception ex)
         {
@@ -135,6 +161,9 @@ public class SpineBaker_Debug : EditorWindow
         }
         finally
         {
+            // --- KẾT THÚC ANIMATION MODE ---
+            AnimationMode.StopAnimationMode();
+            
             bakingCam.targetTexture = null;
             bakeRT.Release();
             animator.enabled = wasAnimatorEnabled;
