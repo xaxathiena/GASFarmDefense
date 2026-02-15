@@ -9,16 +9,19 @@ public class UnitAnimData : ScriptableObject
 
     [Header("Animation Metadata")]
     public List<AnimInfo> animations = new List<AnimInfo>();
-
-    [System.Serializable]
+[System.Serializable]
     public struct AnimInfo
     {
-        public string animName;    // Tên (Attack, Idle...)
-        public int startFrame;     // Bắt đầu từ slice nào
-        public int frameCount;     // Dài bao nhiêu frame
-        public float fps;          // Tốc độ gốc
-        public float duration;     // Thời lượng (giây)
-        public bool loop;          // (Tùy chọn)
+        public string animName;
+        public int startFrame;
+        public int frameCount;
+        public float fps;
+        public float duration;
+        public bool loop;
+        
+        // --- THÊM BIẾN NÀY ---
+        [Range(0.1f, 20f)]
+        public float speedModifier; // 1 = Chuẩn, 2 = Nhanh gấp đôi, 0.5 = Chậm một nửa
     }
 
     // Hàm tiện ích để tìm Animation theo tên lúc Runtime

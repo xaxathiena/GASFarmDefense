@@ -4,10 +4,9 @@ using System.IO;
 using System.Collections.Generic;
 
 /// <summary>
-/// Spine Baker PRO (Final Fixed)
-/// - Tích hợp AnimationMode để ép xương di chuyển.
-/// - Tích hợp Force Repaint để ép Skin cập nhật theo xương.
-/// - Tự động tạo TextureArray và UnitAnimData.
+/// Spine Baker PRO (Final Clean)
+/// - Fix lỗi Mesh cứng đờ.
+/// - Fix lỗi viền đen (Anti-Black Border).
 /// </summary>
 public class SpineBakerPro : EditorWindow
 {
@@ -29,7 +28,7 @@ public class SpineBakerPro : EditorWindow
         Mobile_Fast_ETC2 = TextureFormat.ETC2_RGBA8,
         Uncompressed_RGBA32 = TextureFormat.RGBA32
     }
-    // Mặc định Uncompressed để test hình ảnh trước, nén sau
+    // Vẫn nên để Uncompressed lúc test cho đẹp
     private CompressionType compression = CompressionType.Uncompressed_RGBA32; 
 
     // --- TRẠNG THÁI UI ---
@@ -37,11 +36,11 @@ public class SpineBakerPro : EditorWindow
     private string statusMessage = "";
     private MessageType statusType = MessageType.None;
 
-    [MenuItem("Tools/Abel/Spine Baker PRO (Fixed Motion)")]
+    [MenuItem("Tools/Abel/Spine Baker PRO (Anti-Black Border)")]
     static void Init()
     {
         SpineBakerPro window = GetWindow<SpineBakerPro>();
-        window.titleContent = new GUIContent("Baker Fixed");
+        window.titleContent = new GUIContent("Baker Clean");
         window.minSize = new Vector2(350, 600);
         window.Show();
     }
@@ -89,7 +88,7 @@ public class SpineBakerPro : EditorWindow
         
         GUILayout.Label("1. CẤU HÌNH ANIMATION", EditorStyles.boldLabel);
         GUILayout.BeginVertical("box");
-        targetFPS = EditorGUILayout.Slider("FPS (Độ mượt)", targetFPS, 5, 60);
+        targetFPS = EditorGUILayout.Slider("FPS (Độ mượt)", targetFPS, 1, 60);
         EditorGUILayout.LabelField("Dung lượng:", $"{(targetFPS/30f)*100:F0}% so với gốc", EditorStyles.miniLabel);
         GUILayout.Space(5);
         useManualPosition = EditorGUILayout.ToggleLeft("Giữ nguyên vị trí Unit", useManualPosition);
@@ -124,14 +123,12 @@ public class SpineBakerPro : EditorWindow
 
         int size = (int)targetSize;
         
-        // Setup Camera
         if (bakingCam.targetTexture != null) bakingCam.targetTexture.Release();
         RenderTexture bakeRT = new RenderTexture(size, size, 24, RenderTextureFormat.ARGB32);
         bakingCam.targetTexture = bakeRT;
         bakingCam.clearFlags = CameraClearFlags.SolidColor;
-        bakingCam.backgroundColor = new Color(0,0,0,0);
+        bakingCam.backgroundColor = new Color(0,0,0,0); // Nền đen trong suốt
 
-        // Setup Animation
         bool wasAnimatorEnabled = animator.enabled;
         animator.enabled = false;
         Vector3 originalPos = selected.transform.position;
@@ -143,7 +140,6 @@ public class SpineBakerPro : EditorWindow
 
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
 
-        // Tính tổng Frame
         int totalFrames = 0;
         foreach(var c in clips) totalFrames += Mathf.Max(1, Mathf.FloorToInt(c.length * targetFPS) + 1);
 
@@ -156,7 +152,6 @@ public class SpineBakerPro : EditorWindow
         List<UnitAnimData.AnimInfo> animDataList = new List<UnitAnimData.AnimInfo>();
         int currentSlice = 0;
 
-        // --- 1. BẮT ĐẦU ANIMATION MODE (Chìa khóa để fix lỗi) ---
         if (!AnimationMode.InAnimationMode())
             AnimationMode.StartAnimationMode();
 
@@ -167,7 +162,6 @@ public class SpineBakerPro : EditorWindow
                 AnimationClip clip = clips[i];
                 int framesInClip = Mathf.Max(1, Mathf.FloorToInt(clip.length * targetFPS) + 1);
 
-                // Metadata
                 UnitAnimData.AnimInfo info = new UnitAnimData.AnimInfo();
                 info.animName = clip.name;
                 info.startFrame = currentSlice;
@@ -175,6 +169,7 @@ public class SpineBakerPro : EditorWindow
                 info.fps = targetFPS;
                 info.duration = clip.length;
                 info.loop = clip.isLooping;
+                info.speedModifier = 1.0f;
                 animDataList.Add(info);
 
                 if (EditorUtility.DisplayCancelableProgressBar("Baking...", $"Anim: {clip.name}", (float)i / clips.Length)) break;
@@ -184,59 +179,67 @@ public class SpineBakerPro : EditorWindow
                     float time = f / targetFPS;
                     if (time > clip.length) time = clip.length;
 
-                    // --- 2. SAMPLE ANIMATION ---
+                    // 1. Update Animation & Physics
                     AnimationMode.BeginSampling();
                     AnimationMode.SampleAnimationClip(selected, clip, time);
                     AnimationMode.EndSampling();
 
-                    // --- 3. FORCE UPDATE HIERARCHY (Fix lỗi con cái không đi theo cha) ---
                     SceneView.RepaintAll();
                     UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
                     
-                    // Ép tất cả SkinnedMesh tính toán lại Matrix
                     SkinnedMeshRenderer[] skinRenderers = selected.GetComponentsInChildren<SkinnedMeshRenderer>();
                     foreach (var skr in skinRenderers)
                     {
                         if (skr.enabled && skr.gameObject.activeInHierarchy)
-                        {
                             skr.forceMatrixRecalculationPerRender = true;
-                        }
                     }
 
-                    // --- 4. UPDATE VFX ---
                     ParticleSystem[] particles = selected.GetComponentsInChildren<ParticleSystem>();
-                    foreach (var ps in particles)
-                    {
-                        ps.Simulate(time, true, true);
-                    }
+                    foreach (var ps in particles) ps.Simulate(time, true, true);
 
-                    // --- 5. RENDER ---
-                    SceneView.RepaintAll(); // Final repaint trước khi chụp
+                    SceneView.RepaintAll();
                     bakingCam.Render();
 
-                    // --- 6. READ & PROCESS ---
+                    // 2. Read Pixels
                     Texture2D tempTex = new Texture2D(size, size, TextureFormat.RGBA32, false);
                     RenderTexture.active = bakeRT;
                     tempTex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
                     
-                    // Fix VFX
+                    // --- 3. XỬ LÝ PIXEL: KHỬ VIỀN ĐEN & FIX VFX ---
                     Color[] pixels = tempTex.GetPixels();
-                    bool hasAlpha = false;
                     for (int p = 0; p < pixels.Length; p++)
                     {
                         Color c = pixels[p];
+
+                        // A. KHỬ VIỀN ĐEN (Un-multiply Alpha)
+                        // Nếu pixel có độ trong suốt, ta chia RGB cho Alpha để lấy lại độ sáng gốc.
+                        // Điều này loại bỏ việc viền bị tối đi do hòa trộn với nền đen.
+                        if (c.a > 0.0f)
+                        {
+                            c.r /= c.a;
+                            c.g /= c.a;
+                            c.b /= c.a;
+                        }
+
+                        // B. FIX VFX (Giữ nguyên logic cũ để cứu hiệu ứng Glow)
+                        // Vì bước A đã làm sáng pixel lên, nên logic này vẫn chạy tốt.
                         float maxRGB = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
                         if (maxRGB > vfxThreshold && c.a < maxRGB) {
-                            c.a = maxRGB; pixels[p] = c;
+                            c.a = maxRGB; 
                         }
-                        if(c.a > 0.01f) hasAlpha = true;
+                        
+                        // C. Kẹp giá trị lại (đề phòng chia ra số > 1)
+                        c.r = Mathf.Clamp01(c.r);
+                        c.g = Mathf.Clamp01(c.g);
+                        c.b = Mathf.Clamp01(c.b);
+                        c.a = Mathf.Clamp01(c.a);
+
+                        pixels[p] = c;
                     }
-                    if(hasAlpha) tempTex.SetPixels(pixels); 
-                    else tempTex.SetPixels(new Color[pixels.Length]); 
-                    
+                    tempTex.SetPixels(pixels); 
                     tempTex.Apply();
 
-                    // --- 7. COMPRESS & SAVE ---
+                    // 4. Compress & Copy
                     if (compression != CompressionType.Uncompressed_RGBA32)
                     {
                         EditorUtility.CompressTexture(tempTex, (TextureFormat)compression, TextureCompressionQuality.Best);
@@ -249,7 +252,7 @@ public class SpineBakerPro : EditorWindow
                 }
             }
 
-            // --- 8. FINALIZE ---
+            // 5. Finalize
             textureArray.Apply(false, true); 
             string folderPath = "Assets/BakedData";
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
@@ -268,7 +271,7 @@ public class SpineBakerPro : EditorWindow
             Selection.activeObject = dataSO;
             EditorGUIUtility.PingObject(dataSO);
 
-            Debug.Log($"HOÀN TẤT! Đã sửa lỗi đứng hình.");
+            Debug.Log($"HOÀN TẤT! Đã fix lỗi viền đen.");
         }
         catch (System.Exception ex)
         {
@@ -276,9 +279,7 @@ public class SpineBakerPro : EditorWindow
         }
         finally
         {
-            // --- KẾT THÚC ANIMATION MODE (BẮT BUỘC) ---
             AnimationMode.StopAnimationMode();
-            
             EditorUtility.ClearProgressBar();
             bakingCam.targetTexture = null;
             bakeRT.Release();

@@ -327,8 +327,8 @@ Camera:
   m_GameObject: {fileID: 633134485}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -588,9 +588,10 @@ MonoBehaviour:
   quadMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   instanceMaterial: {fileID: 2100000, guid: 5dad37013f09f4b2c8b0b02aeb210bca, type: 2}
   unitData: {fileID: 11400000, guid: 455392214e742454bbe2c7c1b4672eac, type: 2}
-  unitCount: 100
-  spawnRadius: 5
-  unitScale: 5
+  unitCount: 1000
+  gridSpacing: 0.5
+  enableMovement: 0
+  unitScale: 1
   globalSpeed: 1
 --- !u!4 &1724484351
 Transform:
