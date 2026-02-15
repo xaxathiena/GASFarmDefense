@@ -4,13 +4,10 @@ using System.IO;
 using System.Collections.Generic;
 
 /// <summary>
-/// Spine Baker PRO - Tool bake animation thành Texture2DArray
-/// ✅ ĐÃ SỬA LỖI ĐỨNG HÌNH: Dùng AnimationMode.SampleAnimationClip() thay vì clip.SampleAnimation()
-/// 
-/// Cách dùng:
-/// 1. Mở Scene có "BakingCam"
-/// 2. Chọn GameObject có Animator + AnimationClips
-/// 3. Chạy tool và nhấn "BAKE & CREATE DATA NGAY"
+/// Spine Baker PRO (Final Fixed)
+/// - Tích hợp AnimationMode để ép xương di chuyển.
+/// - Tích hợp Force Repaint để ép Skin cập nhật theo xương.
+/// - Tự động tạo TextureArray và UnitAnimData.
 /// </summary>
 public class SpineBakerPro : EditorWindow
 {
@@ -144,7 +141,6 @@ public class SpineBakerPro : EditorWindow
             selected.transform.rotation = Quaternion.identity;
         }
 
-        // --- BƯỚC QUAN TRỌNG: KHÔNG LẤY SKINNED MESH ĐỂ BAKE NỮA ---
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
 
         // Tính tổng Frame
@@ -160,7 +156,7 @@ public class SpineBakerPro : EditorWindow
         List<UnitAnimData.AnimInfo> animDataList = new List<UnitAnimData.AnimInfo>();
         int currentSlice = 0;
 
-        // --- BẮT ĐẦU ANIMATION MODE (QUAN TRỌNG ĐỂ CÓ CHUYỂN ĐỘNG) ---
+        // --- 1. BẮT ĐẦU ANIMATION MODE (Chìa khóa để fix lỗi) ---
         if (!AnimationMode.InAnimationMode())
             AnimationMode.StartAnimationMode();
 
@@ -188,17 +184,16 @@ public class SpineBakerPro : EditorWindow
                     float time = f / targetFPS;
                     if (time > clip.length) time = clip.length;
 
-                    // 1. Kích hoạt AnimationMode để ép SkinnedMesh cập nhật
+                    // --- 2. SAMPLE ANIMATION ---
                     AnimationMode.BeginSampling();
                     AnimationMode.SampleAnimationClip(selected, clip, time);
                     AnimationMode.EndSampling();
 
-                    // 2. CRITICAL: Force update ALL child transforms & renderers
-                    // Với skeleton có nhiều children bones, cần multiple repaint
+                    // --- 3. FORCE UPDATE HIERARCHY (Fix lỗi con cái không đi theo cha) ---
                     SceneView.RepaintAll();
                     UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
                     
-                    // Force update tất cả SkinnedMesh trong children
+                    // Ép tất cả SkinnedMesh tính toán lại Matrix
                     SkinnedMeshRenderer[] skinRenderers = selected.GetComponentsInChildren<SkinnedMeshRenderer>();
                     foreach (var skr in skinRenderers)
                     {
@@ -208,24 +203,23 @@ public class SpineBakerPro : EditorWindow
                         }
                     }
 
-                    // 3. Force Update VFX (Particle System nếu có)
+                    // --- 4. UPDATE VFX ---
                     ParticleSystem[] particles = selected.GetComponentsInChildren<ParticleSystem>();
                     foreach (var ps in particles)
                     {
                         ps.Simulate(time, true, true);
                     }
 
-                    // 4. Final repaint để đảm bảo tất cả đã update
-                    SceneView.RepaintAll();
-                    
+                    // --- 5. RENDER ---
+                    SceneView.RepaintAll(); // Final repaint trước khi chụp
                     bakingCam.Render();
 
-                    // 2. Read Pixels
+                    // --- 6. READ & PROCESS ---
                     Texture2D tempTex = new Texture2D(size, size, TextureFormat.RGBA32, false);
                     RenderTexture.active = bakeRT;
                     tempTex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
                     
-                    // 3. Fix VFX
+                    // Fix VFX
                     Color[] pixels = tempTex.GetPixels();
                     bool hasAlpha = false;
                     for (int p = 0; p < pixels.Length; p++)
@@ -242,7 +236,7 @@ public class SpineBakerPro : EditorWindow
                     
                     tempTex.Apply();
 
-                    // 4. Compress & Copy
+                    // --- 7. COMPRESS & SAVE ---
                     if (compression != CompressionType.Uncompressed_RGBA32)
                     {
                         EditorUtility.CompressTexture(tempTex, (TextureFormat)compression, TextureCompressionQuality.Best);
@@ -255,7 +249,7 @@ public class SpineBakerPro : EditorWindow
                 }
             }
 
-            // 5. Save Assets
+            // --- 8. FINALIZE ---
             textureArray.Apply(false, true); 
             string folderPath = "Assets/BakedData";
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
@@ -282,7 +276,7 @@ public class SpineBakerPro : EditorWindow
         }
         finally
         {
-            // --- KẾT THÚC ANIMATION MODE ---
+            // --- KẾT THÚC ANIMATION MODE (BẮT BUỘC) ---
             AnimationMode.StopAnimationMode();
             
             EditorUtility.ClearProgressBar();
