@@ -188,6 +188,7 @@ public class SpineBakerPro : EditorWindow
                 info.duration = clip.length;
                 info.loop = clip.isLooping;
                 info.speedModifier = 1.0f; // Mặc định speed chuẩn
+                info.scale = 1.0f; // Mặc định kích thước chuẩn
                 animDataList.Add(info);
 
                 if (EditorUtility.DisplayCancelableProgressBar("Baking...", $"Anim: {clip.name}", (float)i / clips.Length)) break;

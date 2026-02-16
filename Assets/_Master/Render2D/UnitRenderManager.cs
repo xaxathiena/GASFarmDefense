@@ -135,7 +135,9 @@ public class UnitRenderManager : MonoBehaviour
             }
 
             // *** QUAN TRỌNG: Áp dụng unitScale vào đây ***
-            matrices[i].SetTRS(units[i].position, rotation, Vector3.one * unitScale);
+            float currentScale = unitScale * animInfo.scale;
+
+            matrices[i].SetTRS(units[i].position, rotation, Vector3.one * currentScale);
 
             // Lưu frame vào mảng để gửi xuống GPU
             frameIndices[i] = currentFrame;
