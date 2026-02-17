@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Abel_Debug_UV_Rainbow 1
-  m_Shader: {fileID: 4800000, guid: 9a4be8d40d13048f5a0259c5db5a808b, type: 3}
+  m_Name: InstancedUnit_Smooth
+  m_Shader: {fileID: 4800000, guid: 385b897341c07457198b7e7c7f2d3a46, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -22,9 +22,14 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
+    m_TexEnvs:
+    - _MainTexArray:
+        m_Texture: {fileID: 18700000, guid: e01618bd1e99848cbb854faaed3d79ea, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _Cutoff: 0
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
