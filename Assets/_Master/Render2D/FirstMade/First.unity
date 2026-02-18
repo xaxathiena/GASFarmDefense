@@ -341,7 +341,8 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  bulletSystemPrefab: {fileID: 7473325593401808046, guid: fbbd768fe71ff4557ba805731358d342, type: 3}
+  bulletSystem: {fileID: 494054676}
+  gunController: {fileID: 1525867681}
 --- !u!4 &1435841831
 Transform:
   m_ObjectHideFlags: 0
@@ -389,7 +390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcda805ba7aad466794c0534618c6d0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GunController
-  fireRate: 0.1
+  fireRate: 0.01
   bulletSpeed: 20
   spread: 0.1
   turretPivot: {fileID: 1525867685}
@@ -419,7 +420,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: a2673828acfc64c78b623b1c2095ff63, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

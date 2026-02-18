@@ -4,10 +4,12 @@ using VContainer.Unity;
 
 public class BulletGameLifetimeScope : LifetimeScope
 {
-    [SerializeField] private BulletSystem bulletSystemPrefab;
+    [SerializeField] private BulletSystem bulletSystem;
+    [SerializeField] private GunController gunController;
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterComponentInNewPrefab(bulletSystemPrefab, Lifetime.Singleton)
+        builder.RegisterComponent(bulletSystem)
                .As<BulletSystem>();
+        builder.RegisterComponent(gunController).As<GunController>();
     }
 }

@@ -1,32 +1,47 @@
 using UnityEngine;
-using VContainer; // Dùng VContainer để lấy BulletSystem
+using VContainer;
 
 public class GunController : MonoBehaviour
 {
-    [Inject] private BulletSystem bulletSystem; // <--- Dependency Injection
+    [Inject] private BulletSystem bulletSystem;
 
     [Header("Gun Stats")]
-    public float fireRate = 0.1f; // Tốc độ bắn (giây)
+    public float fireRate = 0.1f;
     public float bulletSpeed = 20f;
-    public float spread = 0.1f;   // Độ giật (tản mát)
+    public float spread = 0.1f;
     
     [Header("Visuals")]
-    public Transform turretPivot; // Cái trục xoay của súng
-    public Transform muzzlePoint; // Đầu nòng súng (nơi đạn chui ra)
+    public Transform turretPivot;
+    public Transform muzzlePoint;
 
     private float nextFireTime = 0f;
     private Camera mainCam;
+    
+    // Cache Plane để không new lại mỗi frame (tối ưu nhẹ)
+    private Plane groundPlane; 
 
     void Start()
     {
         mainCam = Camera.main;
+        groundPlane = new Plane(Vector3.up, Vector3.zero);
     }
 
     void Update()
     {
+        // --- FIX LỖI Ở ĐÂY ---
+        // 1. Kiểm tra Camera null (an toàn)
+        if (mainCam == null) return;
+
+        // 2. Lấy vị trí chuột
+        Vector3 mousePos = Input.mousePosition;
+
+        // 3. QUAN TRỌNG: Kiểm tra xem vị trí chuột có bị "Infinity" hay không
+        // Lỗi "screen pos inf" xảy ra do chuột chưa khởi tạo xong hoặc nằm ngoài vùng render hợp lệ
+        if (float.IsInfinity(mousePos.x) || float.IsInfinity(mousePos.y)) return;
+        // ---------------------
+
         // 1. XOAY SÚNG THEO CHUỘT
-        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        Ray ray = mainCam.ScreenPointToRay(mousePos); // Dùng biến mousePos đã check
         
         Vector3 targetPoint = Vector3.zero;
 
@@ -35,9 +50,8 @@ public class GunController : MonoBehaviour
             Vector3 hitPoint = ray.GetPoint(enter);
             targetPoint = hitPoint;
 
-            // Tính hướng từ súng tới chuột
             Vector3 dir3D = hitPoint - turretPivot.position;
-            dir3D.y = 0; // Chỉ xoay quanh trục Y
+            dir3D.y = 0; 
 
             if (dir3D != Vector3.zero)
             {
@@ -45,7 +59,8 @@ public class GunController : MonoBehaviour
             }
         }
 
-        // 2. BẮN SÚNG (Giữ chuột trái)
+        // 2. BẮN SÚNG
+        // Thêm kiểm tra: Chỉ bắn nếu chuột nhấn VÀ không click vào UI (nếu cần)
         if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
         {
             Shoot(targetPoint);
@@ -57,18 +72,18 @@ public class GunController : MonoBehaviour
     {
         if (bulletSystem == null) return;
 
-        // Tính hướng bắn
+        // Logic chuyển đổi tọa độ của bạn đang là: Game 3D Top-Down -> Logic đạn 2D (X, Z)
+        // Vector2 startPos lấy X và Z (từ transform.position)
         Vector2 startPos = new Vector2(muzzlePoint.position.x, muzzlePoint.position.z);
         
-        // Hướng chuẩn
+        // Hướng bắn: targetPos.z - startPos.y (Vì startPos.y ở đây chứa giá trị Z của muzzle)
+        // Logic này đúng cho game top-down thuần
         Vector2 dir = new Vector2(targetPos.x - startPos.x, targetPos.z - startPos.y).normalized;
 
-        // Thêm độ tản mát (Random Spread) giả lập súng máy rung
         dir.x += UnityEngine.Random.Range(-spread, spread);
         dir.y += UnityEngine.Random.Range(-spread, spread);
         dir = dir.normalized;
 
-        // GỌI SYSTEM ĐỂ SPAWN
         bulletSystem.SpawnBullet(startPos, dir, bulletSpeed);
     }
 }

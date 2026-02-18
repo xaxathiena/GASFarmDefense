@@ -2,115 +2,121 @@ using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using System.Collections.Generic;
 
 public class BulletSystem : MonoBehaviour, System.IDisposable
 {
     [Header("Settings")]
-    public Mesh bulletMesh;         // Kéo Mesh Quad vào
-    public Material bulletMaterial; // Kéo Material Instanced vào
-    public UnitAnimData bulletData; // Kéo file Bullets_Data vừa tạo vào
+    public Mesh bulletMesh;
+    public Material bulletMaterial;
+    public UnitAnimData bulletData;
 
     // --- MEMORY ---
     private NativeArray<BulletData> bulletArray;
-    private Matrix4x4[] matrixArray; // Array gửi cho GPU
-    private float[] frameArray;      // Array frame (luôn là 0 vì đạn ko có anim)
+    private NativeArray<Matrix4x4> matrixNativeArray; // Tính toán trên này
+    private Matrix4x4[] matrixManagedArray;           // Copy ra đây để vẽ (API cũ cần cái này)
+    private float[] frameArray;
     
-    private int activeCount = 0;     // Số lượng đạn đang sống
+    // Dùng NativeReference để chia sẻ biến đếm số lượng giữa C# và Job
+    private NativeReference<int> activeCountRef; 
+    
     private const int MAX_BULLETS = 10000;
-
-    // --- RENDER ---
     private RenderParams renderParams;
 
-    // Setup (VContainer sẽ gọi hoặc Start gọi)
     public void Initialize()
     {
-        // Cấp phát bộ nhớ 1 lần duy nhất
         bulletArray = new NativeArray<BulletData>(MAX_BULLETS, Allocator.Persistent);
-        matrixArray = new Matrix4x4[MAX_BULLETS];
-        frameArray = new float[MAX_BULLETS]; // Mặc định là 0 hết
+        matrixNativeArray = new NativeArray<Matrix4x4>(MAX_BULLETS, Allocator.Persistent);
+        matrixManagedArray = new Matrix4x4[MAX_BULLETS];
+        frameArray = new float[MAX_BULLETS];
+        
+        // Khởi tạo biến đếm count
+        activeCountRef = new NativeReference<int>(0, Allocator.Persistent);
 
-        // Setup Render Material
+        // Setup Render
         Material mat = new Material(bulletMaterial);
         mat.SetTexture("_MainTexArray", bulletData.textureArray);
-        
         renderParams = new RenderParams(mat);
+        renderParams.matProps = new MaterialPropertyBlock();
         renderParams.worldBounds = new Bounds(Vector3.zero, Vector3.one * 10000);
     }
 
-    void Start()
-    {
-        Initialize();
-    }
+    void Start() { Initialize(); }
 
-    // Hàm bắn đạn (Gun sẽ gọi hàm này)
     public void SpawnBullet(Vector2 startPos, Vector2 direction, float speed)
     {
-        if (activeCount >= MAX_BULLETS) return; // Full đạn
+        int count = activeCountRef.Value; // Lấy giá trị hiện tại
+        if (count >= MAX_BULLETS) return;
 
-        // Ghi vào cuối danh sách active
-        bulletArray[activeCount] = new BulletData
+        bulletArray[count] = new BulletData
         {
             position = new float2(startPos.x, startPos.y),
             direction = new float2(direction.x, direction.y),
             speed = speed,
-            lifetime = 3.0f // Đạn sống 3 giây
+            lifetime = 3.0f
         };
 
-        activeCount++;
+        activeCountRef.Value = count + 1; // Tăng số lượng
     }
 
     void Update()
     {
-        if (activeCount == 0) return;
+        int currentCount = activeCountRef.Value;
+        if (currentCount == 0) return;
 
-        // 1. CHẠY JOB UPDATE VỊ TRÍ
-        BulletUpdateJob job = new BulletUpdateJob
+        // --- BƯỚC 1: JOB UPDATE VỊ TRÍ ---
+        BulletUpdateJob updateJob = new BulletUpdateJob
         {
             deltaTime = Time.deltaTime,
             bullets = bulletArray
         };
-        JobHandle handle = job.Schedule(activeCount, 64);
-        handle.Complete(); // Đợi xong ngay để vẽ (Sync)
+        // Schedule trả về 1 cái handle (cờ hiệu)
+        JobHandle updateHandle = updateJob.Schedule(currentCount, 64);
 
-        // 2. LỌC ĐẠN CHẾT (SWAP-BACK ALGORITHM)
-        // Kỹ thuật này cực nhanh để xóa phần tử trong mảng
-        for (int i = activeCount - 1; i >= 0; i--)
+        // --- BƯỚC 2: JOB LỌC ĐẠN CHẾT ---
+        // Job này phụ thuộc vào updateHandle (tức là Update xong mới được Lọc)
+        BulletFilterJob filterJob = new BulletFilterJob
         {
-            if (bulletArray[i].lifetime <= 0)
-            {
-                // Nếu đạn chết -> Lấy con cuối cùng đè lên vị trí con chết
-                activeCount--;
-                bulletArray[i] = bulletArray[activeCount];
-            }
-        }
+            bullets = bulletArray,
+            activeCountRef = activeCountRef
+        };
+        JobHandle filterHandle = filterJob.Schedule(updateHandle);
 
-        // 3. UPDATE MATRIX ĐỂ VẼ
-        // (Bước này có thể đưa vào Job nốt, nhưng làm ở đây cho dễ hiểu trước)
-        for (int i = 0; i < activeCount; i++)
+        // --- BƯỚC 3: JOB TÍNH MATRIX ---
+        // Job này phụ thuộc vào filterHandle (Lọc xong, sắp xếp lại mảng rồi mới tính Matrix)
+        // Lưu ý: Lúc schedule ta vẫn dùng currentCount cũ, nhưng bên trong Job ta chỉ quan tâm mảng đã được lọc
+        // Để an toàn và tối ưu, ta có thể chấp nhận tính dư 1 chút (những con vừa chết) hoặc đợi complete.
+        // Ở đây để tối đa hiệu năng, ta tính luôn ma trận dựa trên số lượng cũ (thừa vài con ko sao, vì tí nữa vẽ theo số lượng mới).
+        
+        BulletMatrixJob matrixJob = new BulletMatrixJob
         {
-            BulletData b = bulletArray[i];
+            bullets = bulletArray,
+            matrices = matrixNativeArray
+        };
+        JobHandle finalHandle = matrixJob.Schedule(currentCount, 64, filterHandle);
+
+        // --- BƯỚC 4: CHỜ TẤT CẢ HOÀN TẤT ---
+        finalHandle.Complete(); 
+
+        // --- BƯỚC 5: CHUẨN BỊ VẼ ---
+        // Lấy số lượng thực tế sau khi đã lọc
+        int finalCount = activeCountRef.Value;
+
+        // Copy dữ liệu từ NativeArray sang ManagedArray để vẽ (Thao tác này rất nhanh: MemCpy)
+        // Chỉ copy số lượng cần thiết
+        if (finalCount > 0)
+        {
+            NativeArray<Matrix4x4>.Copy(matrixNativeArray, matrixManagedArray, finalCount);
             
-            // Logic: Đạn hướng nào thì xoay hình theo hướng đó
-            float angle = math.degrees(math.atan2(b.direction.y, b.direction.x));
-            Quaternion rot = Quaternion.Euler(90, 0, -angle + 90); // +90 tùy hướng vẽ gốc của sprite
-
-            // Kéo dãn viên đạn theo tốc độ (Stretched Quad - như đã bàn)
-            // Càng nhanh càng dài ra
-            float stretch = 1.0f + (b.speed * 0.05f);
-            Vector3 scale = new Vector3(0.5f, stretch * 0.5f, 1f); // 0.5 là kích thước gốc
-
-            matrixArray[i].SetTRS(new Vector3(b.position.x, 0, b.position.y), rot, scale);
+            renderParams.matProps.SetFloatArray("_FrameIndex", frameArray);
+            Graphics.RenderMeshInstanced(renderParams, bulletMesh, 0, matrixManagedArray, finalCount);
         }
-
-        // 4. RENDER
-        renderParams.matProps.SetFloatArray("_FrameIndex", frameArray); // Frame 0
-        Graphics.RenderMeshInstanced(renderParams, bulletMesh, 0, matrixArray, activeCount);
     }
 
     public void Dispose()
     {
         if (bulletArray.IsCreated) bulletArray.Dispose();
+        if (matrixNativeArray.IsCreated) matrixNativeArray.Dispose();
+        if (activeCountRef.IsCreated) activeCountRef.Dispose();
     }
     
     private void OnDestroy() { Dispose(); }
