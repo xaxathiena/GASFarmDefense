@@ -1,4 +1,4 @@
-    using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
@@ -8,95 +8,130 @@ using Abel.TowerDefense.Core;
 
 namespace Abel.TowerDefense.EditorTools
 {
-    public class UnitProfileManagerWindow : EditorWindow
+    public class UnitsProfileManagerWindow : EditorWindow
     {
-        private List<UnitProfile> profiles = new List<UnitProfile>();
-        private UnitProfile selectedProfile;
+        // Reference tới Database tổng
+        private UnitsProfile database;
+        
+        // UI State
+        private UnitProfileData selectedUnit;
         private Vector2 scrollPosList;
         private Vector2 scrollPosSettings;
+        private string searchText = "";
 
         // Reflection Cache
         private Type[] availableLogicTypes;
         private string[] logicTypeNames;
 
-        [MenuItem("Abel/Unit Profile Manager")]
+        [MenuItem("Abel/Units Manager (Database)")]
         public static void ShowWindow()
         {
-            GetWindow<UnitProfileManagerWindow>("Unit Profiles");
+            GetWindow<UnitsProfileManagerWindow>("Units Manager");
         }
 
         private void OnEnable()
         {
-            RefreshProfileList();
+            LoadDatabase();
             ScanLogicTypes();
+        }
+
+        private void LoadDatabase()
+        {
+            // Tự động tìm file UnitsProfile trong project
+            string[] guids = AssetDatabase.FindAssets("t:UnitsProfile");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                database = AssetDatabase.LoadAssetAtPath<UnitsProfile>(path);
+            }
+        }
+
+        private void CreateDatabase()
+        {
+            string path = EditorUtility.SaveFilePanelInProject("Create Units Database", "UnitsDatabase", "asset", "Create");
+            if (!string.IsNullOrEmpty(path))
+            {
+                var newDb = ScriptableObject.CreateInstance<UnitsProfile>();
+                AssetDatabase.CreateAsset(newDb, path);
+                AssetDatabase.SaveAssets();
+                database = newDb;
+            }
+        }
+
+        private void ScanLogicTypes()
+        {
+            var types = TypeCache.GetTypesDerivedFrom<UnitGroupBase>();
+            availableLogicTypes = types.Where(t => !t.IsAbstract).ToArray();
+            logicTypeNames = availableLogicTypes.Select(t => t.Name).ToArray();
         }
 
         private void OnGUI()
         {
-            EditorGUILayout.BeginHorizontal();
-
-            // --- LEFT PANEL: LIST ---
-            DrawLeftPanel();
-
-            // --- RIGHT PANEL: SETTINGS ---
-            DrawRightPanel();
-
-            EditorGUILayout.EndHorizontal();
-        }
-
-        // 1. Quét tất cả class kế thừa từ UnitGroupBase
-        private void ScanLogicTypes()
-        {
-            // TypeCache cực nhanh trong Unity Editor mới
-            var types = TypeCache.GetTypesDerivedFrom<UnitGroupBase>();
-            
-            // Lọc bỏ class abstract nếu có
-            availableLogicTypes = types.Where(t => !t.IsAbstract).ToArray();
-            
-            // Tạo danh sách tên để hiển thị lên Popup
-            logicTypeNames = availableLogicTypes.Select(t => t.Name).ToArray();
-        }
-
-        private void RefreshProfileList()
-        {
-            profiles.Clear();
-            string[] guids = AssetDatabase.FindAssets("t:UnitProfile");
-            foreach (string guid in guids)
+            if (database == null)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                profiles.Add(AssetDatabase.LoadAssetAtPath<UnitProfile>(path));
+                DrawNoDatabase();
+                return;
             }
+
+            EditorGUILayout.BeginHorizontal();
+            DrawLeftPanel();
+            DrawRightPanel();
+            EditorGUILayout.EndHorizontal();
+
+            // Xử lý Undo/Dirty để lưu dữ liệu
+            if (GUI.changed)
+            {
+                EditorUtility.SetDirty(database);
+            }
+        }
+
+        private void DrawNoDatabase()
+        {
+            EditorGUILayout.HelpBox("No 'UnitsProfile' database found via Search.", MessageType.Warning);
+            if (GUILayout.Button("Create New Database")) CreateDatabase();
+            if (GUILayout.Button("Refresh Search")) LoadDatabase();
         }
 
         private void DrawLeftPanel()
         {
-            EditorGUILayout.BeginVertical("box", GUILayout.Width(250));
+            EditorGUILayout.BeginVertical("box", GUILayout.Width(280));
+
+            // Header
+            GUILayout.Label("Units List", EditorStyles.boldLabel);
             
-            // Toolbar
+            // Search & Tools
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Profiles", EditorStyles.boldLabel);
-            if (GUILayout.Button("+", GUILayout.Width(30))) CreateNewProfile();
-            if (GUILayout.Button("↻", GUILayout.Width(30))) RefreshProfileList();
+            searchText = EditorGUILayout.TextField(searchText, EditorStyles.toolbarSearchField);
+            if (GUILayout.Button("+", EditorStyles.toolbarButton, GUILayout.Width(30))) CreateNewUnit();
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(5);
 
-            // List
+            // List View
             scrollPosList = EditorGUILayout.BeginScrollView(scrollPosList);
-            foreach (var p in profiles)
+            
+            if (database.units != null)
             {
-                if (p == null) continue;
-                
-                GUI.backgroundColor = (selectedProfile == p) ? Color.cyan : Color.white;
-                if (GUILayout.Button(string.IsNullOrEmpty(p.unitID) ? p.name : p.unitID, EditorStyles.miniButton, GUILayout.Height(25)))
+                for (int i = 0; i < database.units.Count; i++)
                 {
-                    selectedProfile = p;
-                    GUI.FocusControl(null); // Bỏ focus để update data
+                    var unit = database.units[i];
+                    
+                    // Filter logic
+                    if (!string.IsNullOrEmpty(searchText) && 
+                        !unit.unitID.ToLower().Contains(searchText.ToLower())) continue;
+
+                    // Draw Item
+                    GUI.backgroundColor = (selectedUnit == unit) ? Color.cyan : Color.white;
+                    if (GUILayout.Button(string.IsNullOrEmpty(unit.unitID) ? "Unnamed" : unit.unitID, EditorStyles.miniButton, GUILayout.Height(25)))
+                    {
+                        selectedUnit = unit;
+                        GUI.FocusControl(null);
+                    }
                 }
             }
+            
             GUI.backgroundColor = Color.white;
             EditorGUILayout.EndScrollView();
-
             EditorGUILayout.EndVertical();
         }
 
@@ -104,81 +139,73 @@ namespace Abel.TowerDefense.EditorTools
         {
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
 
-            if (selectedProfile == null)
+            if (selectedUnit == null)
             {
-                GUILayout.Label("Select a profile to edit.", EditorStyles.centeredGreyMiniLabel);
+                GUILayout.Label("Select a unit to edit.", EditorStyles.centeredGreyMiniLabel);
             }
             else
             {
                 scrollPosSettings = EditorGUILayout.BeginScrollView(scrollPosSettings);
 
-                GUILayout.Label($"Editing: {selectedProfile.name}", EditorStyles.boldLabel);
+                // Title
+                GUILayout.Label($"Editing: {selectedUnit.unitID}", EditorStyles.boldLabel);
                 EditorGUILayout.Space(10);
 
-                EditorGUI.BeginChangeCheck();
+                // --- RECORD UNDO ---
+                Undo.RecordObject(database, "Modify Unit Profile");
 
-                // --- LOGIC CLASS SELECTOR (REFLECTION DROPDOWN) ---
+                // --- 1. IDENTITY ---
+                selectedUnit.unitID = EditorGUILayout.TextField("Unit ID", selectedUnit.unitID);
+
+                // --- 2. LOGIC REFLECTION ---
+                EditorGUILayout.Space(5);
                 EditorGUILayout.BeginVertical("HelpBox");
-                GUILayout.Label("Logic Configuration", EditorStyles.boldLabel);
-                
+                GUILayout.Label("Logic Behavior", EditorStyles.miniBoldLabel);
+
                 int currentIndex = -1;
-                // Tìm index hiện tại của logic đang lưu trong profile
-                for(int i=0; i<availableLogicTypes.Length; i++)
+                for (int i = 0; i < availableLogicTypes.Length; i++)
                 {
-                    if(availableLogicTypes[i].AssemblyQualifiedName == selectedProfile.logicTypeAQN)
+                    if (availableLogicTypes[i].AssemblyQualifiedName == selectedUnit.logicTypeAQN)
                     {
                         currentIndex = i;
                         break;
                     }
                 }
 
-                int newIndex = EditorGUILayout.Popup("Logic Behavior Class", currentIndex, logicTypeNames);
-                
+                int newIndex = EditorGUILayout.Popup("Logic Class", currentIndex, logicTypeNames);
                 if (newIndex >= 0 && newIndex < availableLogicTypes.Length)
                 {
-                    var selectedType = availableLogicTypes[newIndex];
-                    selectedProfile.logicTypeAQN = selectedType.AssemblyQualifiedName;
-                    selectedProfile.logicDisplayName = selectedType.Name;
-                }
-                else if (currentIndex == -1) 
-                {
-                    EditorGUILayout.HelpBox("Please select a Logic Class!", MessageType.Error);
+                    var type = availableLogicTypes[newIndex];
+                    selectedUnit.logicTypeAQN = type.AssemblyQualifiedName;
+                    selectedUnit.logicDisplayName = type.Name;
                 }
                 EditorGUILayout.EndVertical();
 
-                EditorGUILayout.Space(10);
+                // --- 3. VISUALS & STATS (Manual Drawing) ---
+                // Vì class này không phải là UnityEngine.Object nên không dùng SerializedObject đơn giản được
+                // Ta vẽ thủ công các field
+                
+                EditorGUILayout.Space(5);
+                GUILayout.Label("Visuals", EditorStyles.boldLabel);
+                selectedUnit.mesh = (Mesh)EditorGUILayout.ObjectField("Mesh", selectedUnit.mesh, typeof(Mesh), false);
+                selectedUnit.baseMaterial = (Material)EditorGUILayout.ObjectField("Base Material", selectedUnit.baseMaterial, typeof(Material), false);
+                selectedUnit.animData = (UnitAnimData)EditorGUILayout.ObjectField("Anim Data", selectedUnit.animData, typeof(UnitAnimData), false);
 
-                // --- DEFAULT INSPECTOR FOR OTHER FIELDS ---
-                // Vẽ tất cả các field còn lại (Mesh, Material...) dùng Editor mặc định
-                SerializedObject so = new SerializedObject(selectedProfile);
-                SerializedProperty prop = so.GetIterator();
-                bool enterChildren = true;
-                while (prop.NextVisible(enterChildren))
-                {
-                    enterChildren = false;
-                    // Bỏ qua field script mặc định và các field logic ta đã vẽ custom
-                    if (prop.name == "m_Script" || prop.name == "logicTypeAQN" || prop.name == "logicDisplayName") continue;
-                    
-                    EditorGUILayout.PropertyField(prop, true);
-                }
-                so.ApplyModifiedProperties();
+                EditorGUILayout.Space(5);
+                GUILayout.Label("Stats", EditorStyles.boldLabel);
+                selectedUnit.baseMoveSpeed = EditorGUILayout.FloatField("Move Speed", selectedUnit.baseMoveSpeed);
+                selectedUnit.baseAttackSpeed = EditorGUILayout.FloatField("Attack Speed", selectedUnit.baseAttackSpeed);
 
-                if (EditorGUI.EndChangeCheck())
-                {
-                    EditorUtility.SetDirty(selectedProfile);
-                }
-
-                // Delete Button
+                // --- DELETE BUTTON ---
                 EditorGUILayout.Space(20);
                 GUI.backgroundColor = new Color(1f, 0.6f, 0.6f);
-                if (GUILayout.Button("Delete Profile"))
+                if (GUILayout.Button("Delete Unit"))
                 {
-                    if (EditorUtility.DisplayDialog("Delete", $"Delete {selectedProfile.name}?", "Yes", "No"))
+                    if (EditorUtility.DisplayDialog("Delete", $"Delete {selectedUnit.unitID}?", "Yes", "No"))
                     {
-                        string path = AssetDatabase.GetAssetPath(selectedProfile);
-                        AssetDatabase.DeleteAsset(path);
-                        selectedProfile = null;
-                        RefreshProfileList();
+                        database.units.Remove(selectedUnit);
+                        selectedUnit = null;
+                        GUIUtility.ExitGUI(); // Thoát ngay để tránh lỗi vẽ tiếp
                     }
                 }
                 GUI.backgroundColor = Color.white;
@@ -189,18 +216,13 @@ namespace Abel.TowerDefense.EditorTools
             EditorGUILayout.EndVertical();
         }
 
-        private void CreateNewProfile()
+        private void CreateNewUnit()
         {
-            string path = EditorUtility.SaveFilePanelInProject("Create Unit Profile", "NewUnitProfile", "asset", "Save Profile");
-            if (!string.IsNullOrEmpty(path))
-            {
-                var newProfile = ScriptableObject.CreateInstance<UnitProfile>();
-                newProfile.unitID = "New_Unit";
-                AssetDatabase.CreateAsset(newProfile, path);
-                AssetDatabase.SaveAssets();
-                RefreshProfileList();
-                selectedProfile = newProfile;
-            }
+            Undo.RecordObject(database, "Add New Unit");
+            var newUnit = new UnitProfileData();
+            newUnit.unitID = "New_Unit_" + database.units.Count;
+            database.units.Add(newUnit);
+            selectedUnit = newUnit;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Abel.TowerDefense.Render
         private Matrix4x4[] matrices;
         private float[] frameIndices;
 
-        public UnitBatchRenderer(UnitProfile profile, int capacity)
+        public UnitBatchRenderer(UnitProfileData profile, int capacity)
         {
             this.mesh = profile.mesh;
             this.animData = profile.animData;

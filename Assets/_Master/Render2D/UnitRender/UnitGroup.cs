@@ -16,10 +16,10 @@ namespace Abel.TowerDefense.Core
         public NativeArray<UnitLogicData> LogicData;
 
         protected UnitBatchRenderer renderer;
-        protected UnitProfile profile;
+        protected UnitProfileData profile;
         public string GroupName => profile.unitID; // For debugging/UI
 
-        public UnitGroupBase(UnitProfile profile)
+        public UnitGroupBase(UnitProfileData profile)
         {
             this.profile = profile;
 

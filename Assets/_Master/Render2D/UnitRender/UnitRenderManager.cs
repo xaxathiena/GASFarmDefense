@@ -15,7 +15,7 @@ namespace Abel.TowerDefense.Render
     public class UnitRenderManager : MonoBehaviour
     {
         [Header("Configuration")]
-        public UnitProfile visualConfig;
+        public UnitProfileData visualConfig;
         public int unitCount = 5000;
 
         // Data Storage (Native Memory)

@@ -9,17 +9,17 @@ namespace Abel.TowerDefense.Render
     public class GameUnitManager : MonoBehaviour
     {
         [Header("Load Profiles")]
-        public List<UnitProfile> profilesToLoad;
+        public UnitsProfile unitProfiles;
 
         // Dictionary quản lý các Group theo UnitID
         private Dictionary<string, UnitGroupBase> loadedGroups = new Dictionary<string, UnitGroupBase>();
         public IReadOnlyDictionary<string, UnitGroupBase> LoadedGroups => loadedGroups;
 
-        private void CreateGroupFromProfile(UnitProfile profile)
+        private void CreateGroupFromProfile(UnitProfileData profile)
         {
             if (string.IsNullOrEmpty(profile.logicTypeAQN))
             {
-                Debug.LogError($"Profile {profile.name} chưa chọn Logic Class!");
+                Debug.LogError($"Profile {profile.unitID} chưa chọn Logic Class!");
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace Abel.TowerDefense.Render
             {
                 // create group on the fly if not exist (Optional)
                 Debug.LogWarning($"UnitID {unitID} does not exist, creating group on the fly.");
-                var profile = profilesToLoad.Find(p => p.unitID == unitID);
+                var profile = unitProfiles.GetUnitByID(unitID);
                 if (profile != null)
                 {
                     CreateGroupFromProfile(profile);

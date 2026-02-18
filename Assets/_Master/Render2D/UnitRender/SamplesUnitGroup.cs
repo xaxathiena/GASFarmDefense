@@ -9,7 +9,7 @@ namespace Abel.TowerDefense.Logic
     // Unit A: Chỉ đứng chơi loop anim
     public class SimpleLoopGroup : UnitGroupBase
     {
-        public SimpleLoopGroup(UnitProfile profile) : base(profile) { }
+        public SimpleLoopGroup(UnitProfileData profile) : base(profile) { }
 
         protected override void OnSpawnLogic(ref UnitLogicData logic, ref UnitRenderData render)
         {
@@ -28,7 +28,7 @@ namespace Abel.TowerDefense.Logic
         private int idleIdx;
         private int atkIdx;
 
-        public AggressiveFSMGroup(UnitProfile profile) : base(profile) 
+        public AggressiveFSMGroup(UnitProfileData profile) : base(profile) 
         { 
              // Cache index để chạy nhanh
              // (Giả sử Animation Data có anim tên "Idle" và "Attack")

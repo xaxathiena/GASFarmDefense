@@ -7,20 +7,20 @@ namespace Abel.TowerDefense.Logic
 {
     public interface IUnitLogicStrategy
     {
-        void OnSpawn(UnitProfile profile, ref UnitLogicData logic, ref UnitRenderData render);
-        void UpdateLogic(float dt, UnitProfile profile, NativeArray<UnitLogicData> logicData, NativeArray<UnitRenderData> renderData, int count);
+        void OnSpawn(UnitProfileData profile, ref UnitLogicData logic, ref UnitRenderData render);
+        void UpdateLogic(float dt, UnitProfileData profile, NativeArray<UnitLogicData> logicData, NativeArray<UnitRenderData> renderData, int count);
     }
 
     // --- LOGIC CHO UNIT A (Đơn giản, loop 1 anim) ---
     public class PassiveLoopLogic : IUnitLogicStrategy
     {
-        public void OnSpawn(UnitProfile profile, ref UnitLogicData logic, ref UnitRenderData render)
+        public void OnSpawn(UnitProfileData profile, ref UnitLogicData logic, ref UnitRenderData render)
         {
             // Unit A always plays Anim 0
             render.animIndex = 0;
         }
 
-        public void UpdateLogic(float dt, UnitProfile profile, NativeArray<UnitLogicData> logicData, NativeArray<UnitRenderData> renderData, int count)
+        public void UpdateLogic(float dt, UnitProfileData profile, NativeArray<UnitLogicData> logicData, NativeArray<UnitRenderData> renderData, int count)
         {
             // Unit A does nothing logically. Just exists. 
             // Animation timer is handled by the Job in UnitGroup.
@@ -34,7 +34,7 @@ namespace Abel.TowerDefense.Logic
         private int idleAnimIdx = -1;
         private int attackAnimIdx = -1;
 
-        public void OnSpawn(UnitProfile profile, ref UnitLogicData logic, ref UnitRenderData render)
+        public void OnSpawn(UnitProfileData profile, ref UnitLogicData logic, ref UnitRenderData render)
         {
             // Cache indices on first spawn if needed, or look up now
             if (idleAnimIdx == -1) idleAnimIdx = profile.GetAnimIndex(UnitState.Idle);
@@ -45,7 +45,7 @@ namespace Abel.TowerDefense.Logic
             render.animIndex = idleAnimIdx;
         }
 
-        public void UpdateLogic(float dt, UnitProfile profile, NativeArray<UnitLogicData> logicData, NativeArray<UnitRenderData> renderData, int count)
+        public void UpdateLogic(float dt, UnitProfileData profile, NativeArray<UnitLogicData> logicData, NativeArray<UnitRenderData> renderData, int count)
         {
             // Note: In a real project, this loop should be a Burst Job.
             // But for learning FSM flow, C# loop is fine for < 5000 units.

@@ -321,7 +321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 226643d69bc92ea46a39f81b36b6b82c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Abel.TowerDefense.InputSystem.InputCreateUnit
-  unitIDToSpawn: ChampionGalahadProfile
+  unitIDToSpawn: ChampionGalahad
 --- !u!4 &624655220
 Transform:
   m_ObjectHideFlags: 0
@@ -736,9 +736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2e120d76fe86df46bea6c6ce3788f7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Abel.TowerDefense.Render.GameUnitManager
-  profilesToLoad:
-  - {fileID: 11400000, guid: 075250bc06b88f14ab634d7483ff73ca, type: 2}
-  - {fileID: 11400000, guid: 081da8bc563e93a42b7b219728453f78, type: 2}
+  unitProfiles: {fileID: 11400000, guid: 075250bc06b88f14ab634d7483ff73ca, type: 2}
 --- !u!4 &1911245698
 Transform:
   m_ObjectHideFlags: 0

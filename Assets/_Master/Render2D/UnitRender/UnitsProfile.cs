@@ -12,9 +12,8 @@ namespace Abel.TowerDefense.Config
         Move = 2,
         Die = 3
     }
-
-    [CreateAssetMenu(fileName = "NewVisualProfile", menuName = "Abel/Unit Visual Profile")]
-    public class UnitProfile : ScriptableObject
+    [System.Serializable]
+    public class UnitProfileData
     {
         [Header("Identity")]
         public string unitID; // VD: "Goblin_Archer"
@@ -38,6 +37,17 @@ namespace Abel.TowerDefense.Config
             var animIndex = animData.animations.FindIndex(i => i.animName == state.ToString());
             if (animIndex >= 0) return animData.animations[animIndex].startFrame;
             return 0;
+        }
+    }
+    [CreateAssetMenu(fileName = "UnitsDatabase", menuName = "Abel/Units Database")]
+    public class UnitsProfile : ScriptableObject
+    {
+        public List<UnitProfileData> units = new List<UnitProfileData>();
+
+        // Helper lấy data theo ID
+        public UnitProfileData GetUnitByID(string id)
+        {
+            return units.Find(u => u.unitID == id);
         }
     }
 }
