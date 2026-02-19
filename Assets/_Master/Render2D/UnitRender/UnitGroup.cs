@@ -13,7 +13,6 @@ namespace Abel.TowerDefense.Core
         public int ActiveCount { get; protected set; } = 0;
 
         public NativeArray<UnitRenderData> RenderData;
-        public NativeArray<UnitLogicData> LogicData;
 
         protected UnitBatchRenderer renderer;
         protected UnitProfileData profile;
@@ -24,44 +23,13 @@ namespace Abel.TowerDefense.Core
             this.profile = profile;
 
             RenderData = new NativeArray<UnitRenderData>(MAX_CAPACITY, Allocator.Persistent);
-            LogicData = new NativeArray<UnitLogicData>(MAX_CAPACITY, Allocator.Persistent);
 
             renderer = new UnitBatchRenderer(profile, MAX_CAPACITY);
         }
 
-        public void Spawn(Vector2 position)
-        {
-            if (ActiveCount >= MAX_CAPACITY) return;
-            int id = ActiveCount;
+        public virtual void Spawn(Vector2 position){}
 
-            // 1. Init Data cơ bản
-            var logic = new UnitLogicData
-            {
-                currentState = UnitState.Idle,
-                stateTimer = 0,
-                attackSpeed = profile.baseAttackSpeed
-            };
-
-            var render = new UnitRenderData
-            {
-                position = new Unity.Mathematics.float2(position.x, position.y),
-                rotation = 0,
-                scale = 1.0f,
-                animIndex = 0,
-                animTimer = Random.Range(0f, 1f),
-                playSpeed = 1.0f
-            };
-
-            // 2. Gọi hàm Abstract để lớp con xử lý logic riêng
-            OnSpawnLogic(ref logic, ref render);
-
-            // 3. Save
-            LogicData[id] = logic;
-            RenderData[id] = render;
-            ActiveCount++;
-        }
-
-        public void Update(float dt)
+        public virtual void Update(float dt)
         {
             if (ActiveCount == 0) return;
 
@@ -76,10 +44,9 @@ namespace Abel.TowerDefense.Core
             renderer.Render(RenderData, ActiveCount);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (RenderData.IsCreated) RenderData.Dispose();
-            if (LogicData.IsCreated) LogicData.Dispose();
             if (renderer != null) renderer.Dispose();
         }
 

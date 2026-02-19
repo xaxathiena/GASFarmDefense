@@ -91,7 +91,7 @@ namespace Abel.TowerDefense.DebugTools
 
             // Get Data (Copy struct)
             var render = selectedGroup.RenderData[selectedIndex];
-            var logic = selectedGroup.LogicData[selectedIndex];
+            // var logic = selectedGroup.LogicData[selectedIndex];
 
             // Draw Box
             float width = 250;
@@ -110,9 +110,9 @@ namespace Abel.TowerDefense.DebugTools
 
             GUILayout.Space(5);
             GUILayout.Label($"<b>--- Logic Data ---</b>");
-            GUILayout.Label($"State: <color=yellow>{logic.currentState}</color>");
-            GUILayout.Label($"State Timer: {logic.stateTimer:F2}s");
-            GUILayout.Label($"Atk Speed: {logic.attackSpeed}");
+            // GUILayout.Label($"State: <color=yellow>{logic.currentState}</color>");
+            // GUILayout.Label($"State Timer: {logic.stateTimer:F2}s");
+            // GUILayout.Label($"Atk Speed: {logic.attackSpeed}");
 
             GUILayout.EndArea();
         }
