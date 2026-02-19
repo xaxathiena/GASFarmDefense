@@ -57,15 +57,20 @@ namespace Abel.TowerDefense.Render
                 
                 // Formula: StartFrame + (Timer * FPS * Modifiers) % FrameCount
                 float speed = info.fps * info.speedModifier * u.playSpeed;
-                float currentFrame = info.startFrame + (u.animTimer * speed) % info.frameCount;
+                // Floor to integer slice index to prevent tri-linear blending between
+                // adjacent Texture2DArray slices (which causes horizontal stripe artifacts).
+                float currentFrame = Mathf.Floor(info.startFrame + (u.animTimer * speed) % info.frameCount);
 
                 // 2. Create Matrix (TRS)
                 // Note: Using negative Z rotation for correct 2D orientation on the XZ plane
                 Quaternion rot = Quaternion.Euler(90, 0, -u.rotation);
                 Vector3 pos = new Vector3(u.position.x, 0, u.position.y);
                 
-                // Combine unit scale with animation specific scale (e.g., boss scaling)
-                Vector3 finalScale = Vector3.one * u.scale * info.scale; 
+                // Combine unit scale with animation-specific scale.
+                // Use aspectRatio (width / height) to scale X independently so the sprite
+                // is not forced into a 1:1 square (fixes wrong proportions for portrait sprites).
+                float baseScale = u.scale * info.scale;
+                Vector3 finalScale = new Vector3(info.aspectRatio * baseScale, baseScale, 1f);
 
                 matrices[i].SetTRS(pos, rot, finalScale);
                 frameIndices[i] = currentFrame;

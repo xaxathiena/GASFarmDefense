@@ -1,7 +1,6 @@
 using UnityEngine;
 using VContainer;
 using Abel.TowerDefense.Render;
-using System;
 
 namespace Abel.TowerDefense.InputSystem
 {
@@ -9,19 +8,36 @@ namespace Abel.TowerDefense.InputSystem
     {
         // Inject the manager
         [SerializeField] private string unitIDToSpawn = "Goblin_Archer"; // Set this in Inspector to choose which unit to spawn
+        [SerializeField] private Transform[] spawnPoints; // Optional: predefined spawn points, or we can just use mouse position
         private GameUnitManager unitManager;
         [Inject]
         public void Construct(GameUnitManager manager)
         {
             unitManager = manager;
         }
+        void Start()
+        {
+            if (spawnPoints == null || spawnPoints.Length == 0)
+            {
+                Debug.LogWarning("No spawn points assigned. Units will spawn at mouse position.");
+            }
+            if (spawnPoints != null && spawnPoints.Length > 0)
+            {
+                foreach (var point in spawnPoints)
+                {
+                    if (point != null)
+                    {
+                        // Renderer maps position.x→World X, position.y→World Z (XZ plane).
+                        // Must use (x, z) — NOT (x, y) — otherwise all units land on Y=0 → horizontal line.
+                        unitManager.SpawnUnit(unitIDToSpawn, new Vector2(point.position.x, point.position.z));
+                    }
+                    point.gameObject.SetActive(false);
+                }
+            }
+        }
         void Update()
         {
-            // Spawning logic via Input
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                unitManager.SpawnUnit(unitIDToSpawn, GetMouseWorldPosition());
-            }
+           // unitManager.SpawnUnit(unitIDToSpawn, GetMouseWorldPosition());
         }
 
         private Vector2 GetMouseWorldPosition()

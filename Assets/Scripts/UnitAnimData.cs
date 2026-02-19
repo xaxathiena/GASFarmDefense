@@ -23,8 +23,14 @@ public class UnitAnimData : ScriptableObject
         [Range(0.1f, 20f)]
         public float speedModifier; // 1 = Chuẩn, 2 = Nhanh gấp đôi, 0.5 = Chậm một nửa
         // --- THÊM BIẾN NÀY ---
-        [Range(0.1f, 10.0f)]
+        [Range(0.1f, 50.0f)]
         public float scale;         // Kích thước riêng (Mặc định là 1)
+
+        // Tỉ lệ chiều rộng / chiều cao của sprite (width / height).
+        // 1.0 = vuông, 0.5 = cao gấp đôi rộng (portrait), 2.0 = rộng gấp đôi cao (landscape).
+        // Dùng để render đúng tỉ lệ mà không cần mesh riêng.
+        [Range(0.1f, 10f)]
+        public float aspectRatio;   // width / height  (default = 1.0)
     }
 
     // Hàm tiện ích để tìm Animation theo tên lúc Runtime

@@ -14,39 +14,11 @@ namespace Abel.TowerDefense.Render
         // Dictionary quản lý các Group theo UnitID
         private Dictionary<string, UnitGroupBase> loadedGroups = new Dictionary<string, UnitGroupBase>();
         public IReadOnlyDictionary<string, UnitGroupBase> LoadedGroups => loadedGroups;
-
-        private void CreateGroupFromProfile(UnitProfileData profile)
+        void Start()
         {
-            if (string.IsNullOrEmpty(profile.logicTypeAQN))
-            {
-                Debug.LogError($"Profile {profile.unitID} chưa chọn Logic Class!");
-                return;
-            }
-
-            try
-            {
-                // REFLECTION MAGIC: Tạo instance của class kế thừa UnitGroupBase từ string
-                Type logicType = Type.GetType(profile.logicTypeAQN);
-
-                // Activator.CreateInstance(Type, params object[])
-                // Gọi constructor: public MyGroup(UnitProfile p) : base(p)
-                if (!loadedGroups.ContainsKey(profile.unitID))
-                {
-                    UnitGroupBase group = (UnitGroupBase)Activator.CreateInstance(logicType, new object[] { profile });
-                    loadedGroups.Add(profile.unitID, group);
-                    Debug.Log($"Loaded Group: {profile.unitID} using logic {logicType.Name}");
-                }
-                else
-                {
-                    Debug.LogWarning($"Group with UnitID {profile.unitID} already exists!");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Lỗi tạo group cho {profile.unitID}: {e.Message}");
-            }
+            
         }
-
+       
         void Update()
         {
             float dt = Time.deltaTime;
@@ -77,6 +49,37 @@ namespace Abel.TowerDefense.Render
                 {
                     Debug.LogError($"Không tìm thấy profile cho UnitID {unitID}!");
                 }
+            }
+        }
+         private void CreateGroupFromProfile(UnitProfileData profile)
+        {
+            if (string.IsNullOrEmpty(profile.logicTypeAQN))
+            {
+                Debug.LogError($"Profile {profile.unitID} chưa chọn Logic Class!");
+                return;
+            }
+
+            try
+            {
+                // REFLECTION MAGIC: Tạo instance của class kế thừa UnitGroupBase từ string
+                Type logicType = Type.GetType(profile.logicTypeAQN);
+
+                // Activator.CreateInstance(Type, params object[])
+                // Gọi constructor: public MyGroup(UnitProfile p) : base(p)
+                if (!loadedGroups.ContainsKey(profile.unitID))
+                {
+                    UnitGroupBase group = (UnitGroupBase)Activator.CreateInstance(logicType, new object[] { profile });
+                    loadedGroups.Add(profile.unitID, group);
+                    Debug.Log($"Loaded Group: {profile.unitID} using logic {logicType.Name}");
+                }
+                else
+                {
+                    Debug.LogWarning($"Group with UnitID {profile.unitID} already exists!");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Lỗi tạo group cho {profile.unitID}: {e.Message}");
             }
         }
 
