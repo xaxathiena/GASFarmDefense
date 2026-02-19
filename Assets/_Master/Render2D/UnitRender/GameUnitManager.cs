@@ -3,92 +3,112 @@ using System;
 using System.Collections.Generic;
 using Abel.TowerDefense.Config;
 using Abel.TowerDefense.Core;
+using Abel.TowerDefense.Logic;
 
 namespace Abel.TowerDefense.Render
 {
     public class GameUnitManager : MonoBehaviour
     {
-        [Header("Load Profiles")]
-        public UnitsProfile unitProfiles;
+        [Header("Database")]
+        public GameDatabase gameDatabase;
 
-        // Dictionary quản lý các Group theo UnitID
-        private Dictionary<string, UnitGroupBase> loadedGroups = new Dictionary<string, UnitGroupBase>();
-        public IReadOnlyDictionary<string, UnitGroupBase> LoadedGroups => loadedGroups;
+        // Separate dictionaries to prevent ID collisions
+        private Dictionary<string, UnitGroupBase> unitGroups = new Dictionary<string, UnitGroupBase>();
+
+        // Notice the type is BulletGroupBase, allowing us to use bullet-specific methods (like Spawn with direction)
+        private Dictionary<string, BulletGroup> bulletGroups = new Dictionary<string, BulletGroup>();
+        public IReadOnlyDictionary<string, UnitGroupBase> LoadedUnitGroups => unitGroups;
+        public IReadOnlyDictionary<string, BulletGroup> LoadedBulletGroups => bulletGroups;
         void Start()
         {
-            
-        }
-       
-        void Update()
-        {
-            float dt = Time.deltaTime;
-            foreach (var group in loadedGroups.Values)
+            if (gameDatabase == null) return;
+
+            // 1. Initialize Units
+            foreach (var unitData in gameDatabase.units)
             {
-                group.Update(dt);
+                CreateGroup(unitData.unitID, unitData.logicTypeAQN, unitData, unitGroups);
+            }
+
+            // 2. Initialize Bullets
+            foreach (var bulletData in gameDatabase.bullets)
+            {
+                CreateGroup(bulletData.bulletID, bulletData.logicTypeAQN, bulletData, bulletGroups);
             }
         }
 
-        // API Spawn cho Input gọi
-        public void SpawnUnit(string unitID, Vector2 pos)
+        // A generic helper to instantiate and register groups via Reflection
+        private void CreateGroup<TGroup, TData>(string id, string logicAQN, TData profileData, Dictionary<string, TGroup> dictionary)
+            where TGroup : UnitGroupBase
         {
-            if (loadedGroups.TryGetValue(unitID, out var group))
-            {
-                group.Spawn(pos);
-            }
-            else
-            {
-                // create group on the fly if not exist (Optional)
-                Debug.LogWarning($"UnitID {unitID} does not exist, creating group on the fly.");
-                var profile = unitProfiles.GetUnitByID(unitID);
-                if (profile != null)
-                {
-                    CreateGroupFromProfile(profile);
-                    loadedGroups[unitID].Spawn(pos);
-                }
-                else
-                {
-                    Debug.LogError($"Không tìm thấy profile cho UnitID {unitID}!");
-                }
-            }
-        }
-         private void CreateGroupFromProfile(UnitProfileData profile)
-        {
-            if (string.IsNullOrEmpty(profile.logicTypeAQN))
-            {
-                Debug.LogError($"Profile {profile.unitID} chưa chọn Logic Class!");
-                return;
-            }
+            if (string.IsNullOrEmpty(logicAQN)) return;
 
             try
             {
-                // REFLECTION MAGIC: Tạo instance của class kế thừa UnitGroupBase từ string
-                Type logicType = Type.GetType(profile.logicTypeAQN);
+                Type logicType = Type.GetType(logicAQN);
+                // Create instance passing the specific profile data (UnitProfileData or BulletProfileData)
+                TGroup group = (TGroup)Activator.CreateInstance(logicType, new object[] { profileData });
 
-                // Activator.CreateInstance(Type, params object[])
-                // Gọi constructor: public MyGroup(UnitProfile p) : base(p)
-                if (!loadedGroups.ContainsKey(profile.unitID))
+                if (!dictionary.ContainsKey(id))
                 {
-                    UnitGroupBase group = (UnitGroupBase)Activator.CreateInstance(logicType, new object[] { profile });
-                    loadedGroups.Add(profile.unitID, group);
-                    Debug.Log($"Loaded Group: {profile.unitID} using logic {logicType.Name}");
-                }
-                else
-                {
-                    Debug.LogWarning($"Group with UnitID {profile.unitID} already exists!");
+                    dictionary.Add(id, group);
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"Lỗi tạo group cho {profile.unitID}: {e.Message}");
+                Debug.LogError($"[GameUnitManager] Failed to create group for {id}: {e.Message}");
+            }
+        }
+
+        void Update()
+        {
+            float dt = Time.deltaTime;
+
+            // Update all units
+            foreach (var group in unitGroups.Values) group.Update(dt);
+
+            // Update all bullets
+            foreach (var group in bulletGroups.Values) group.Update(dt);
+        }
+
+        // --- PUBLIC API FOR INPUT / GAMEPLAY ---
+
+        // API for Units (Needs only Position)
+        public void SpawnUnit(string unitID, Vector2 pos)
+        {
+            if (unitGroups.TryGetValue(unitID, out var group))
+            {
+                group.Spawn(pos);
+            }
+        }
+
+        // API for Bullets (Needs Position AND Direction)
+        public void SpawnBullet(string bulletID, Vector2 pos, Vector2 direction)
+        {
+            if (bulletGroups.TryGetValue(bulletID, out var group))
+            {
+                // We can safely call the specific bullet spawn method because we strictly typed the dictionary
+                group.Spawn(pos, direction);
+            }
+        }
+        public void SetPathForGroup(string unitID, Vector2[] path)
+        {
+            if (unitGroups.TryGetValue(unitID, out var group))
+            {
+                if (group is Abel.TowerDefense.Logic.EnemyFollowingGroup pathGroup)
+                {
+                    pathGroup.pathWaypoints = path;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Không thể set path! Chưa tạo Group cho UnitID {unitID}");
             }
         }
 
         void OnDestroy()
         {
-            foreach (var group in loadedGroups.Values)
-            {
-                group.Dispose();
-            }
+            foreach (var group in unitGroups.Values) group.Dispose();
+            foreach (var group in bulletGroups.Values) group.Dispose();
         }
     }
 }

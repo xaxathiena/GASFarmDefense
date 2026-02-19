@@ -3453,6 +3453,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Abel.TowerDefense.InputSystem.InputCreateUnit
   unitIDToSpawn: ChampionGalahad
+  enemyIDToSpawn: RookieKingArthur
   spawnPoints:
   - {fileID: 62291946}
   - {fileID: 1862310387}
@@ -3490,6 +3491,14 @@ MonoBehaviour:
   - {fileID: 1108881715}
   - {fileID: 609676938}
   - {fileID: 1333191885}
+  pathTransforms:
+  - {fileID: 1406470869}
+  - {fileID: 1583065440}
+  - {fileID: 1316888549}
+  - {fileID: 577774454}
+  - {fileID: 1251533692}
+  - {fileID: 123923183}
+  spawnInterval: 1
 --- !u!4 &624655220
 Transform:
   m_ObjectHideFlags: 0
@@ -6291,7 +6300,7 @@ Transform:
   m_GameObject: {fileID: 948276799}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

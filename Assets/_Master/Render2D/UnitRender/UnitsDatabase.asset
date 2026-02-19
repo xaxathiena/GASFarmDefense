@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Abel.TowerDefense.Config.UnitVisualProfile
   units:
   - unitID: ChampionGalahad
+    maxCapacity: 500
     logicTypeAQN: Abel.TowerDefense.Logic.SimpleLoopGroup, Assembly-CSharp, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
     logicDisplayName: SimpleLoopGroup
@@ -23,11 +24,21 @@ MonoBehaviour:
     baseMoveSpeed: 5
     baseAttackSpeed: 1
   - unitID: RookieKingArthur
-    logicTypeAQN: Abel.TowerDefense.Logic.SimpleLoopGroup, Assembly-CSharp, Version=0.0.0.0,
+    maxCapacity: 500
+    logicTypeAQN: Abel.TowerDefense.Logic.EnemyFollowingGroup, Assembly-CSharp, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-    logicDisplayName: SimpleLoopGroup
+    logicDisplayName: EnemyFollowingGroup
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: d48795cf15e1c004fa86f320cb84feae, type: 2}
-    animData: {fileID: 11400000, guid: 455392214e742454bbe2c7c1b4672eac, type: 2}
+    animData: {fileID: 11400000, guid: 8d9db22a4f170df43b359f17d958ba39, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
+  bullets:
+  - bulletID: Default
+    maxCapacity: 1000
+    logicTypeAQN: 
+    logicDisplayName: 
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 0}
+    animData: {fileID: 0}
+    moveSpeed: 20

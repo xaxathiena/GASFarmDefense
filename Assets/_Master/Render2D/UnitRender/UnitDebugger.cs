@@ -48,7 +48,7 @@ namespace Abel.TowerDefense.DebugTools
                 // OR we just make them public for Debugging.
                 
                 // For this example, let's assume GameUnitManager has public fields or getters
-                var loadedGroups = unitManager.LoadedGroups;
+                var loadedGroups = unitManager.LoadedUnitGroups;
                 foreach (var group in loadedGroups.Values)
                 {
                     int idx = group.FindUnitIndexAt(hitPoint2D, clickRadius);
