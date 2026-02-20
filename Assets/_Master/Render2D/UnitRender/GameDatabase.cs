@@ -23,8 +23,8 @@ namespace Abel.TowerDefense.Config
         [Header("Logic Configuration")]
         // Lưu tên đầy đủ của class (Assembly Qualified Name) để Reflection tìm ra
         [HideInInspector] public string logicTypeAQN;
-        // Tên ngắn gọn để hiện lên Editor cho đẹp
-        [HideInInspector] public string logicDisplayName;
+        // // Tên ngắn gọn để hiện lên Editor cho đẹp
+        // [HideInInspector] public string logicDisplayName;
 
         [Header("Visual Resources")]
         public Mesh mesh;
@@ -48,27 +48,24 @@ namespace Abel.TowerDefense.Config
         public int maxCapacity = 2000; // Đạn thường cần số lượng lớn
         public string logicTypeAQN;
         public string logicDisplayName;
-        
+
         public Mesh mesh;
         public Material baseMaterial;
         public UnitAnimData animData;
-        
+
         public float moveSpeed = 20.0f; // Đạn chỉ cần tốc độ bay
     }
     [CreateAssetMenu(fileName = "UnitsDatabase", menuName = "Abel/Units Database")]
     public class GameDatabase : ScriptableObject
     {
+        // Store the list of prefixes directly in the database so it saves across sessions
+        public List<string> definedPrefixes = new List<string> { "unit_", "bullet_", "effect_", "weapon_" };
         public List<UnitProfileData> units = new List<UnitProfileData>();
-        public List<BulletProfileData> bullets = new List<BulletProfileData>();
 
         // Helper lấy data theo ID
         public UnitProfileData GetUnitByID(string id)
         {
             return units.Find(u => u.unitID == id);
-        }
-        public BulletProfileData GetBulletByID(string id)
-        {
-            return bullets.Find(b => b.bulletID == id);
         }
     }
 }

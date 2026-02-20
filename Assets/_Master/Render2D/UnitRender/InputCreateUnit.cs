@@ -49,7 +49,6 @@ namespace Abel.TowerDefense.InputSystem
                     cachedPath[i] = new Vector2(pathTransforms[i].position.x, pathTransforms[i].position.z);
                     pathTransforms[i].gameObject.SetActive(false); // Ẩn cột mốc đi
                 }
-                unitManager.SetPathForGroup(enemyIDToSpawn, cachedPath);
             }
         }
         void Update()

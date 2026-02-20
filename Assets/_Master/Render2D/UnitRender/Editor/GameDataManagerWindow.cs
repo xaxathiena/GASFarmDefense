@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Abel.TowerDefense.Config;
 using Abel.TowerDefense.Core;
-using Abel.TowerDefense.Logic;
 
 namespace Abel.TowerDefense.EditorTools
 {
@@ -12,22 +12,22 @@ namespace Abel.TowerDefense.EditorTools
     {
         private GameDatabase database;
 
-        // Tab system
-        private string[] tabs = { "Units", "Bullets", "Weapons (WIP)", "Effects (WIP)" };
-        private int currentTab = 0;
-
         // UI State
-        private UnitProfileData selectedUnit;
-        private BulletProfileData selectedBullet;
+        private UnitProfileData selectedProfile;
         private Vector2 scrollPosList;
         private Vector2 scrollPosSettings;
         private string searchText = "";
 
+        // Filter System
+        private int currentFilterIndex = 0;
+
+        // Prefix Creation System
+        private bool isAddingNewPrefix = false;
+        private string newPrefixInput = "";
+
         // Reflection Caches
-        private Type[] unitLogicTypes;
-        private string[] unitLogicNames;
-        private Type[] bulletLogicTypes;
-        private string[] bulletLogicNames;
+        private Type[] logicTypes;
+        private string[] logicNames;
 
         [MenuItem("Abel/Game Data Manager")]
         public static void ShowWindow()
@@ -50,42 +50,21 @@ namespace Abel.TowerDefense.EditorTools
             }
         }
 
-        private void CreateDatabase()
-        {
-            string path = EditorUtility.SaveFilePanelInProject("Create Database", "GameDatabase", "asset", "Create");
-            if (!string.IsNullOrEmpty(path))
-            {
-                database = ScriptableObject.CreateInstance<GameDatabase>();
-                AssetDatabase.CreateAsset(database, path);
-                AssetDatabase.SaveAssets();
-            }
-        }
-
         private void ScanLogicTypes()
         {
-            // Scan Unit Logics
-            unitLogicTypes = TypeCache.GetTypesDerivedFrom<UnitGroupBase>().Where(t => !t.IsAbstract).ToArray();
-            unitLogicNames = unitLogicTypes.Select(t => t.Name).ToArray();
-
-            // Scan Bullet Logics
-            bulletLogicTypes = TypeCache
-                .GetTypesDerivedFrom<BulletGroup>()
-                .Concat(new[] { typeof(BulletGroup) })
-                .Where(t => !t.IsAbstract)
-                .ToArray(); 
-            bulletLogicNames = bulletLogicTypes.Select(t => t.Name).ToArray();
+            logicTypes = TypeCache.GetTypesDerivedFrom<UnitGroupBase>().Where(t => !t.IsAbstract).ToArray();
+            logicNames = logicTypes.Select(t => t.Name).ToArray();
         }
 
         private void OnGUI()
         {
-            DrawTopToolbar();
-
             if (database == null)
             {
                 EditorGUILayout.HelpBox("No GameDatabase found.", MessageType.Warning);
-                if (GUILayout.Button("Create New Database")) CreateDatabase();
                 return;
             }
+
+            EditorGUILayout.Space(5);
 
             EditorGUILayout.BeginHorizontal();
             DrawLeftPanel();
@@ -95,49 +74,52 @@ namespace Abel.TowerDefense.EditorTools
             if (GUI.changed) EditorUtility.SetDirty(database);
         }
 
-        private void DrawTopToolbar()
-        {
-            GUILayout.Space(5);
-            currentTab = GUILayout.Toolbar(currentTab, tabs, GUILayout.Height(30));
-            GUILayout.Space(5);
-        }
-
-        // --- LEFT PANEL (LIST) ---
+        // --- LEFT PANEL (LIST & FILTERS) ---
         private void DrawLeftPanel()
         {
-            EditorGUILayout.BeginVertical("box", GUILayout.Width(280));
+            EditorGUILayout.BeginVertical("box", GUILayout.Width(300));
+
+            // Build dynamic filter options: "All", "Common", and all defined prefixes
+            List<string> filterOptions = new List<string> { "All", "Common" };
+            filterOptions.AddRange(database.definedPrefixes);
+
+            // Clamp filter index in case a prefix was deleted
+            currentFilterIndex = Mathf.Clamp(currentFilterIndex, 0, filterOptions.Count - 1);
 
             EditorGUILayout.BeginHorizontal();
+            currentFilterIndex = EditorGUILayout.Popup(currentFilterIndex, filterOptions.ToArray(), GUILayout.Width(90));
             searchText = EditorGUILayout.TextField(searchText, EditorStyles.toolbarSearchField);
             if (GUILayout.Button("+", EditorStyles.toolbarButton, GUILayout.Width(30))) CreateNewItem();
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.Space(5);
             scrollPosList = EditorGUILayout.BeginScrollView(scrollPosList);
 
-            if (currentTab == 0 && database.units != null) // UNITS TAB
+            if (database.units != null)
             {
-                foreach (var unit in database.units.ToList())
+                foreach (var profile in database.units.ToList())
                 {
-                    if (!string.IsNullOrEmpty(searchText) && !unit.unitID.ToLower().Contains(searchText.ToLower())) continue;
+                    // 1. Determine if this profile is "Common" (does not start with any defined prefix)
+                    bool isCommon = !database.definedPrefixes.Any(p => profile.unitID.StartsWith(p));
 
-                    GUI.backgroundColor = (selectedUnit == unit) ? Color.cyan : Color.white;
-                    if (GUILayout.Button(unit.unitID, EditorStyles.miniButton, GUILayout.Height(25)))
+                    // 2. Filter logic
+                    if (currentFilterIndex == 1 && !isCommon) continue; // Filter: Common
+                    if (currentFilterIndex > 1) // Filter: Specific Prefix
                     {
-                        selectedUnit = unit;
-                        GUI.FocusControl(null);
+                        string activePrefix = filterOptions[currentFilterIndex];
+                        if (!profile.unitID.StartsWith(activePrefix)) continue;
                     }
-                }
-            }
-            else if (currentTab == 1 && database.bullets != null) // BULLETS TAB
-            {
-                foreach (var bullet in database.bullets.ToList())
-                {
-                    if (!string.IsNullOrEmpty(searchText) && !bullet.bulletID.ToLower().Contains(searchText.ToLower())) continue;
 
-                    GUI.backgroundColor = (selectedBullet == bullet) ? Color.yellow : Color.white;
-                    if (GUILayout.Button(bullet.bulletID, EditorStyles.miniButton, GUILayout.Height(25)))
+                    // Search text logic
+                    if (!string.IsNullOrEmpty(searchText) && !profile.unitID.ToLower().Contains(searchText.ToLower())) continue;
+
+                    // 3. UI Drawing with dynamic colors
+                    GUI.backgroundColor = GetColorForID(profile.unitID, profile == selectedProfile);
+
+                    if (GUILayout.Button(string.IsNullOrEmpty(profile.unitID) ? "Unnamed" : profile.unitID, EditorStyles.miniButton, GUILayout.Height(25)))
                     {
-                        selectedBullet = bullet;
+                        selectedProfile = profile;
+                        isAddingNewPrefix = false; // Reset state when selecting new item
                         GUI.FocusControl(null);
                     }
                 }
@@ -154,13 +136,9 @@ namespace Abel.TowerDefense.EditorTools
             EditorGUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
             scrollPosSettings = EditorGUILayout.BeginScrollView(scrollPosSettings);
 
-            if (currentTab == 0 && selectedUnit != null)
+            if (selectedProfile != null)
             {
-                DrawUnitSettings();
-            }
-            else if (currentTab == 1 && selectedBullet != null)
-            {
-                DrawBulletSettings();
+                DrawProfileSettings();
             }
             else
             {
@@ -171,56 +149,144 @@ namespace Abel.TowerDefense.EditorTools
             EditorGUILayout.EndVertical();
         }
 
-        private void DrawUnitSettings()
+        private void DrawProfileSettings()
         {
-            Undo.RecordObject(database, "Modify Unit");
-            GUILayout.Label($"Editing Unit: {selectedUnit.unitID}", EditorStyles.boldLabel);
+            Undo.RecordObject(database, "Modify Profile");
+            GUILayout.Label($"Editing: {selectedProfile.unitID}", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
 
-            selectedUnit.unitID = EditorGUILayout.TextField("Unit ID", selectedUnit.unitID);
-            selectedUnit.maxCapacity = EditorGUILayout.IntField("Max Capacity", selectedUnit.maxCapacity);
+            // --- PREFIX & IDENTITY SYSTEM ---
+            DrawIdentitySection();
 
-            DrawLogicSelector(ref selectedUnit.logicTypeAQN, ref selectedUnit.logicDisplayName, unitLogicTypes, unitLogicNames);
+            selectedProfile.maxCapacity = EditorGUILayout.IntField("Max Capacity", selectedProfile.maxCapacity);
+
+            // DrawLogicSelector(ref selectedProfile.logicTypeAQN, ref selectedProfile.logicDisplayName, logicTypes, logicNames);
 
             EditorGUILayout.Space();
             GUILayout.Label("Visuals", EditorStyles.boldLabel);
-            selectedUnit.mesh = (Mesh)EditorGUILayout.ObjectField("Mesh", selectedUnit.mesh, typeof(Mesh), false);
-            selectedUnit.baseMaterial = (Material)EditorGUILayout.ObjectField("Material", selectedUnit.baseMaterial, typeof(Material), false);
-            selectedUnit.animData = (UnitAnimData)EditorGUILayout.ObjectField("Anim Data", selectedUnit.animData, typeof(UnitAnimData), false);
+            selectedProfile.mesh = (Mesh)EditorGUILayout.ObjectField("Mesh", selectedProfile.mesh, typeof(Mesh), false);
+            selectedProfile.baseMaterial = (Material)EditorGUILayout.ObjectField("Material", selectedProfile.baseMaterial, typeof(Material), false);
+            selectedProfile.animData = (UnitAnimData)EditorGUILayout.ObjectField("Anim Data", selectedProfile.animData, typeof(UnitAnimData), false);
 
             EditorGUILayout.Space();
             GUILayout.Label("Stats", EditorStyles.boldLabel);
-            selectedUnit.baseMoveSpeed = EditorGUILayout.FloatField("Move Speed", selectedUnit.baseMoveSpeed);
-            selectedUnit.baseAttackSpeed = EditorGUILayout.FloatField("Attack Speed", selectedUnit.baseAttackSpeed);
+            selectedProfile.baseMoveSpeed = EditorGUILayout.FloatField("Move Speed", selectedProfile.baseMoveSpeed);
+            selectedProfile.baseAttackSpeed = EditorGUILayout.FloatField("Attack Speed", selectedProfile.baseAttackSpeed);
 
-            DrawDeleteButton(() => { database.units.Remove(selectedUnit); selectedUnit = null; });
+            DrawDeleteButton(() => { database.units.Remove(selectedProfile); selectedProfile = null; });
         }
 
-        private void DrawBulletSettings()
+        private void DrawIdentitySection()
         {
-            Undo.RecordObject(database, "Modify Bullet");
-            GUILayout.Label($"Editing Bullet: {selectedBullet.bulletID}", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical("HelpBox");
+            GUILayout.Label("Identity", EditorStyles.miniBoldLabel);
 
-            selectedBullet.bulletID = EditorGUILayout.TextField("Bullet ID", selectedBullet.bulletID);
-            selectedBullet.maxCapacity = EditorGUILayout.IntField("Max Capacity", selectedBullet.maxCapacity);
+            // 1. Extract current prefix and base name
+            string currentPrefix = "";
+            string baseName = selectedProfile.unitID;
 
-            DrawLogicSelector(ref selectedBullet.logicTypeAQN, ref selectedBullet.logicDisplayName, bulletLogicTypes, bulletLogicNames);
+            foreach (string p in database.definedPrefixes)
+            {
+                if (selectedProfile.unitID.StartsWith(p))
+                {
+                    currentPrefix = p;
+                    baseName = selectedProfile.unitID.Substring(p.Length);
+                    break;
+                }
+            }
 
-            EditorGUILayout.Space();
-            GUILayout.Label("Visuals", EditorStyles.boldLabel);
-            selectedBullet.mesh = (Mesh)EditorGUILayout.ObjectField("Mesh", selectedBullet.mesh, typeof(Mesh), false);
-            selectedBullet.baseMaterial = (Material)EditorGUILayout.ObjectField("Material", selectedBullet.baseMaterial, typeof(Material), false);
-            selectedBullet.animData = (UnitAnimData)EditorGUILayout.ObjectField("Anim Data", selectedBullet.animData, typeof(UnitAnimData), false);
+            // 2. Build Prefix Dropdown Options
+            List<string> prefixOptions = new List<string> { "[Common]" };
+            prefixOptions.AddRange(database.definedPrefixes);
+            prefixOptions.Add("[+ Add New Prefix]");
 
-            EditorGUILayout.Space();
-            GUILayout.Label("Stats", EditorStyles.boldLabel);
-            selectedBullet.moveSpeed = EditorGUILayout.FloatField("Move Speed", selectedBullet.moveSpeed);
+            int selectedPrefixIdx = currentPrefix == "" ? 0 : database.definedPrefixes.IndexOf(currentPrefix) + 1;
 
-            DrawDeleteButton(() => { database.bullets.Remove(selectedBullet); selectedBullet = null; });
+            // 3. Draw Dropdown and handle changes properly
+            EditorGUI.BeginChangeCheck(); // Start tracking user interaction
+            int newSelectedIdx = EditorGUILayout.Popup("Prefix", selectedPrefixIdx, prefixOptions.ToArray());
+
+            // Only execute this block if the user ACTUALLY changed the dropdown selection
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (newSelectedIdx == prefixOptions.Count - 1)
+                {
+                    isAddingNewPrefix = true; // Show the input field
+                }
+                else
+                {
+                    isAddingNewPrefix = false; // Hide the input field
+                    currentPrefix = newSelectedIdx == 0 ? "" : database.definedPrefixes[newSelectedIdx - 1];
+                    selectedProfile.unitID = currentPrefix + baseName;
+                    GUI.FocusControl(null); // Remove focus to update UI
+                }
+            }
+
+            // 4. Draw Add New Prefix UI
+            if (isAddingNewPrefix)
+            {
+                EditorGUILayout.BeginHorizontal();
+                newPrefixInput = EditorGUILayout.TextField(" ", newPrefixInput);
+
+                // Add Button
+                if (GUILayout.Button("Add", EditorStyles.miniButton, GUILayout.Width(60)))
+                {
+                    if (!string.IsNullOrEmpty(newPrefixInput) && !database.definedPrefixes.Contains(newPrefixInput))
+                    {
+                        database.definedPrefixes.Add(newPrefixInput);
+                        currentPrefix = newPrefixInput;
+                        selectedProfile.unitID = currentPrefix + baseName;
+                        isAddingNewPrefix = false; // Hide after adding
+                        newPrefixInput = "";
+                        GUI.FocusControl(null);
+                    }
+                }
+
+                // Cancel Button (UX Improvement)
+                if (GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(25)))
+                {
+                    isAddingNewPrefix = false;
+                    newPrefixInput = "";
+                    GUI.FocusControl(null);
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.Space(2);
+            }
+
+            // 5. Draw Base Name input
+            // 5. Draw Base Name input & Auto Fill Button
+            EditorGUILayout.BeginHorizontal();
+            EditorGUI.BeginChangeCheck();
+            baseName = EditorGUILayout.TextField("Base Name", baseName);
+            if (EditorGUI.EndChangeCheck())
+            {
+                selectedProfile.unitID = currentPrefix + baseName;
+            }
+
+            // Auto Fill Button
+            if (GUILayout.Button("Auto Fill", EditorStyles.miniButton, GUILayout.Width(70)))
+            {
+                // Force base name to lower case
+                baseName = baseName.ToLower();
+
+                // Update the actual profile ID to reflect the lowercase base name
+                selectedProfile.unitID = currentPrefix + baseName;
+
+                // Pass the lowercase base name to the search function
+                AutoFillVisualAssets(selectedProfile, baseName);
+
+                GUI.FocusControl(null); // Remove focus to refresh UI immediately
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndVertical();
         }
 
         // --- HELPER METHODS ---
+
         private void DrawLogicSelector(ref string aqn, ref string displayName, Type[] types, string[] names)
         {
+            EditorGUILayout.Space(5);
             EditorGUILayout.BeginVertical("HelpBox");
             GUILayout.Label("Logic Behavior", EditorStyles.miniBoldLabel);
             string localAqn = aqn;
@@ -237,18 +303,17 @@ namespace Abel.TowerDefense.EditorTools
         private void CreateNewItem()
         {
             Undo.RecordObject(database, "Add New Item");
-            if (currentTab == 0)
+
+            // Auto-assign prefix based on current filter (if it's not All or Common)
+            string prefix = "";
+            if (currentFilterIndex > 1)
             {
-                var nu = new UnitProfileData { unitID = "New_Unit_" + database.units.Count };
-                database.units.Add(nu);
-                selectedUnit = nu;
+                prefix = database.definedPrefixes[currentFilterIndex - 2];
             }
-            else if (currentTab == 1)
-            {
-                var nb = new BulletProfileData { bulletID = "New_Bullet_" + database.bullets.Count };
-                database.bullets.Add(nb);
-                selectedBullet = nb;
-            }
+
+            var newProfile = new UnitProfileData { unitID = prefix + "New_" + database.units.Count };
+            database.units.Add(newProfile);
+            selectedProfile = newProfile;
         }
 
         private void DrawDeleteButton(Action onDelete)
@@ -261,6 +326,87 @@ namespace Abel.TowerDefense.EditorTools
                 GUIUtility.ExitGUI();
             }
             GUI.backgroundColor = Color.white;
+        }
+
+        /// <summary>
+        /// Generates a stable pastel color based on the prefix string hash.
+        /// </summary>
+        private Color GetColorForID(string id, bool isSelected)
+        {
+            if (isSelected) return Color.cyan;
+
+            // Find prefix to determine color
+            string currentPrefix = "";
+            foreach (string p in database.definedPrefixes)
+            {
+                if (id.StartsWith(p))
+                {
+                    currentPrefix = p;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(currentPrefix)) return Color.white; // Common items are white
+
+            // Generate a unique, stable pastel color from the prefix string
+            UnityEngine.Random.InitState(currentPrefix.GetHashCode());
+            float h = UnityEngine.Random.Range(0f, 1f);
+            return Color.HSVToRGB(h, 0.2f, 1.0f); // Low saturation, high value for pastel colors
+        }
+        /// <summary>
+        /// Automatically finds and assigns Mesh, Material, and AnimData based on the baseName.
+        /// </summary>
+        private void AutoFillVisualAssets(UnitProfileData profile, string baseName)
+        {
+            if (string.IsNullOrEmpty(baseName))
+            {
+                Debug.LogWarning("[Auto Fill] Base name is empty!");
+                return;
+            }
+
+            Undo.RecordObject(database, "Auto Fill Visuals");
+            int filledCount = 0;
+
+            // 1. Auto assign Quad Mesh (Built-in Unity asset)
+            if (profile.mesh == null)
+            {
+                profile.mesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
+                if (profile.mesh != null) filledCount++;
+            }
+
+            // 2. Auto assign Material (Searches for "baseName_Material")
+            string matSearchString = $"{baseName}_Material t:Material";
+            string[] matGuids = AssetDatabase.FindAssets(matSearchString);
+            if (matGuids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(matGuids[0]);
+                profile.baseMaterial = AssetDatabase.LoadAssetAtPath<Material>(path);
+                filledCount++;
+            }
+            else
+            {
+                Debug.LogWarning($"[Auto Fill] Could not find Material named: {baseName}_Material");
+            }
+
+            // 3. Auto assign AnimData (Searches for "baseName_Data")
+            string animSearchString = $"{baseName}_Data t:UnitAnimData";
+            string[] animGuids = AssetDatabase.FindAssets(animSearchString);
+            if (animGuids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(animGuids[0]);
+                profile.animData = AssetDatabase.LoadAssetAtPath<UnitAnimData>(path);
+                filledCount++;
+            }
+            else
+            {
+                Debug.LogWarning($"[Auto Fill] Could not find UnitAnimData named: {baseName}_Data");
+            }
+
+            // Notify user
+            if (filledCount > 0)
+            {
+                Debug.Log($"[Auto Fill] Successfully filled {filledCount} assets for {baseName}.");
+            }
         }
     }
 }

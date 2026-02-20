@@ -5,18 +5,18 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Spine Baker PRO (Full Options)
-/// - Fix lỗi Mesh, Viền đen.
-/// - Thêm tùy chọn xuất ảnh PNG từng frame để kiểm tra.
+/// - Fixes Mesh and Black Outline issues.
+/// - Adds option to export individual PNG frames for debugging.
 /// </summary>
 public class SpineBakerPro : EditorWindow
 {
-    // --- CẤU HÌNH CAPTURE ---
+    // --- CAPTURE CONFIGURATION ---
     private float targetFPS = 15.0f;
     private float yOffset = 0.0f;
     private bool useManualPosition = false;
     private float vfxThreshold = 0.2f;
 
-    // --- CẤU HÌNH OUTPUT ---
+    // --- OUTPUT CONFIGURATION ---
     public enum OutputSize { _512 = 512, _256 = 256, _128 = 128 }
     private OutputSize targetSize = OutputSize._256; 
 
@@ -30,10 +30,10 @@ public class SpineBakerPro : EditorWindow
     }
     private CompressionType compression = CompressionType.Uncompressed_RGBA32; 
 
-    // --- TÙY CHỌN DEBUG MỚI ---
-    private bool exportIndividualPNGs = false; // <--- Checkbox mới
+    // --- NEW DEBUG OPTIONS ---
+    private bool exportIndividualPNGs = false;
 
-    // --- TRẠNG THÁI UI ---
+    // --- UI STATE ---
     private bool isValidSelection = false;
     private string statusMessage = "";
     private MessageType statusType = MessageType.None;
@@ -56,22 +56,22 @@ public class SpineBakerPro : EditorWindow
         isValidSelection = false;
         
         if (obj == null) {
-            statusMessage = "Chưa chọn Object nào."; statusType = MessageType.Info; return;
+            statusMessage = "No object selected."; statusType = MessageType.Info; return;
         }
         Animator anim = obj.GetComponent<Animator>();
         if (anim == null) {
-            statusMessage = "Lỗi: Object thiếu Animator!"; statusType = MessageType.Error; return;
+            statusMessage = "Error: Object is missing Animator!"; statusType = MessageType.Error; return;
         }
         if (anim.runtimeAnimatorController == null || anim.runtimeAnimatorController.animationClips.Length == 0) {
-            statusMessage = "Lỗi: Animator không có Clips!"; statusType = MessageType.Warning; return;
+            statusMessage = "Error: Animator has no Clips!"; statusType = MessageType.Warning; return;
         }
         Camera cam = GameObject.Find("BakingCam")?.GetComponent<Camera>();
         if (cam == null) {
-            statusMessage = "Lỗi Critical: Thiếu 'BakingCam'!"; statusType = MessageType.Error; return;
+            statusMessage = "Critical Error: 'BakingCam' is missing!"; statusType = MessageType.Error; return;
         }
 
         isValidSelection = true;
-        statusMessage = $"SẴN SÀNG: {obj.name} ({anim.runtimeAnimatorController.animationClips.Length} clips)";
+        statusMessage = $"READY: {obj.name} ({anim.runtimeAnimatorController.animationClips.Length} clips)";
         statusType = MessageType.Info;
     }
 
@@ -88,36 +88,35 @@ public class SpineBakerPro : EditorWindow
 
         GUILayout.Space(10);
         
-        GUILayout.Label("1. CẤU HÌNH ANIMATION", EditorStyles.boldLabel);
+        GUILayout.Label("1. ANIMATION CONFIGURATION", EditorStyles.boldLabel);
         GUILayout.BeginVertical("box");
-        targetFPS = EditorGUILayout.Slider("FPS (Độ mượt)", targetFPS, 1, 60);
-        EditorGUILayout.LabelField("Dung lượng:", $"{(targetFPS/30f)*100:F0}% so với gốc", EditorStyles.miniLabel);
+        targetFPS = EditorGUILayout.Slider("FPS (Smoothness)", targetFPS, 1, 60);
+        EditorGUILayout.LabelField("Storage size:", $"{(targetFPS/30f)*100:F0}% compared to original", EditorStyles.miniLabel);
         GUILayout.Space(5);
-        useManualPosition = EditorGUILayout.ToggleLeft("Giữ nguyên vị trí Unit", useManualPosition);
-        if (!useManualPosition) yOffset = EditorGUILayout.FloatField("Hạ thấp Unit (Y)", yOffset);
-        vfxThreshold = EditorGUILayout.Slider("Lọc viền đen VFX", vfxThreshold, 0f, 0.5f);
+        useManualPosition = EditorGUILayout.ToggleLeft("Keep Original Position", useManualPosition);
+        if (!useManualPosition) yOffset = EditorGUILayout.FloatField("Lower Unit (Y)", yOffset);
+        vfxThreshold = EditorGUILayout.Slider("VFX Outline Threshold", vfxThreshold, 0f, 0.5f);
         GUILayout.EndVertical();
 
         GUILayout.Space(10);
 
-        GUILayout.Label("2. CẤU HÌNH OUTPUT", EditorStyles.boldLabel);
+        GUILayout.Label("2. OUTPUT CONFIGURATION", EditorStyles.boldLabel);
         GUILayout.BeginVertical("box");
-        targetSize = (OutputSize)EditorGUILayout.EnumPopup("Kích thước Texture:", targetSize);
-        compression = (CompressionType)EditorGUILayout.EnumPopup("Chuẩn nén:", compression);
+        targetSize = (OutputSize)EditorGUILayout.EnumPopup("Texture Size:", targetSize);
+        compression = (CompressionType)EditorGUILayout.EnumPopup("Compression:", compression);
         
         GUILayout.Space(5);
-        // --- CHECKBOX MỚI ---
-        exportIndividualPNGs = EditorGUILayout.ToggleLeft("Xuất thêm ảnh PNG từng frame (Debug)", exportIndividualPNGs);
+        exportIndividualPNGs = EditorGUILayout.ToggleLeft("Export individual PNG frames (Debug)", exportIndividualPNGs);
         if (exportIndividualPNGs) 
         {
-            EditorGUILayout.HelpBox("Sẽ tạo folder 'Assets/BakedFrames/...' chứa ảnh.", MessageType.Warning);
+            EditorGUILayout.HelpBox("Will create a folder 'Assets/BakedFrames/...' containing images.", MessageType.Warning);
         }
         GUILayout.EndVertical();
 
         GUILayout.Space(20);
 
         EditorGUI.BeginDisabledGroup(!isValidSelection);
-        if (GUILayout.Button("BAKE & CREATE DATA NGAY", GUILayout.Height(50)))
+        if (GUILayout.Button("BAKE & CREATE DATA NOW", GUILayout.Height(50)))
         {
             BakeAndPackage();
         }
@@ -127,6 +126,8 @@ public class SpineBakerPro : EditorWindow
     void BakeAndPackage()
     {
         GameObject selected = Selection.activeGameObject;
+        string selectedName = selected != null ? selected.name : "None";
+        selectedName = selectedName.Replace(" ", "_").ToLowerInvariant(); // Sanitize name for folder/files
         Animator animator = selected.GetComponent<Animator>();
         Camera bakingCam = GameObject.Find("BakingCam").GetComponent<Camera>();
 
@@ -147,21 +148,20 @@ public class SpineBakerPro : EditorWindow
             selected.transform.rotation = Quaternion.identity;
         }
 
-        // --- TẠO FOLDER PNG NẾU CẦN ---
-        string pngFolderPath = $"Assets/BakedFrames/{selected.name}";
+        // --- CREATE PNG FOLDER IF NEEDED ---
+        string pngFolderPath = $"Assets/BakedFrames/{selectedName}";
         if (exportIndividualPNGs)
         {
             if (Directory.Exists(pngFolderPath)) Directory.Delete(pngFolderPath, true);
             Directory.CreateDirectory(pngFolderPath);
         }
-        // -------------------------------
 
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
 
         int totalFrames = 0;
         foreach(var c in clips) totalFrames += Mathf.Max(1, Mathf.FloorToInt(c.length * targetFPS) + 1);
 
-        Debug.Log($"Bắt đầu Bake: {totalFrames} frames. Size: {size}. Format: {compression}");
+        Debug.Log($"Starting Bake: {totalFrames} frames. Size: {size}. Format: {compression}");
 
         Texture2DArray textureArray = new Texture2DArray(size, size, totalFrames, (TextureFormat)compression, false);
         textureArray.filterMode = FilterMode.Bilinear;
@@ -187,8 +187,8 @@ public class SpineBakerPro : EditorWindow
                 info.fps = targetFPS;
                 info.duration = clip.length;
                 info.loop = clip.isLooping;
-                info.speedModifier = 1.0f; // Mặc định speed chuẩn
-                info.scale = 1.0f; // Mặc định kích thước chuẩn
+                info.speedModifier = 1.0f; // Default standard speed
+                info.scale = 1.0f; // Default standard scale
                 animDataList.Add(info);
 
                 if (EditorUtility.DisplayCancelableProgressBar("Baking...", $"Anim: {clip.name}", (float)i / clips.Length)) break;
@@ -224,7 +224,7 @@ public class SpineBakerPro : EditorWindow
                     RenderTexture.active = bakeRT;
                     tempTex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
                     
-                    // 3. Process Pixels (Khử viền đen)
+                    // 3. Process Pixels (Remove black outline)
                     Color[] pixels = tempTex.GetPixels();
                     for (int p = 0; p < pixels.Length; p++)
                     {
@@ -240,13 +240,12 @@ public class SpineBakerPro : EditorWindow
                     tempTex.SetPixels(pixels); 
                     tempTex.Apply();
 
-                    // --- XUẤT PNG NẾU CẦN ---
+                    // --- EXPORT PNG IF NEEDED ---
                     if (exportIndividualPNGs)
                     {
                         byte[] bytes = tempTex.EncodeToPNG();
                         File.WriteAllBytes($"{pngFolderPath}/{clip.name}_{f:D3}.png", bytes);
                     }
-                    // ------------------------
 
                     // 4. Compress & Copy to Array
                     if (compression != CompressionType.Uncompressed_RGBA32)
@@ -261,34 +260,72 @@ public class SpineBakerPro : EditorWindow
                 }
             }
 
-            // 5. Finalize
+            // 5. Finalize & Create Assets
+            // 5. Finalize & Create Assets
             textureArray.Apply(false, true); 
-            string folderPath = "Assets/BakedData";
-            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
             
-            string texPath = $"{folderPath}/{selected.name}_Array.asset";
+            // --- CREATE FOLDER STRUCTURE ---
+            string baseFolderPath = "Assets/BakedData";
+            if (!Directory.Exists(baseFolderPath)) Directory.CreateDirectory(baseFolderPath);
+            
+            // Target folder for this specific unit
+            string targetFolderPath = $"{baseFolderPath}/{selectedName}";
+            if (!Directory.Exists(targetFolderPath)) Directory.CreateDirectory(targetFolderPath);
+            
+            // Save Texture Array
+            string texPath = $"{targetFolderPath}/{selectedName}_Array.asset";
             AssetDatabase.CreateAsset(textureArray, texPath);
 
-            string dataPath = $"{folderPath}/{selected.name}_Data.asset";
+            // --- CREATE MATERIAL AUTOMATICALLY ---
+            string matPath = $"{targetFolderPath}/{selectedName}_Material.mat";
+            Shader instancedShader = Shader.Find("Abel/Instanced/BakedTextureArray");
+            if (instancedShader != null)
+            {
+                Material newMat = new Material(instancedShader);
+                newMat.SetTexture("_MainTexArray", textureArray);
+                newMat.enableInstancing = true; // Critical for performance
+                AssetDatabase.CreateAsset(newMat, matPath);
+            }
+            else
+            {
+                Debug.LogWarning("Shader 'Abel/Instanced/BakedTextureArray' not found. Material creation skipped.");
+            }
+
+            // Save AnimData
+            string dataPath = $"{targetFolderPath}/{selectedName}_Data.asset";
             UnitAnimData dataSO = ScriptableObject.CreateInstance<UnitAnimData>();
             dataSO.textureArray = textureArray;
             dataSO.animations = animDataList;
             
             AssetDatabase.CreateAsset(dataSO, dataPath);
+            
+            // Force Unity to save and recognize the newly created folders and files
             AssetDatabase.SaveAssets();
 
-            Selection.activeObject = dataSO;
-            EditorGUIUtility.PingObject(dataSO);
+            // --- NAVIGATE PROJECT TAB TO FOLDER ---
+            // Load the folder as a DefaultAsset to select it in the Project window
+            UnityEngine.Object folderObj = AssetDatabase.LoadAssetAtPath<DefaultAsset>(targetFolderPath);
+            if (folderObj != null)
+            {
+                Selection.activeObject = folderObj;
+                EditorGUIUtility.PingObject(folderObj);
+            }
+            else
+            {
+                // Fallback to selecting the data object if folder ping fails
+                Selection.activeObject = dataSO;
+                EditorGUIUtility.PingObject(dataSO);
+            }
             
-            string msg = "HOÀN TẤT!";
-            if (exportIndividualPNGs) msg += $"\nĐã xuất ảnh frame vào: {pngFolderPath}";
+            string msg = "DONE!";
+            if (exportIndividualPNGs) msg += $"\nExported frame images to: {pngFolderPath}";
             Debug.Log(msg);
             
             if (exportIndividualPNGs) EditorUtility.RevealInFinder(pngFolderPath);
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"Lỗi: {ex.Message}");
+            Debug.LogError($"Error: {ex.Message}");
         }
         finally
         {
