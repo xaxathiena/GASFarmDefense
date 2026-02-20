@@ -29,7 +29,7 @@ namespace Abel.TowerDefense.EditorTools
         private Type[] logicTypes;
         private string[] logicNames;
 
-        [MenuItem("Abel/Game Data Manager")]
+        [MenuItem("Tools/Abel/Game Data Manager")]
         public static void ShowWindow()
         {
             GetWindow<GameDataManagerWindow>("Game Database");
