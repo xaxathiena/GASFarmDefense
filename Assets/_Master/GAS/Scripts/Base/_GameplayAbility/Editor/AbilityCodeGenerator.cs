@@ -6,7 +6,7 @@ namespace GAS.Editor
 {
     /// <summary>
     /// Editor tool to generate new ability Data + Behaviour files.
-    /// Usage: Tools/GAS/Create New Ability
+    /// Usage: Tools/Abel/GAS/Create New Ability
     /// </summary>
     public class AbilityCodeGenerator : EditorWindow
     {
@@ -14,7 +14,7 @@ namespace GAS.Editor
         private string dataFolder = "Assets/_Master/GAS/Scripts/FD/Abilities";
         private string behaviourFolder = "Assets/_Master/GAS/Scripts/FD/Abilities";
 
-        [MenuItem("Tools/GAS/Create New Ability")]
+        [MenuItem("Tools/Abel/GAS/Create New Ability")]
         public static void ShowWindow()
         {
             var window = GetWindow<AbilityCodeGenerator>("Create Ability");

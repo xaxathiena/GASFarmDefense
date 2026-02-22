@@ -54,7 +54,7 @@ namespace GAS
         private List<string> errors = new List<string>();
         private Vector2 scrollPosition;
 
-        [MenuItem("GAS/Tools/Tag Migration Utility")]
+        [MenuItem("Tools/Abel/GAS/Tag Migration Utility")]
         public static void ShowWindow()
         {
             var window = GetWindow<TagMigrationUtility>("Tag Migration");

@@ -10,16 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be754ac30361c4c8b837aabfcde3e2da, type: 3}
-  m_Name: rookie_king_arthur_Data
+  m_Name: championgalahad_Data
   m_EditorClassIdentifier: Assembly-CSharp::UnitAnimData
-  textureArray: {fileID: 18700000, guid: 26d3663d8ea78bf45b2399071f9ad8a0, type: 2}
+  textureArray: {fileID: 18700000, guid: 7cb1feae218e8a7489b2065a619b6980, type: 2}
   animations:
-  - animName: Atk_0136
+  - animName: Idle_0152
     startFrame: 0
-    frameCount: 226
-    fps: 15
-    duration: 15
+    frameCount: 19
+    fps: 1
+    duration: 18
+    loop: 1
+    speedModifier: 20
+    scale: 1
+    aspectRatio: 0
+  - animName: Atk_0152
+    startFrame: 19
+    frameCount: 19
+    fps: 1
+    duration: 18
     loop: 0
-    speedModifier: 1
+    speedModifier: 20
     scale: 1
     aspectRatio: 0

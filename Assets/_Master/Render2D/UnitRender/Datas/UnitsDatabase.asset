@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f1c4bb553cc5b4793ca4b5156a54f1, type: 3}
+  m_Name: UnitsDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::Abel.TowerDefense.Config.UnitVisualProfile
+  definedPrefixes:
+  - unit_
+  - bullet_
+  - effect_
+  - weapon_
+  - Enemy
+  units:
+  - unitID: unit_championgalahad
+    maxCapacity: 10000
+    logicTypeAQN: Abel.TowerDefense.Logic.SimpleLoopGroup, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: a99cded1462b4c646b36d020b4257ecc, type: 2}
+    animData: {fileID: 11400000, guid: 9de97d90ac5ad344cb039786f03a2574, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+  - unitID: unit_rookie_king_arthur
+    maxCapacity: 500
+    logicTypeAQN: Abel.TowerDefense.Logic.EnemyFollowingGroup, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
+    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+  - unitID: Enemyrookie_king_arthur
+    maxCapacity: 1000
+    logicTypeAQN: 
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
+    animData: {fileID: 0}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+  - unitID: unit_champion_boar
+    maxCapacity: 10000
+    logicTypeAQN: 
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 94f9f14d71f600645b0d848e6e3f75db, type: 2}
+    animData: {fileID: 11400000, guid: 572def7995f841641aa32b47a52e082c, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1

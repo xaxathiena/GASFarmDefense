@@ -11,7 +11,7 @@ namespace FD.Ability.Editor
     /// </summary>
     public class AddMoveSpeedAttribute
     {
-        [MenuItem("Tools/GAS/Add MoveSpeed Attribute")]
+        [MenuItem("Tools/Abel/GAS/Add MoveSpeed Attribute")]
         public static void PatchAttributeSet()
         {
             string filePath = "Assets/_Master/Scripts/Base/FDAttributeSet.cs";
