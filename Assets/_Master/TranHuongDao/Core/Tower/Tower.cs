@@ -92,6 +92,7 @@ namespace Abel.TranHuongDao.Core
         /// <summary>Called every frame by TowerManager.Tick().</summary>
         public void Tick(float dt)
         {
+            return; // it will be open when we apply ability countdown to tower
             // Tick the GAS to update cooldowns and active effects
             asc.Tick();
 

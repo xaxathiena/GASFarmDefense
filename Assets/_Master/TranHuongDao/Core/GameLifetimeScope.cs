@@ -56,7 +56,7 @@ namespace Abel.TranHuongDao.Core
 
             // ── Game Systems ──────────────────────────────────────────────────────
             builder.RegisterEntryPoint<MapManager>(Lifetime.Singleton).As<IMapManager>();
-            builder.Register<WaveManager>(Lifetime.Singleton).As<IWaveManager>();
+            
 
             // EnemyManager: ITickable + IStartable + IDisposable exposed as IEnemyManager
             builder.RegisterEntryPoint<EnemyManager>(Lifetime.Singleton).As<IEnemyManager>();
@@ -66,6 +66,8 @@ namespace Abel.TranHuongDao.Core
 
             // BulletManager: ITickable + IDisposable exposed as IBulletManager
             builder.RegisterEntryPoint<BulletManager>(Lifetime.Singleton).As<IBulletManager>();
+            builder.RegisterEntryPoint<WaveManager>(Lifetime.Singleton).As<IWaveManager>();
+            builder.RegisterEntryPoint<InstanceIDService>(Lifetime.Singleton).As<IInstanceIDService>();
         }
     }
 }

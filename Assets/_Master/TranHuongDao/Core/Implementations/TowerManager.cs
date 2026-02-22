@@ -26,6 +26,10 @@ namespace Abel.TranHuongDao.Core
         /// Provided via RegisterInstance in GameLifetimeScope.
         /// </summary>
         private readonly TDTowerNormalAttackData normalAttackData;
+        /// <summary>
+        /// Service for generating unique instance IDs for towers.  Used for render mapping and GAS targeting.
+        /// </summary>
+        private readonly IInstanceIDService instanceIDService;
 
         // ── Tower registry ────────────────────────────────────────────────────────
         private readonly Dictionary<int, Tower> activeTowers = new Dictionary<int, Tower>(32);
@@ -38,7 +42,6 @@ namespace Abel.TranHuongDao.Core
 
         // ── Counters ─────────────────────────────────────────────────────────────
         public int ActiveTowerCount => activeTowers.Count;
-        private int nextInstanceID = 1;
 
         // ── Hardcoded initial positions ──────────────────────────────────────────
         private static readonly (string id, Vector3 position, float health)[] InitialTowers =
@@ -63,11 +66,12 @@ namespace Abel.TranHuongDao.Core
         public TowerManager(
             IObjectResolver container,
             IRender2DService renderService,
-            TDTowerNormalAttackData normalAttackData)
+            TDTowerNormalAttackData normalAttackData, IInstanceIDService instanceIDService)
         {
             this.container = container;
             this.renderService = renderService;
             this.normalAttackData = normalAttackData;
+            this.instanceIDService = instanceIDService;
         }
 
         // ── VContainer entry points ──────────────────────────────────────────────
@@ -139,7 +143,7 @@ namespace Abel.TranHuongDao.Core
             // Resolve a fresh Transient AbilitySystemComponent for this tower
             var asc = container.Resolve<AbilitySystemComponent>();
             var tower = new Tower(asc);
-            int id = nextInstanceID++;
+            int id = instanceIDService.GetNextID();
 
             tower.Initialize(id, towerID, position, maxHealth, normalAttackData, renderService);
             tower.OnDestroyed += HandleTowerDestroyed;

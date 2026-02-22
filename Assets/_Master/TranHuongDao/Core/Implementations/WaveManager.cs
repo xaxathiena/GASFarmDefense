@@ -9,21 +9,21 @@ namespace Abel.TranHuongDao.Core
     /// Controls wave progression: queues waves, delegates spawning to IEnemyManager,
     /// and tracks when a wave is fully cleared.
     /// </summary>
-    public class WaveManager : IWaveManager, IInitializable
+    public class WaveManager : IWaveManager, IInitializable, IStartable
     {
         // ── State ─────────────────────────────────────────────────────────────────
-        public int  CurrentWaveIndex { get; private set; }
-        public int  TotalWaves       { get; private set; }
-        public bool IsWaveRunning    { get; private set; }
+        public int CurrentWaveIndex { get; private set; }
+        public int TotalWaves { get; private set; }
+        public bool IsWaveRunning { get; private set; }
 
         // ── Events ────────────────────────────────────────────────────────────────
         public event Action<int> OnWaveStarted;
         public event Action<int> OnWaveCompleted;
-        public event Action      OnAllWavesCompleted;
+        public event Action OnAllWavesCompleted;
 
         // ── Dependencies ──────────────────────────────────────────────────────────
         private readonly IEnemyManager _enemyManager;
-        private readonly IMapManager   _mapManager;
+        private readonly IMapManager _mapManager;
 
         // ── Internal ──────────────────────────────────────────────────────────────
         private IReadOnlyList<WaveConfig> _waveConfigs;
@@ -33,7 +33,7 @@ namespace Abel.TranHuongDao.Core
         public WaveManager(IEnemyManager enemyManager, IMapManager mapManager)
         {
             _enemyManager = enemyManager;
-            _mapManager   = mapManager;
+            _mapManager = mapManager;
             _enemyManager.OnEnemyRemoved += NotifyEnemyDefeated;
         }
 
@@ -43,20 +43,61 @@ namespace Abel.TranHuongDao.Core
         }
 
         // ── IInitializable ────────────────────────────────────────────────────────
-        /// <summary>Called by VContainer after all dependencies are injected.</summary>
-        public void Initialize() { /* no-op; wave configs supplied via Initialize(list) */ }
+        /// <summary>
+        /// Called by VContainer after all dependencies are injected.
+        /// Bootstraps a hardcoded demo wave. Replace with data-driven configs when ready.
+        /// </summary>
+        public void Initialize()
+        {
+            var demoWaves = new List<WaveConfig>
+            {
+                new WaveConfig
+                {
+                    waveName     = "Wave 1",
+                    startDelay   = 2f,
+                    spawnEntries = new List<SpawnEntry>
+                    {
+                        new SpawnEntry { enemyID = "unit_champion_boar", count = 5,  intervalBetweenSpawns = 1.0f, pathIndex = 0 },
+                    }
+                },
+                new WaveConfig
+                {
+                    waveName     = "Wave 2",
+                    startDelay   = 1f,
+                    spawnEntries = new List<SpawnEntry>
+                    {
+                        new SpawnEntry { enemyID = "unit_champion_boar", count = 8,  intervalBetweenSpawns = 0.8f, pathIndex = 0 },
+                    }
+                },
+                new WaveConfig
+                {
+                    waveName     = "Wave 3 — Boss",
+                    startDelay   = 1f,
+                    spawnEntries = new List<SpawnEntry>
+                    {
+                        new SpawnEntry { enemyID = "unit_champion_boar", count = 10, intervalBetweenSpawns = 0.6f, pathIndex = 0 },
+                    }
+                },
+            };
+
+            Initialize(demoWaves);
+            Debug.Log($"[WaveManager] Initialized with {TotalWaves} demo waves.");
+        }
 
         // ── IWaveManager ──────────────────────────────────────────────────────────
 
         public void Initialize(IReadOnlyList<WaveConfig> waveConfigs)
         {
-            _waveConfigs     = waveConfigs;
-            TotalWaves       = waveConfigs.Count;
+            _waveConfigs = waveConfigs;
+            TotalWaves = waveConfigs.Count;
             CurrentWaveIndex = 0;
-            IsWaveRunning    = false;
+            IsWaveRunning = false;
             _enemiesRemaining = 0;
         }
-
+        public void Start()
+        {
+            StartNextWave();
+        }
         public void StartNextWave()
         {
             if (IsWaveRunning)
