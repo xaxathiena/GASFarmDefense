@@ -153,7 +153,20 @@ namespace Abel.TowerDefense.EditorTools
         private void DrawProfileSettings()
         {
             Undo.RecordObject(database, "Modify Profile");
+            
+            // --- THÊM CHỨC NĂNG COPY TẠI ĐÂY ---
+            EditorGUILayout.BeginHorizontal();
             GUILayout.Label($"Editing: {selectedProfile.unitID}", EditorStyles.boldLabel);
+            
+            // Nút Copy
+            if (GUILayout.Button("Copy ID", EditorStyles.miniButton, GUILayout.Width(60)))
+            {
+                EditorGUIUtility.systemCopyBuffer = selectedProfile.unitID;
+                Debug.Log($"[Unit Render Manager] Copied '{selectedProfile.unitID}' to clipboard!");
+            }
+            EditorGUILayout.EndHorizontal();
+            // ----------------------------------
+
             EditorGUILayout.Space(5);
 
             // --- PREFIX & IDENTITY SYSTEM ---
