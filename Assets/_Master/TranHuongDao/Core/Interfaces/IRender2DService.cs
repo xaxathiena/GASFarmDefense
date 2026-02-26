@@ -41,5 +41,11 @@ namespace Abel.TranHuongDao.Core
         /// <paramref name="animIndex"/> maps to the index inside UnitAnimData.animations list.
         /// </summary>
         void SetAnimationState(string unitID, int instanceID, int animIndex, float playSpeed = 1f);
+
+        /// <summary>
+        /// Push a new normalized HP value [0..1] for a registered instance.
+        /// Call ONLY when HP changes (event-driven), not every frame.
+        /// </summary>
+        void SetHpPercent(string unitID, int instanceID, float hpPercent);
     }
 }

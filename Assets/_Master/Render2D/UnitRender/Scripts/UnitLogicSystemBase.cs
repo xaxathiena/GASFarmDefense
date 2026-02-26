@@ -92,11 +92,13 @@ namespace Abel.TowerDefense.Core
                 syncBuffers[entity.UnitID].Add(new UnitSyncData
                 {
                     instanceID = entity.GetInstanceID(),
-                    position = entity.Position,
-                    rotation = entity.Rotation,
-                    scale = entity.Scale,
-                    animIndex = currentAnimIndex,
-                    playSpeed = entity.PlaySpeed
+                    position   = entity.Position,
+                    rotation   = entity.Rotation,
+                    scale      = entity.Scale,
+                    animIndex  = currentAnimIndex,
+                    playSpeed  = entity.PlaySpeed,
+                    // Forward normalized HP so the render system can draw the health bar.
+                    hpPercent  = entity.HpPercent
                 });
             }
 

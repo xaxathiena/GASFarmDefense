@@ -186,6 +186,21 @@ namespace Abel.TranHuongDao.Core
             buf.Dirty      = true;
         }
 
+        /// <summary>
+        /// Write a new normalized HP value into the sync buffer.
+        /// Called only when HP changes (event-driven) — zero per-frame overhead at full health.
+        /// </summary>
+        public void SetHpPercent(string unitID, int instanceID, float hpPercent)
+        {
+            if (!_buffers.TryGetValue(unitID, out var buf)) return;
+            if (!buf.InstanceToSlot.TryGetValue(instanceID, out int slot)) return;
+
+            var s        = buf.Data[slot];
+            s.hpPercent  = hpPercent < 0f ? 0f : (hpPercent > 1f ? 1f : hpPercent); // Clamp without Mathf
+            buf.Data[slot] = s;
+            buf.Dirty      = true;
+        }
+
         // ── Private helpers ───────────────────────────────────────────────────────
 
         private TypeBuffer GetOrCreateBuffer(string unitID)
@@ -214,6 +229,7 @@ namespace Abel.TranHuongDao.Core
                 scale      = scale,
                 animIndex  = 0,
                 playSpeed  = 1f,
+                hpPercent  = 1f, // Newly spawned units start at full health.
             };
     }
 }

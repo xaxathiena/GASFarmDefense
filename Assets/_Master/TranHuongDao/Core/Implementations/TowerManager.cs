@@ -15,7 +15,7 @@ namespace Abel.TranHuongDao.Core
     ///
     /// Registered as ITickable + IStartable + IDisposable via RegisterEntryPoint.
     /// </summary>
-    public class TowerManager : ITowerManager, ITowerSpawner, ITickable, IStartable, IDisposable
+    public class TowerManager : ITowerManager, ITowerSpawner, ITickable, IDisposable
     {
         // ── Dependencies ─────────────────────────────────────────────────────────
         private readonly IObjectResolver container;
@@ -43,25 +43,6 @@ namespace Abel.TranHuongDao.Core
         // ── Counters ─────────────────────────────────────────────────────────────
         public int ActiveTowerCount => activeTowers.Count;
 
-        // ── Hardcoded initial positions ──────────────────────────────────────────
-        private static readonly (string id, Vector3 position, float health)[] InitialTowers =
-        {
-            ("unit_championgalahad", new Vector3( 0f, 0f,  5f), 500f),
-            ("unit_championgalahad", new Vector3( 5f, 0f,  0f), 500f),
-            ("unit_championgalahad", new Vector3(-5f, 0f,  0f), 500f),
-            ("unit_championgalahad", new Vector3(-10f, 0f,  0f), 500f),
-            ("unit_championgalahad", new Vector3( 0f, 0f, -5f), 500f),
-            ("unit_championgalahad", new Vector3(10f, 0f, 0f), 500f),
-            ("unit_championgalahad", new Vector3(0f, 0f, 10f), 500f),
-            ("unit_championgalahad", new Vector3(5f, 0f, 5f), 500f),
-            ("unit_championgalahad", new Vector3(-5f, 0f, 5f), 500f),
-            ("unit_championgalahad", new Vector3(5f, 0f, -5f), 500f),
-            ("unit_championgalahad", new Vector3(-5f, 0f, -5f), 500f),
-            ("unit_championgalahad", new Vector3(10f, 0f, 5f), 500f),
-            ("unit_championgalahad", new Vector3(-10f, 0f, 5f), 500f),
-
-        };
-
         // ─────────────────────────────────────────────────────────────────────────
         public TowerManager(
             IObjectResolver container,
@@ -72,15 +53,6 @@ namespace Abel.TranHuongDao.Core
             this.renderService = renderService;
             this.normalAttackData = normalAttackData;
             this.instanceIDService = instanceIDService;
-        }
-
-        // ── VContainer entry points ──────────────────────────────────────────────
-
-        public void Start()
-        {
-            Debug.Log("[TowerManager] Spawning initial towers.");
-            foreach (var (id, pos, hp) in InitialTowers)
-                SpawnTowerInternal(id, pos, hp);
         }
 
         public void Tick()

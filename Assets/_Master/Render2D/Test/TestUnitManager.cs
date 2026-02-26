@@ -42,6 +42,8 @@ namespace Abel.TowerDefense.Test
             public float Scale => scale;
             public UnitState CurrentState => currentState;
             public float PlaySpeed => 1.0f;
+            // Placeholder: always full HP for simulation. Replace with real HP / maxHP when available.
+            public float HpPercent => 1.0f;
             public int GetInstanceID() => instanceID;
 
             public string GetUnitInfo()

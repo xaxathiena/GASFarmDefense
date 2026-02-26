@@ -21,43 +21,41 @@ MonoBehaviour:
   units:
   - unitID: unit_championgalahad
     maxCapacity: 10000
-    logicTypeAQN: Abel.TowerDefense.Logic.SimpleLoopGroup, Assembly-CSharp, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: a99cded1462b4c646b36d020b4257ecc, type: 2}
     animData: {fileID: 11400000, guid: 9de97d90ac5ad344cb039786f03a2574, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
+    showHealthBar: 1
   - unitID: unit_rookie_king_arthur
     maxCapacity: 500
-    logicTypeAQN: Abel.TowerDefense.Logic.EnemyFollowingGroup, Assembly-CSharp, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
     animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
+    showHealthBar: 1
   - unitID: Enemyrookie_king_arthur
     maxCapacity: 1000
-    logicTypeAQN: 
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
     animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
+    showHealthBar: 1
   - unitID: unit_champion_boar
     maxCapacity: 10000
-    logicTypeAQN: 
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 94f9f14d71f600645b0d848e6e3f75db, type: 2}
     animData: {fileID: 11400000, guid: 572def7995f841641aa32b47a52e082c, type: 2}
-    baseMoveSpeed: 5
+    baseMoveSpeed: 1
     baseAttackSpeed: 1
+    showHealthBar: 1
   - unitID: bullet_normal
     maxCapacity: 1000
-    logicTypeAQN: 
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: a2673828acfc64c78b623b1c2095ff63, type: 2}
     animData: {fileID: 11400000, guid: 3b6da8f1d2d98444693c05a2764119cd, type: 2}
     baseMoveSpeed: 10
     baseAttackSpeed: 1
+    showHealthBar: 0

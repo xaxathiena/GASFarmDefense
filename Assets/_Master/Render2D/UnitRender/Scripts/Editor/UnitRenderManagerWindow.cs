@@ -153,11 +153,11 @@ namespace Abel.TowerDefense.EditorTools
         private void DrawProfileSettings()
         {
             Undo.RecordObject(database, "Modify Profile");
-            
+
             // --- THÊM CHỨC NĂNG COPY TẠI ĐÂY ---
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label($"Editing: {selectedProfile.unitID}", EditorStyles.boldLabel);
-            
+
             // Nút Copy
             if (GUILayout.Button("Copy ID", EditorStyles.miniButton, GUILayout.Width(60)))
             {
@@ -181,6 +181,7 @@ namespace Abel.TowerDefense.EditorTools
             selectedProfile.mesh = (Mesh)EditorGUILayout.ObjectField("Mesh", selectedProfile.mesh, typeof(Mesh), false);
             selectedProfile.baseMaterial = (Material)EditorGUILayout.ObjectField("Material", selectedProfile.baseMaterial, typeof(Material), false);
             selectedProfile.animData = (UnitAnimData)EditorGUILayout.ObjectField("Anim Data", selectedProfile.animData, typeof(UnitAnimData), false);
+            selectedProfile.showHealthBar = EditorGUILayout.Toggle("Show Health Bar", selectedProfile.showHealthBar);
 
             EditorGUILayout.Space();
             GUILayout.Label("Stats", EditorStyles.boldLabel);

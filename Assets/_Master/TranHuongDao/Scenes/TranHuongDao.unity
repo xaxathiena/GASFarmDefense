@@ -323,8 +323,6 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -346,7 +344,6 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
@@ -429,7 +426,7 @@ MonoBehaviour:
   gameDatabase: {fileID: 11400000, guid: 075250bc06b88f14ab634d7483ff73ca, type: 2}
   gameManager: {fileID: 2002587549}
   unitDebugger: {fileID: 2002587548}
-  showUnitDebugger: 1
+  showUnitDebugger: 0
   towerNormalAttackData: {fileID: 11400000, guid: d47fb2eb6a3634c4eb1ec5c512ebfc96, type: 2}
   towerBuilderConfigSO: {fileID: 11400000, guid: c68605544dab9c3439ab377c3cec3463, type: 2}
   mapLayoutManager: {fileID: 2061553634}
@@ -517,8 +514,6 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -540,7 +535,6 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -870,6 +864,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UnitRender
       objectReference: {fileID: 0}
+    - target: {fileID: 7271351828700597938, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
+      propertyPath: hpQuadMesh
+      value: 
+      objectReference: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 7271351828700597938, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
+      propertyPath: defaultHPMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 5787c9db8388f3749afde3874f7a6263, type: 2}
     - target: {fileID: 7694320117742002331, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.8

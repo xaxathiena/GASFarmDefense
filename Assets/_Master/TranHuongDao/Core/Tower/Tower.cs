@@ -46,6 +46,9 @@ namespace Abel.TranHuongDao.Core
         // TryActivateAbility is guarded by GAS cooldown, but we poll this every frame.
         // No extra throttle needed; the cooldown defined in TDTowerNormalAttackData drives the rate.
 
+        // Cached max-health inverse: avoids a division every time HP changes.
+        private float maxHealthInverse;
+
         // ─────────────────────────────────────────────────────────────────────────
         public Tower(AbilitySystemComponent asc)
         {
@@ -80,7 +83,13 @@ namespace Abel.TranHuongDao.Core
             attributeSet.FullRestore();
             asc.InitializeAttributeSet(attributeSet);
 
-            // Grant the NormalAttack ability so the ASC can activate it
+            // Cache the reciprocal once so HP changes only cost a multiply, not a divide.
+            maxHealthInverse = maxHealth > 0f ? 1f / maxHealth : 1f;
+
+            // Subscribe so HP changes are forwarded to the render pipeline automatically.
+            attributeSet.Health.OnValueChanged += HandleHealthValueChanged;
+
+            // Grant the NormalAttack ability so the ASC can activate it.
             if (normalAttackData != null)
                 asc.GiveAbility(normalAttackData);
 
@@ -105,6 +114,8 @@ namespace Abel.TranHuongDao.Core
         /// <summary>Remove render layer and proxy Transform. Called by TowerManager.</summary>
         public void Cleanup()
         {
+            attributeSet.Health.OnValueChanged -= HandleHealthValueChanged;
+
             if (renderInitialized)
             {
                 renderService.RemoveRender(TowerID, InstanceID);
@@ -127,6 +138,13 @@ namespace Abel.TranHuongDao.Core
             // TryActivateAbility internally calls IAbilityBehaviour.CanActivate first.
             // The TowerAttackAbilityBehaviour will query IEnemyManager for closest target.
             asc.TryActivateAbility(normalAttackData);
+        }
+
+        private void HandleHealthValueChanged(float oldValue, float newValue)
+        {
+            // Event-driven: called only when HP changes, never every frame.
+            if (renderInitialized)
+                renderService.SetHpPercent(TowerID, InstanceID, newValue * maxHealthInverse);
         }
     }
 }

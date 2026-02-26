@@ -16,5 +16,7 @@ namespace Abel.TowerDefense.Core
         float Scale { get; }
         UnitState CurrentState { get; }
         float PlaySpeed { get; }
+        // Normalized health value [0.0 .. 1.0]; used by HealthBarBatchRenderer each frame.
+        float HpPercent { get; }
     }
 }

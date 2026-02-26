@@ -11,25 +11,38 @@ namespace Abel.TowerDefense.Render
     {
         public readonly int MaxCapacity;
 
-        // Mảng nội bộ của Render để duy trì Animation Timer
+        // Internal render data array – persists between frames to keep animTimer state.
         private NativeArray<UnitRenderData> renderData;
         private UnitBatchRenderer batchRenderer;
-    
-        public RenderGroup(UnitRenderProfileData profile)
+        private HealthBarBatchRenderer hpBatchRenderer;
+
+        /// <summary>
+        /// Creates a RenderGroup for one unit type.
+        /// </summary>
+        /// <param name="profile">Sprite/animation profile for this unit type.</param>
+        /// <param name="hpQuadMesh">Shared quad mesh used for all health bars.</param>
+        /// <param name="hpMaterial">Material that reads _HPPercent and draws the health bar.</param>
+        public RenderGroup(UnitRenderProfileData profile, UnityEngine.Mesh hpQuadMesh, UnityEngine.Material hpMaterial)
         {
             this.MaxCapacity = profile.maxCapacity;
             renderData = new NativeArray<UnitRenderData>(this.MaxCapacity, Allocator.Persistent);
             batchRenderer = new UnitBatchRenderer(profile, this.MaxCapacity);
+            if (profile.showHealthBar)
+            {
+
+                hpBatchRenderer = new HealthBarBatchRenderer(hpQuadMesh, hpMaterial, this.MaxCapacity);
+            }
         }
 
         /// <summary>
-        /// Hàm này được System A gọi mỗi frame.
+        /// Called every frame by the Logic system (System A).
+        /// Runs the sync job, then issues both the unit draw call and the health-bar draw call.
         /// </summary>
         public void SyncAndRender(NativeArray<UnitSyncData> incomingData, int activeCount, float dt)
         {
             if (activeCount == 0) return;
 
-            // Job: Copy Data từ Logic sang Render + Tính toán Animation
+            // Job: copy position/anim/hp data from the logic buffer into the render buffer.
             var syncJob = new SyncAndAnimateJob
             {
                 dt = dt,
@@ -39,14 +52,18 @@ namespace Abel.TowerDefense.Render
 
             syncJob.Schedule(activeCount, 64).Complete();
 
-            // Vẽ lên màn hình
+            // Draw unit sprites.
             batchRenderer.Render(renderData, activeCount);
+
+            // Draw health bars only if this unit type has them enabled.
+            hpBatchRenderer?.Render(renderData, activeCount);
         }
 
         public void Dispose()
         {
             if (renderData.IsCreated) renderData.Dispose();
             if (batchRenderer != null) batchRenderer.Dispose();
+            if (hpBatchRenderer != null) hpBatchRenderer.Dispose();
         }
         /// <summary>
         /// Finds the index of a unit within a specific radius. Returns -1 if not found.
@@ -90,29 +107,33 @@ namespace Abel.TowerDefense.Render
             public void Execute(int i)
             {
                 var sync = inData[i];
-                var render = outRenderData[i]; // Lấy render data cũ để giữ lại animTimer
-                render.instanceID = sync.instanceID;
-                // 1. Cập nhật vị trí, góc xoay từ Logic
-                render.instanceID = sync.instanceID; // Required for UnitDebugger click selection
+                // Preserve the previous render state so animTimer survives between frames.
+                var render = outRenderData[i];
+
+                // 1. Copy transform data from the logic buffer.
+                render.instanceID = sync.instanceID; // Required for UnitDebugger click selection.
                 render.position = sync.position;
                 render.rotation = sync.rotation;
                 render.scale = sync.scale;
                 render.playSpeed = sync.playSpeed;
 
-                // 2. Logic Animation Timer
+                // 2. Copy normalized health so the health-bar renderer can read it directly.
+                render.hpPercent = sync.hpPercent;
+
+                // 3. Animation timer: reset on state transition, accumulate otherwise.
                 if (render.animIndex != sync.animIndex)
                 {
-                    // Logic vừa đổi state (VD: Idle sang Attack) -> Reset timer
+                    // The logic system changed the animation state – restart from the beginning.
                     render.animIndex = sync.animIndex;
                     render.animTimer = 0f;
                 }
                 else
                 {
-                    // Vẫn state cũ -> Tăng thời gian
+                    // Same state – advance the timer.
                     render.animTimer += dt;
                 }
 
-                // 3. Lưu lại
+                // Write result back to the persistent render buffer.
                 outRenderData[i] = render;
             }
         }

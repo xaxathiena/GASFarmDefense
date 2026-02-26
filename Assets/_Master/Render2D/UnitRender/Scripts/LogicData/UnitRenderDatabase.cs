@@ -21,10 +21,6 @@ namespace Abel.TowerDefense.Config
         [Tooltip("Maximum number of active units of this type at the same time.")]
         public int maxCapacity = 1000; // Default is 1000
         [Header("Logic Configuration")]
-        // Lưu tên đầy đủ của class (Assembly Qualified Name) để Reflection tìm ra
-        [HideInInspector] public string logicTypeAQN;
-        // // Tên ngắn gọn để hiện lên Editor cho đẹp
-        // [HideInInspector] public string logicDisplayName;
 
         [Header("Visual Resources")]
         public Mesh mesh;
@@ -33,7 +29,10 @@ namespace Abel.TowerDefense.Config
 
         public float baseMoveSpeed = 5.0f;
         public float baseAttackSpeed = 1.0f;
-        // Hàm tiện ích để tra cứu nhanh
+
+        [Header("Health Bar")]
+        [Tooltip("Enable to render a health bar above this unit type. Disable for projectiles, FX, etc.")]
+        public bool showHealthBar = true;
         public int GetAnimIndex(UnitState state)
         {
             var animIndex = animData.animations.FindIndex(i => i.animName == state.ToString());
@@ -48,7 +47,6 @@ namespace Abel.TowerDefense.Config
         public List<string> definedPrefixes = new List<string> { "unit_", "bullet_", "effect_", "weapon_" };
         public List<UnitRenderProfileData> units = new List<UnitRenderProfileData>();
 
-        // Helper lấy data theo ID
         public UnitRenderProfileData GetUnitByID(string id)
         {
             return units.Find(u => u.unitID == id);

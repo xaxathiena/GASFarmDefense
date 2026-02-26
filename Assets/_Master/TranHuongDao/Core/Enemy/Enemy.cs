@@ -39,6 +39,9 @@ namespace Abel.TranHuongDao.Core
         private IRender2DService renderService;
         private bool             renderInitialized;
 
+        // Cached max-health inverse: avoids a division every time HP changes.
+        private float maxHealthInverse;
+
         // ── Path following ───────────────────────────────────────────────────────
         private IReadOnlyList<Vector3> path;
         private int   waypointIndex;
@@ -95,8 +98,12 @@ namespace Abel.TranHuongDao.Core
             attributeSet.FullRestore();                                  // sets Health to MaxHealth
             asc.InitializeAttributeSet(attributeSet);
 
-            // Subscribe AFTER InitializeAttributeSet so the ASC owner pointer is valid
-            attributeSet.OnHealthDepleted += HandleHealthDepleted;
+            // Cache the reciprocal once so HP changes only cost a multiply, not a divide.
+            maxHealthInverse = maxHealth > 0f ? 1f / maxHealth : 1f;
+
+            // Subscribe AFTER InitializeAttributeSet so the ASC owner pointer is valid.
+            attributeSet.OnHealthDepleted   += HandleHealthDepleted;
+            attributeSet.Health.OnValueChanged += HandleHealthValueChanged;
 
             // ── Render ─────────────────────────────────────────────────────────
             renderService.RenderUnit(EnemyID, InstanceID, Position, Rotation);
@@ -127,7 +134,8 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         public void Cleanup()
         {
-            attributeSet.OnHealthDepleted -= HandleHealthDepleted;
+            attributeSet.OnHealthDepleted              -= HandleHealthDepleted;
+            attributeSet.Health.OnValueChanged         -= HandleHealthValueChanged;
 
             if (renderInitialized)
             {
@@ -171,9 +179,16 @@ namespace Abel.TranHuongDao.Core
             }
         }
 
+        private void HandleHealthValueChanged(float oldValue, float newValue)
+        {
+            // Event-driven: called only when HP changes, never every frame.
+            if (renderInitialized)
+                renderService.SetHpPercent(EnemyID, InstanceID, newValue * maxHealthInverse);
+        }
+
         private void HandleHealthDepleted()
         {
-            // Unsubscribe immediately so this fires only once
+            // Unsubscribe immediately so this fires only once.
             attributeSet.OnHealthDepleted -= HandleHealthDepleted;
             OnDeath?.Invoke(this);
         }

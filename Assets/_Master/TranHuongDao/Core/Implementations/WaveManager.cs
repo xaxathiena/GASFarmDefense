@@ -57,7 +57,7 @@ namespace Abel.TranHuongDao.Core
                     startDelay   = 2f,
                     spawnEntries = new List<SpawnEntry>
                     {
-                        new SpawnEntry { enemyID = "unit_champion_boar", count = 5,  intervalBetweenSpawns = 1.0f, pathIndex = 0 },
+                        new SpawnEntry { enemyID = "unit_champion_boar", count = 1000,  intervalBetweenSpawns = 0.1f, pathIndex = 0 },
                     }
                 },
                 new WaveConfig
@@ -66,7 +66,7 @@ namespace Abel.TranHuongDao.Core
                     startDelay   = 1f,
                     spawnEntries = new List<SpawnEntry>
                     {
-                        new SpawnEntry { enemyID = "unit_champion_boar", count = 8,  intervalBetweenSpawns = 0.8f, pathIndex = 0 },
+                        new SpawnEntry { enemyID = "unit_champion_boar", count = 1000,  intervalBetweenSpawns = 0.1f, pathIndex = 0 },
                     }
                 },
                 new WaveConfig
@@ -75,7 +75,7 @@ namespace Abel.TranHuongDao.Core
                     startDelay   = 1f,
                     spawnEntries = new List<SpawnEntry>
                     {
-                        new SpawnEntry { enemyID = "unit_champion_boar", count = 10, intervalBetweenSpawns = 0.6f, pathIndex = 0 },
+                        new SpawnEntry { enemyID = "unit_champion_boar", count = 1000, intervalBetweenSpawns = 0.1f, pathIndex = 0 },
                     }
                 },
             };
