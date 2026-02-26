@@ -816,7 +816,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 521548087131381273, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.9389
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 521548087131381273, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: m_LocalPosition.y
@@ -824,7 +824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 521548087131381273, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.5943
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 521548087131381273, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: m_LocalRotation.w
@@ -869,6 +869,18 @@ PrefabInstance:
     - target: {fileID: 2644642202465938452, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: m_Name
       value: UnitRender
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694320117742002331, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694320117742002331, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7694320117742002331, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -931,10 +943,16 @@ MonoBehaviour:
   cellSize: 1
   originPosition: {x: 0, y: 0, z: 0}
   enemyPathWaypoints:
-  - {x: 0, y: 1, z: 0}
-  - {x: 0, y: 2, z: 0}
-  - {x: 0, y: 3, z: 0}
-  - {x: 0, y: 11.03, z: 0}
+  - {x: 2, y: 10, z: 0}
+  - {x: 2, y: 6, z: 0}
+  - {x: 15, y: 6, z: 0}
+  - {x: 15, y: 10, z: 0}
+  - {x: 9, y: 10, z: 0}
+  - {x: 9, y: 0, z: 0}
+  - {x: 15, y: 0, z: 0}
+  - {x: 15, y: 4, z: 0}
+  - {x: 2, y: 4, z: 0}
+  - {x: 2, y: 0, z: 0}
 --- !u!4 &2061553635
 Transform:
   m_ObjectHideFlags: 0
