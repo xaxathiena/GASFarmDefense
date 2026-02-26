@@ -23,14 +23,14 @@ namespace Abel.TranHuongDao.Core
 
         // ── Dependencies ──────────────────────────────────────────────────────────
         private readonly IEnemyManager _enemyManager;
-        private readonly IMapManager _mapManager;
+        private readonly IMapLayoutManager _mapManager;
 
         // ── Internal ──────────────────────────────────────────────────────────────
         private IReadOnlyList<WaveConfig> _waveConfigs;
         private int _enemiesRemaining;
 
         // ── Constructor ───────────────────────────────────────────────────────────
-        public WaveManager(IEnemyManager enemyManager, IMapManager mapManager)
+        public WaveManager(IEnemyManager enemyManager, IMapLayoutManager mapManager)
         {
             _enemyManager = enemyManager;
             _mapManager = mapManager;
@@ -121,7 +121,7 @@ namespace Abel.TranHuongDao.Core
                     if (entry != null) _enemiesRemaining += entry.count;
 
             // Delegate spawning to EnemyManager
-            var paths = _mapManager.GetPaths();
+            var paths = _mapManager.GetEnemyPath();
             _enemyManager.BeginWave(config, paths);
 
             IsWaveRunning = true;

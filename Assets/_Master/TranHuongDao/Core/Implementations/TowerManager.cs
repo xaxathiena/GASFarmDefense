@@ -15,7 +15,7 @@ namespace Abel.TranHuongDao.Core
     ///
     /// Registered as ITickable + IStartable + IDisposable via RegisterEntryPoint.
     /// </summary>
-    public class TowerManager : ITowerManager, ITickable, IStartable, IDisposable
+    public class TowerManager : ITowerManager, ITowerSpawner, ITickable, IStartable, IDisposable
     {
         // ── Dependencies ─────────────────────────────────────────────────────────
         private readonly IObjectResolver container;
@@ -135,6 +135,16 @@ namespace Abel.TranHuongDao.Core
         }
 
         public bool IsCellAvailable(Vector3 gridPosition) => !occupiedCells.Contains(gridPosition);
+
+        // ── ITowerSpawner ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Spawns a tower without re-checking cell availability.
+        /// The caller (e.g. TowerDragDropManager) is responsible for validating
+        /// via CanBuildAt and marking the cell with SetCellState before calling this.
+        /// </summary>
+        public void SpawnTower(string unitID, Vector3 position)
+            => SpawnTowerInternal(unitID, position, 500f);
 
         // ── Private helpers ──────────────────────────────────────────────────────
 

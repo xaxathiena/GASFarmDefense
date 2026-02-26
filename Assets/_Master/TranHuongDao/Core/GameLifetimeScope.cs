@@ -20,6 +20,18 @@ namespace Abel.TranHuongDao.Core
         [Header("Tower Abilities")]
         [SerializeField] private TDTowerNormalAttackData towerNormalAttackData;
 
+        // ── Tower builder config (drag the TowerBuilderConfigSO asset here) ─────
+        [Header("Tower Builder")]
+        [SerializeField] private TowerBuilderConfigSO towerBuilderConfigSO;
+
+        // ── Map layout (place the MapLayoutManager MonoBehaviour in the scene) ────
+        [Header("Map Layout")]
+        [SerializeField] private MapLayoutManager mapLayoutManager;
+
+        // ── Drag-and-drop system (scene MonoBehaviour with the preview SpriteRenderer) ──
+        [Header("Tower Drag & Drop")]
+        [SerializeField] private TowerDragDropManager towerDragDropManager;
+
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder); // Registers Render2DService, GameRenderManager, UnitDebugger, and UnitRenderDatabase
@@ -54,15 +66,33 @@ namespace Abel.TranHuongDao.Core
             // ── Tower ability SO (ScriptableObject → RegisterInstance) ────────────
             builder.RegisterInstance(towerNormalAttackData);
 
+            // ── Tower builder config — inject the inner plain-data class directly ──
+            // RegisterInstance pins the already-created TowerBuilderConfig value so any
+            // class that declares a constructor parameter of type TowerBuilderConfig
+            // will receive this instance automatically.
+            builder.RegisterInstance(towerBuilderConfigSO.config);
+
             // ── Game Systems ──────────────────────────────────────────────────────
-            builder.RegisterEntryPoint<MapManager>(Lifetime.Singleton).As<IMapManager>();
-            
+            // MapLayoutManager is a MonoBehaviour; use RegisterComponent to bind the
+            // scene instance so VContainer injects it as both interface types.
+            // Single MapLayoutManager instance satisfies all map-related contracts.
+            builder.RegisterComponent(mapLayoutManager)
+                   .As<IMapLayoutManager>();
+
+            // TowerDragDropManager is a MonoBehaviour; RegisterComponent + As<ITickable>
+            // ensures VContainer calls its Tick() every frame via the PlayerLoop.
+            // VContainer also calls [Inject] Construct() to supply IMapLayoutManager.
+            builder.RegisterComponent(towerDragDropManager)
+                   .As<ITickable>();
 
             // EnemyManager: ITickable + IStartable + IDisposable exposed as IEnemyManager
             builder.RegisterEntryPoint<EnemyManager>(Lifetime.Singleton).As<IEnemyManager>();
 
-            // TowerManager: ITickable + IStartable + IDisposable exposed as ITowerManager
-            builder.RegisterEntryPoint<TowerManager>(Lifetime.Singleton).As<ITowerManager>();
+            // TowerManager: also exposed as ITowerSpawner so TowerDragDropManager can
+            // call SpawnTower() without depending on the full ITowerManager contract.
+            builder.RegisterEntryPoint<TowerManager>(Lifetime.Singleton)
+                   .As<ITowerManager>()
+                   .As<ITowerSpawner>();
 
             // BulletManager: ITickable + IDisposable exposed as IBulletManager
             builder.RegisterEntryPoint<BulletManager>(Lifetime.Singleton).As<IBulletManager>();

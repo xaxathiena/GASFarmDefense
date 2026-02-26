@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be754ac30361c4c8b837aabfcde3e2da, type: 3}
-  m_Name: Bullets_Data
+  m_Name: bullet_normal_Data
   m_EditorClassIdentifier: Assembly-CSharp::UnitAnimData
   textureArray: {fileID: 18700000, guid: e01618bd1e99848cbb854faaed3d79ea, type: 2}
   animations:
@@ -21,4 +21,5 @@ MonoBehaviour:
     duration: 1
     loop: 1
     speedModifier: 1
-    scale: 0
+    scale: 0.3
+    aspectRatio: 1
