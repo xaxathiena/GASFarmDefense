@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using Abel.TowerDefense.Config;
 
 /// <summary>
 /// Spine Baker PRO (Full Options)
@@ -18,17 +19,17 @@ public class SpineBakerPro : EditorWindow
 
     // --- OUTPUT CONFIGURATION ---
     public enum OutputSize { _512 = 512, _256 = 256, _128 = 128 }
-    private OutputSize targetSize = OutputSize._256; 
+    private OutputSize targetSize = OutputSize._256;
 
-    public enum CompressionType 
-    { 
-        PC_High_BC7 = TextureFormat.BC7, 
-        PC_Normal_DXT5 = TextureFormat.DXT5, 
-        Mobile_High_ASTC = TextureFormat.ASTC_6x6, 
+    public enum CompressionType
+    {
+        PC_High_BC7 = TextureFormat.BC7,
+        PC_Normal_DXT5 = TextureFormat.DXT5,
+        Mobile_High_ASTC = TextureFormat.ASTC_6x6,
         Mobile_Fast_ETC2 = TextureFormat.ETC2_RGBA8,
         Uncompressed_RGBA32 = TextureFormat.RGBA32
     }
-    private CompressionType compression = CompressionType.Uncompressed_RGBA32; 
+    private CompressionType compression = CompressionType.Uncompressed_RGBA32;
 
     // --- NEW DEBUG OPTIONS ---
     private bool exportIndividualPNGs = false;
@@ -54,19 +55,23 @@ public class SpineBakerPro : EditorWindow
     {
         GameObject obj = Selection.activeGameObject;
         isValidSelection = false;
-        
-        if (obj == null) {
+
+        if (obj == null)
+        {
             statusMessage = "No object selected."; statusType = MessageType.Info; return;
         }
         Animator anim = obj.GetComponent<Animator>();
-        if (anim == null) {
+        if (anim == null)
+        {
             statusMessage = "Error: Object is missing Animator!"; statusType = MessageType.Error; return;
         }
-        if (anim.runtimeAnimatorController == null || anim.runtimeAnimatorController.animationClips.Length == 0) {
+        if (anim.runtimeAnimatorController == null || anim.runtimeAnimatorController.animationClips.Length == 0)
+        {
             statusMessage = "Error: Animator has no Clips!"; statusType = MessageType.Warning; return;
         }
         Camera cam = GameObject.Find("BakingCam")?.GetComponent<Camera>();
-        if (cam == null) {
+        if (cam == null)
+        {
             statusMessage = "Critical Error: 'BakingCam' is missing!"; statusType = MessageType.Error; return;
         }
 
@@ -78,20 +83,23 @@ public class SpineBakerPro : EditorWindow
     void OnGUI()
     {
         GUILayout.Space(10);
-        if (isValidSelection) {
+        if (isValidSelection)
+        {
             GUI.backgroundColor = new Color(0.6f, 1f, 0.6f);
             EditorGUILayout.HelpBox(statusMessage, MessageType.Info);
             GUI.backgroundColor = Color.white;
-        } else {
+        }
+        else
+        {
             EditorGUILayout.HelpBox(statusMessage, statusType);
         }
 
         GUILayout.Space(10);
-        
+
         GUILayout.Label("1. ANIMATION CONFIGURATION", EditorStyles.boldLabel);
         GUILayout.BeginVertical("box");
         targetFPS = EditorGUILayout.Slider("FPS (Smoothness)", targetFPS, 1, 60);
-        EditorGUILayout.LabelField("Storage size:", $"{(targetFPS/30f)*100:F0}% compared to original", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField("Storage size:", $"{(targetFPS / 30f) * 100:F0}% compared to original", EditorStyles.miniLabel);
         GUILayout.Space(5);
         useManualPosition = EditorGUILayout.ToggleLeft("Keep Original Position", useManualPosition);
         if (!useManualPosition) yOffset = EditorGUILayout.FloatField("Lower Unit (Y)", yOffset);
@@ -104,10 +112,10 @@ public class SpineBakerPro : EditorWindow
         GUILayout.BeginVertical("box");
         targetSize = (OutputSize)EditorGUILayout.EnumPopup("Texture Size:", targetSize);
         compression = (CompressionType)EditorGUILayout.EnumPopup("Compression:", compression);
-        
+
         GUILayout.Space(5);
         exportIndividualPNGs = EditorGUILayout.ToggleLeft("Export individual PNG frames (Debug)", exportIndividualPNGs);
-        if (exportIndividualPNGs) 
+        if (exportIndividualPNGs)
         {
             EditorGUILayout.HelpBox("Will create a folder 'Assets/BakedFrames/...' containing images.", MessageType.Warning);
         }
@@ -132,18 +140,19 @@ public class SpineBakerPro : EditorWindow
         Camera bakingCam = GameObject.Find("BakingCam").GetComponent<Camera>();
 
         int size = (int)targetSize;
-        
+
         if (bakingCam.targetTexture != null) bakingCam.targetTexture.Release();
         RenderTexture bakeRT = new RenderTexture(size, size, 24, RenderTextureFormat.ARGB32);
         bakingCam.targetTexture = bakeRT;
         bakingCam.clearFlags = CameraClearFlags.SolidColor;
-        bakingCam.backgroundColor = new Color(0,0,0,0); 
+        bakingCam.backgroundColor = new Color(0, 0, 0, 0);
 
         bool wasAnimatorEnabled = animator.enabled;
         animator.enabled = false;
         Vector3 originalPos = selected.transform.position;
         Quaternion originalRot = selected.transform.rotation;
-        if (!useManualPosition) {
+        if (!useManualPosition)
+        {
             selected.transform.position = new Vector3(0, -yOffset, 0);
             selected.transform.rotation = Quaternion.identity;
         }
@@ -159,7 +168,7 @@ public class SpineBakerPro : EditorWindow
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
 
         int totalFrames = 0;
-        foreach(var c in clips) totalFrames += Mathf.Max(1, Mathf.FloorToInt(c.length * targetFPS) + 1);
+        foreach (var c in clips) totalFrames += Mathf.Max(1, Mathf.FloorToInt(c.length * targetFPS) + 1);
 
         Debug.Log($"Starting Bake: {totalFrames} frames. Size: {size}. Format: {compression}");
 
@@ -173,7 +182,7 @@ public class SpineBakerPro : EditorWindow
         if (!AnimationMode.InAnimationMode())
             AnimationMode.StartAnimationMode();
 
-        try 
+        try
         {
             for (int i = 0; i < clips.Length; i++)
             {
@@ -181,7 +190,7 @@ public class SpineBakerPro : EditorWindow
                 int framesInClip = Mathf.Max(1, Mathf.FloorToInt(clip.length * targetFPS) + 1);
 
                 UnitAnimData.AnimInfo info = new UnitAnimData.AnimInfo();
-                info.animName = clip.name;
+                info.animState = ParseToAnimStateName(clip); // Default fallback
                 info.startFrame = currentSlice;
                 info.frameCount = framesInClip;
                 info.fps = targetFPS;
@@ -205,7 +214,7 @@ public class SpineBakerPro : EditorWindow
 
                     SceneView.RepaintAll();
                     UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-                    
+
                     SkinnedMeshRenderer[] skinRenderers = selected.GetComponentsInChildren<SkinnedMeshRenderer>();
                     foreach (var skr in skinRenderers)
                     {
@@ -223,7 +232,7 @@ public class SpineBakerPro : EditorWindow
                     Texture2D tempTex = new Texture2D(size, size, TextureFormat.RGBA32, false);
                     RenderTexture.active = bakeRT;
                     tempTex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
-                    
+
                     // 3. Process Pixels (Remove black outline)
                     Color[] pixels = tempTex.GetPixels();
                     for (int p = 0; p < pixels.Length; p++)
@@ -233,11 +242,11 @@ public class SpineBakerPro : EditorWindow
 
                         float maxRGB = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
                         if (maxRGB > vfxThreshold && c.a < maxRGB) { c.a = maxRGB; } // Fix VFX Glow
-                        
+
                         c.r = Mathf.Clamp01(c.r); c.g = Mathf.Clamp01(c.g); c.b = Mathf.Clamp01(c.b); c.a = Mathf.Clamp01(c.a);
                         pixels[p] = c;
                     }
-                    tempTex.SetPixels(pixels); 
+                    tempTex.SetPixels(pixels);
                     tempTex.Apply();
 
                     // --- EXPORT PNG IF NEEDED ---
@@ -252,7 +261,7 @@ public class SpineBakerPro : EditorWindow
                     {
                         EditorUtility.CompressTexture(tempTex, (TextureFormat)compression, TextureCompressionQuality.Best);
                     }
-                    
+
                     Graphics.CopyTexture(tempTex, 0, 0, textureArray, currentSlice, 0);
                     DestroyImmediate(tempTex);
 
@@ -262,16 +271,16 @@ public class SpineBakerPro : EditorWindow
 
             // 5. Finalize & Create Assets
             // 5. Finalize & Create Assets
-            textureArray.Apply(false, true); 
-            
+            textureArray.Apply(false, true);
+
             // --- CREATE FOLDER STRUCTURE ---
             string baseFolderPath = "Assets/BakedData";
             if (!Directory.Exists(baseFolderPath)) Directory.CreateDirectory(baseFolderPath);
-            
+
             // Target folder for this specific unit
             string targetFolderPath = $"{baseFolderPath}/{selectedName}";
             if (!Directory.Exists(targetFolderPath)) Directory.CreateDirectory(targetFolderPath);
-            
+
             // Save Texture Array
             string texPath = $"{targetFolderPath}/{selectedName}_Array.asset";
             AssetDatabase.CreateAsset(textureArray, texPath);
@@ -296,9 +305,9 @@ public class SpineBakerPro : EditorWindow
             UnitAnimData dataSO = ScriptableObject.CreateInstance<UnitAnimData>();
             dataSO.textureArray = textureArray;
             dataSO.animations = animDataList;
-            
+
             AssetDatabase.CreateAsset(dataSO, dataPath);
-            
+
             // Force Unity to save and recognize the newly created folders and files
             AssetDatabase.SaveAssets();
 
@@ -316,11 +325,11 @@ public class SpineBakerPro : EditorWindow
                 Selection.activeObject = dataSO;
                 EditorGUIUtility.PingObject(dataSO);
             }
-            
+
             string msg = "DONE!";
             if (exportIndividualPNGs) msg += $"\nExported frame images to: {pngFolderPath}";
             Debug.Log(msg);
-            
+
             if (exportIndividualPNGs) EditorUtility.RevealInFinder(pngFolderPath);
         }
         catch (System.Exception ex)
@@ -333,13 +342,32 @@ public class SpineBakerPro : EditorWindow
             EditorUtility.ClearProgressBar();
             bakingCam.targetTexture = null;
             bakeRT.Release();
-            
-            if (!useManualPosition) {
+
+            if (!useManualPosition)
+            {
                 selected.transform.position = originalPos;
                 selected.transform.rotation = originalRot;
             }
             animator.enabled = wasAnimatorEnabled;
             AssetDatabase.Refresh();
         }
+    }
+
+    private static UnitAnimState ParseToAnimStateName(AnimationClip clip)
+    {
+        return clip.name.ToLowerInvariant().Contains("idle") ? UnitAnimState.Idle :
+                                         clip.name.ToLowerInvariant().Contains("attack") ? UnitAnimState.Attack :
+                                         clip.name.ToLowerInvariant().Contains("move") ? UnitAnimState.Move :
+                                         clip.name.ToLowerInvariant().Contains("die") ? UnitAnimState.Die :
+                                            clip.name.ToLowerInvariant().Contains("castskill1") ? UnitAnimState.CastSkill1 :
+                                            clip.name.ToLowerInvariant().Contains("castskill2") ? UnitAnimState.CastSkill2 :
+                                            clip.name.ToLowerInvariant().Contains("castskill3") ? UnitAnimState.CastSkill3 :
+                                            clip.name.ToLowerInvariant().Contains("castskill4") ? UnitAnimState.CastSkill4 :
+                                            clip.name.ToLowerInvariant().Contains("castskill5") ? UnitAnimState.CastSkill5 :
+                                            clip.name.ToLowerInvariant().Contains("sprint") ? UnitAnimState.Sprint :
+                                            clip.name.ToLowerInvariant().Contains("hurt") ? UnitAnimState.Hurt :
+                                            clip.name.ToLowerInvariant().Contains("stun") ? UnitAnimState.Stun :
+                                            UnitAnimState.Idle; // Default fallback
+                                           
     }
 }

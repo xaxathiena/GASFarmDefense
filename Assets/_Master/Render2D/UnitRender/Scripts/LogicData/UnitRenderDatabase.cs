@@ -5,12 +5,21 @@ using static UnitAnimData;
 
 namespace Abel.TowerDefense.Config
 {
-    public enum UnitState
+    public enum UnitAnimState
     {
         Idle = 0,
         Attack = 1,
         Move = 2,
-        Die = 3
+        Die = 3,
+        CastSkill1 = 4,
+        CastSkill2 = 5,
+        CastSkill3 = 6,
+        CastSkill4 = 7,
+        CastSkill5 = 8,
+        Sprint = 9,
+        Hurt = 10,
+        Stun = 11,
+        
     }
     [System.Serializable]
     public class UnitRenderProfileData
@@ -33,9 +42,9 @@ namespace Abel.TowerDefense.Config
         [Header("Health Bar")]
         [Tooltip("Enable to render a health bar above this unit type. Disable for projectiles, FX, etc.")]
         public bool showHealthBar = true;
-        public int GetAnimIndex(UnitState state)
+        public int GetAnimIndex(UnitAnimState state)
         {
-            var animIndex = animData.animations.FindIndex(i => i.animName == state.ToString());
+            var animIndex = animData.animations.FindIndex(i => i.animState == state);
             if (animIndex >= 0) return animData.animations[animIndex].startFrame;
             return 0;
         }

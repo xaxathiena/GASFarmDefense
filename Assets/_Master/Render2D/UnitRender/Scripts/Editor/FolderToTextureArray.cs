@@ -3,6 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using Abel.TowerDefense.Config;
 
 public class FolderToTextureArray : EditorWindow
 {
@@ -32,7 +33,7 @@ public class FolderToTextureArray : EditorWindow
     [System.Serializable]
     public class ManualAnimInfo
     {
-        public string name = "New Anim";
+        public UnitAnimState name = UnitAnimState.Idle;
         public int frameCount = 10;
         public float fps = 15;
         public bool loop = true;
@@ -80,7 +81,7 @@ public class FolderToTextureArray : EditorWindow
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("+ Thêm Animation", GUILayout.Height(30)))
         {
-            animConfigs.Add(new ManualAnimInfo() { name = "Anim_" + (animConfigs.Count + 1) });
+            animConfigs.Add(new ManualAnimInfo() { name = UnitAnimState.Idle });
         }
         if (GUILayout.Button("Xóa Hết", GUILayout.Height(30)))
         {
@@ -100,7 +101,7 @@ public class FolderToTextureArray : EditorWindow
             GUILayout.BeginVertical("box");
             GUILayout.BeginHorizontal();
             GUILayout.Label($"#{i+1}", GUILayout.Width(30));
-            anim.name = EditorGUILayout.TextField(anim.name, GUILayout.Width(120));
+            anim.name = (UnitAnimState)EditorGUILayout.EnumPopup(anim.name, GUILayout.Width(120));
             if (GUILayout.Button("X", GUILayout.Width(25))) { animConfigs.RemoveAt(i); break; }
             GUILayout.EndHorizontal();
 
@@ -217,7 +218,7 @@ public class FolderToTextureArray : EditorWindow
             foreach (var cfg in animConfigs)
             {
                 UnitAnimData.AnimInfo info = new UnitAnimData.AnimInfo();
-                info.animName = cfg.name;
+                info.animState = cfg.name;
                 info.startFrame = currentStart;
                 info.frameCount = cfg.frameCount;
                 info.fps = cfg.fps;

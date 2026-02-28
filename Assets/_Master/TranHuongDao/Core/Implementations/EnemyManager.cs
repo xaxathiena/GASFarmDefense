@@ -189,7 +189,7 @@ namespace Abel.TranHuongDao.Core
                     {
                         enemyID        = entry.enemyID,
                         maxHealth      = 100f,     // TODO: read from EnemyDataTable
-                        moveSpeed      = 3f,       // TODO: read from EnemyDataTable
+                        moveSpeed      = 1f,       // TODO: read from EnemyDataTable
                         waypoints      = waypoints,
                         delayRemaining = accumulated
                     });

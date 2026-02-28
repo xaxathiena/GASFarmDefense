@@ -11,7 +11,7 @@ namespace Abel.TowerDefense.Test
     {
         [Header("Simulation Settings")]
         public List<string> unitIDsToSpawn;
-        public UnitState targetAnimState = UnitState.Idle;
+        public UnitAnimState targetAnimState = UnitAnimState.Idle;
         [Range(0, 10000)] public int spawnCount = 0;
 
         [Header("Debug Actions")]
@@ -33,14 +33,14 @@ namespace Abel.TowerDefense.Test
             public float2 position;
             public float rotation;
             public float scale;
-            public UnitState currentState;
+            public UnitAnimState currentState;
 
             // Implementing ILogicEntity
             public string UnitID => id;
             public float2 Position => position;
             public float Rotation => rotation;
             public float Scale => scale;
-            public UnitState CurrentState => currentState;
+            public UnitAnimState CurrentState => currentState;
             public float PlaySpeed => 1.0f;
             // Placeholder: always full HP for simulation. Replace with real HP / maxHP when available.
             public float HpPercent => 1.0f;

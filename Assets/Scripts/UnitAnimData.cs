@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Abel.TowerDefense.Config;
 
 [CreateAssetMenu(fileName = "NewUnitData", menuName = "Abel/Unit Anim Data")]
 public class UnitAnimData : ScriptableObject
@@ -12,7 +13,7 @@ public class UnitAnimData : ScriptableObject
 [System.Serializable]
     public struct AnimInfo
     {
-        public string animName;
+        public UnitAnimState animState;
         public int startFrame;
         public int frameCount;
         public float fps;
@@ -34,11 +35,11 @@ public class UnitAnimData : ScriptableObject
     }
 
     // Hàm tiện ích để tìm Animation theo tên lúc Runtime
-    public bool GetAnim(string name, out AnimInfo info)
+    public bool GetAnim(UnitAnimState state, out AnimInfo info)
     {
         foreach (var a in animations)
         {
-            if (a.animName == name)
+            if (a.animState == state)
             {
                 info = a;
                 return true;

@@ -113,7 +113,13 @@ namespace Abel.TowerDefense.Render
             // Nothing native to free here; arrays are managed.
             // If hpMaterial was cloned (new Material(...)), destroy it to avoid leaks.
             if (hpMaterial != null)
+            {
+#if UNITY_EDITOR
+                Object.DestroyImmediate(hpMaterial);
+#else
                 Object.Destroy(hpMaterial);
+#endif
+            }
         }
     }
 }

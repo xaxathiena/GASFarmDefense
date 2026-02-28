@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Abel.TowerDefense.Config;
 using Abel.TowerDefense.Core;
+using Abel.TowerDefense.Data; // Ensure this is included for UnitAnimData
 
 namespace Abel.TowerDefense.EditorTools
 {
@@ -29,6 +30,11 @@ namespace Abel.TowerDefense.EditorTools
         private Type[] logicTypes;
         private string[] logicNames;
 
+        // --- NEW: Caching for Preview & Embedded Editor ---
+        private Editor animDataEditor;
+        private Texture2D cachedPreviewTexture;
+        private UnitRenderProfileData lastPreviewedProfile;
+
         [MenuItem("Tools/Abel/Render/Unit Render Manager")]
         public static void ShowWindow()
         {
@@ -39,6 +45,13 @@ namespace Abel.TowerDefense.EditorTools
         {
             LoadDatabase();
             ScanLogicTypes();
+        }
+
+        private void OnDisable()
+        {
+            // Clean up memory to prevent Editor leaks
+            if (cachedPreviewTexture != null) DestroyImmediate(cachedPreviewTexture);
+            if (animDataEditor != null) DestroyImmediate(animDataEditor);
         }
 
         private void LoadDatabase()
@@ -80,11 +93,9 @@ namespace Abel.TowerDefense.EditorTools
         {
             EditorGUILayout.BeginVertical("box", GUILayout.Width(300));
 
-            // Build dynamic filter options: "All", "Common", and all defined prefixes
             List<string> filterOptions = new List<string> { "All", "Common" };
             filterOptions.AddRange(database.definedPrefixes);
 
-            // Clamp filter index in case a prefix was deleted
             currentFilterIndex = Mathf.Clamp(currentFilterIndex, 0, filterOptions.Count - 1);
 
             EditorGUILayout.BeginHorizontal();
@@ -100,27 +111,24 @@ namespace Abel.TowerDefense.EditorTools
             {
                 foreach (var profile in database.units.ToList())
                 {
-                    // 1. Determine if this profile is "Common" (does not start with any defined prefix)
                     bool isCommon = !database.definedPrefixes.Any(p => profile.unitID.StartsWith(p));
 
-                    // 2. Filter logic
-                    if (currentFilterIndex == 1 && !isCommon) continue; // Filter: Common
-                    if (currentFilterIndex > 1) // Filter: Specific Prefix
+                    if (currentFilterIndex == 1 && !isCommon) continue; 
+                    if (currentFilterIndex > 1) 
                     {
                         string activePrefix = filterOptions[currentFilterIndex];
                         if (!profile.unitID.StartsWith(activePrefix)) continue;
                     }
 
-                    // Search text logic
                     if (!string.IsNullOrEmpty(searchText) && !profile.unitID.ToLower().Contains(searchText.ToLower())) continue;
 
-                    // 3. UI Drawing with dynamic colors
                     GUI.backgroundColor = GetColorForID(profile.unitID, profile == selectedProfile);
 
                     if (GUILayout.Button(string.IsNullOrEmpty(profile.unitID) ? "Unnamed" : profile.unitID, EditorStyles.miniButton, GUILayout.Height(25)))
                     {
+                        if (selectedProfile != profile) lastPreviewedProfile = null; // Force refresh preview
                         selectedProfile = profile;
-                        isAddingNewPrefix = false; // Reset state when selecting new item
+                        isAddingNewPrefix = false; 
                         GUI.FocusControl(null);
                     }
                 }
@@ -154,41 +162,134 @@ namespace Abel.TowerDefense.EditorTools
         {
             Undo.RecordObject(database, "Modify Profile");
 
-            // --- THÊM CHỨC NĂNG COPY TẠI ĐÂY ---
+            // --- HEADER ---
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label($"Editing: {selectedProfile.unitID}", EditorStyles.boldLabel);
-
-            // Nút Copy
             if (GUILayout.Button("Copy ID", EditorStyles.miniButton, GUILayout.Width(60)))
             {
                 EditorGUIUtility.systemCopyBuffer = selectedProfile.unitID;
                 Debug.Log($"[Unit Render Manager] Copied '{selectedProfile.unitID}' to clipboard!");
             }
             EditorGUILayout.EndHorizontal();
-            // ----------------------------------
-
+            
             EditorGUILayout.Space(5);
 
-            // --- PREFIX & IDENTITY SYSTEM ---
+            // --- TOP SECTION (2 COLUMNS: PREVIEW | BASIC SETTINGS) ---
+            EditorGUILayout.BeginHorizontal();
+            
+            // COLUMN 1: PREVIEW BOX
+            EditorGUILayout.BeginVertical("box", GUILayout.Width(130));
+            DrawPreviewBox();
+            EditorGUILayout.EndVertical();
+
+            // COLUMN 2: IDENTITY & VISUAL RESOURCES
+            EditorGUILayout.BeginVertical();
             DrawIdentitySection();
-
+            
+            EditorGUILayout.Space(2);
+            EditorGUILayout.BeginVertical("HelpBox");
+            GUILayout.Label("Core Settings", EditorStyles.miniBoldLabel);
             selectedProfile.maxCapacity = EditorGUILayout.IntField("Max Capacity", selectedProfile.maxCapacity);
-
-            // DrawLogicSelector(ref selectedProfile.logicTypeAQN, ref selectedProfile.logicDisplayName, logicTypes, logicNames);
-
-            EditorGUILayout.Space();
-            GUILayout.Label("Visuals", EditorStyles.boldLabel);
+            
+            EditorGUI.BeginChangeCheck();
             selectedProfile.mesh = (Mesh)EditorGUILayout.ObjectField("Mesh", selectedProfile.mesh, typeof(Mesh), false);
             selectedProfile.baseMaterial = (Material)EditorGUILayout.ObjectField("Material", selectedProfile.baseMaterial, typeof(Material), false);
             selectedProfile.animData = (UnitAnimData)EditorGUILayout.ObjectField("Anim Data", selectedProfile.animData, typeof(UnitAnimData), false);
             selectedProfile.showHealthBar = EditorGUILayout.Toggle("Show Health Bar", selectedProfile.showHealthBar);
+            
+            if (EditorGUI.EndChangeCheck())
+            {
+                // Refresh preview if they drag-dropped a new AnimData
+                lastPreviewedProfile = null; 
+            }
+            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.EndVertical(); // End Column 2
+            EditorGUILayout.EndHorizontal(); // End Top Section
 
-            EditorGUILayout.Space();
+            EditorGUILayout.Space(10);
+
+            // --- EMBEDDED ANIM DATA EDITOR ---
+            DrawEmbeddedAnimDataEditor();
+
+            EditorGUILayout.Space(10);
+
+            // --- STATS SECTION ---
             GUILayout.Label("Stats", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical("HelpBox");
             selectedProfile.baseMoveSpeed = EditorGUILayout.FloatField("Move Speed", selectedProfile.baseMoveSpeed);
             selectedProfile.baseAttackSpeed = EditorGUILayout.FloatField("Attack Speed", selectedProfile.baseAttackSpeed);
+            EditorGUILayout.EndVertical();
 
             DrawDeleteButton(() => { database.units.Remove(selectedProfile); selectedProfile = null; });
+        }
+
+        // --- NEW: PREVIEW GENERATOR ---
+        private void DrawPreviewBox()
+        {
+            GUILayout.Label("Preview", EditorStyles.miniBoldLabel);
+
+            // Try to generate texture from the Texture2DArray inside AnimData
+            if (lastPreviewedProfile != selectedProfile)
+            {
+                if (cachedPreviewTexture != null) DestroyImmediate(cachedPreviewTexture);
+                cachedPreviewTexture = null;
+                lastPreviewedProfile = selectedProfile;
+
+                if (selectedProfile.animData != null && selectedProfile.animData.textureArray != null)
+                {
+                    try
+                    {
+                        Texture2DArray texArray = selectedProfile.animData.textureArray;
+                        // Create a temporary Texture2D with matching format to copy the first slice (frame 0)
+                        cachedPreviewTexture = new Texture2D(texArray.width, texArray.height, texArray.format, false);
+                        Graphics.CopyTexture(texArray, 0, 0, cachedPreviewTexture, 0, 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogWarning($"[Unit Render Manager] Could not extract preview: {ex.Message}");
+                    }
+                }
+            }
+
+            // Draw the texture if available
+            if (cachedPreviewTexture != null)
+            {
+                Rect rect = GUILayoutUtility.GetRect(115, 115);
+                GUI.DrawTexture(rect, cachedPreviewTexture, ScaleMode.ScaleToFit);
+            }
+            else
+            {
+                GUILayout.Label("No Texture\nAssigned", EditorStyles.centeredGreyMiniLabel, GUILayout.Height(115));
+            }
+        }
+
+        // --- NEW: EMBEDDED ANIM DATA EDITOR ---
+        private void DrawEmbeddedAnimDataEditor()
+        {
+            if (selectedProfile.animData == null) return;
+
+            GUILayout.Label("Animation Settings (Embedded)", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical("box");
+            
+            EditorGUI.BeginChangeCheck();
+            
+            // Create or update the cached editor for the ScriptableObject
+            if (animDataEditor == null || animDataEditor.target != selectedProfile.animData)
+            {
+                Editor.CreateCachedEditor(selectedProfile.animData, null, ref animDataEditor);
+            }
+
+            // Draw the inspector natively
+            animDataEditor.OnInspectorGUI();
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                // Save the SO if user tweaked values inside our tool
+                EditorUtility.SetDirty(selectedProfile.animData);
+            }
+            
+            EditorGUILayout.EndVertical();
         }
 
         private void DrawIdentitySection()
@@ -196,7 +297,6 @@ namespace Abel.TowerDefense.EditorTools
             EditorGUILayout.BeginVertical("HelpBox");
             GUILayout.Label("Identity", EditorStyles.miniBoldLabel);
 
-            // 1. Extract current prefix and base name
             string currentPrefix = "";
             string baseName = selectedProfile.unitID;
 
@@ -210,40 +310,35 @@ namespace Abel.TowerDefense.EditorTools
                 }
             }
 
-            // 2. Build Prefix Dropdown Options
             List<string> prefixOptions = new List<string> { "[Common]" };
             prefixOptions.AddRange(database.definedPrefixes);
             prefixOptions.Add("[+ Add New Prefix]");
 
             int selectedPrefixIdx = currentPrefix == "" ? 0 : database.definedPrefixes.IndexOf(currentPrefix) + 1;
 
-            // 3. Draw Dropdown and handle changes properly
-            EditorGUI.BeginChangeCheck(); // Start tracking user interaction
+            EditorGUI.BeginChangeCheck(); 
             int newSelectedIdx = EditorGUILayout.Popup("Prefix", selectedPrefixIdx, prefixOptions.ToArray());
 
-            // Only execute this block if the user ACTUALLY changed the dropdown selection
             if (EditorGUI.EndChangeCheck())
             {
                 if (newSelectedIdx == prefixOptions.Count - 1)
                 {
-                    isAddingNewPrefix = true; // Show the input field
+                    isAddingNewPrefix = true; 
                 }
                 else
                 {
-                    isAddingNewPrefix = false; // Hide the input field
+                    isAddingNewPrefix = false; 
                     currentPrefix = newSelectedIdx == 0 ? "" : database.definedPrefixes[newSelectedIdx - 1];
                     selectedProfile.unitID = currentPrefix + baseName;
-                    GUI.FocusControl(null); // Remove focus to update UI
+                    GUI.FocusControl(null); 
                 }
             }
 
-            // 4. Draw Add New Prefix UI
             if (isAddingNewPrefix)
             {
                 EditorGUILayout.BeginHorizontal();
                 newPrefixInput = EditorGUILayout.TextField(" ", newPrefixInput);
 
-                // Add Button
                 if (GUILayout.Button("Add", EditorStyles.miniButton, GUILayout.Width(60)))
                 {
                     if (!string.IsNullOrEmpty(newPrefixInput) && !database.definedPrefixes.Contains(newPrefixInput))
@@ -251,13 +346,12 @@ namespace Abel.TowerDefense.EditorTools
                         database.definedPrefixes.Add(newPrefixInput);
                         currentPrefix = newPrefixInput;
                         selectedProfile.unitID = currentPrefix + baseName;
-                        isAddingNewPrefix = false; // Hide after adding
+                        isAddingNewPrefix = false; 
                         newPrefixInput = "";
                         GUI.FocusControl(null);
                     }
                 }
 
-                // Cancel Button (UX Improvement)
                 if (GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(25)))
                 {
                     isAddingNewPrefix = false;
@@ -268,8 +362,6 @@ namespace Abel.TowerDefense.EditorTools
                 EditorGUILayout.Space(2);
             }
 
-            // 5. Draw Base Name input
-            // 5. Draw Base Name input & Auto Fill Button
             EditorGUILayout.BeginHorizontal();
             EditorGUI.BeginChangeCheck();
             baseName = EditorGUILayout.TextField("Base Name", baseName);
@@ -278,40 +370,16 @@ namespace Abel.TowerDefense.EditorTools
                 selectedProfile.unitID = currentPrefix + baseName;
             }
 
-            // Auto Fill Button
             if (GUILayout.Button("Auto Fill", EditorStyles.miniButton, GUILayout.Width(70)))
             {
-                // Force base name to lower case
                 baseName = baseName.ToLower();
-
-                // Update the actual profile ID to reflect the lowercase base name
                 selectedProfile.unitID = currentPrefix + baseName;
-
-                // Pass the lowercase base name to the search function
                 AutoFillVisualAssets(selectedProfile, baseName);
-
-                GUI.FocusControl(null); // Remove focus to refresh UI immediately
+                lastPreviewedProfile = null; // Refresh preview after autofill
+                GUI.FocusControl(null); 
             }
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.EndVertical();
-        }
-
-        // --- HELPER METHODS ---
-
-        private void DrawLogicSelector(ref string aqn, ref string displayName, Type[] types, string[] names)
-        {
-            EditorGUILayout.Space(5);
-            EditorGUILayout.BeginVertical("HelpBox");
-            GUILayout.Label("Logic Behavior", EditorStyles.miniBoldLabel);
-            string localAqn = aqn;
-            int currentIndex = Array.FindIndex(types, t => t.AssemblyQualifiedName == localAqn);
-            int newIndex = EditorGUILayout.Popup("Logic Class", currentIndex, names);
-            if (newIndex >= 0 && newIndex < types.Length)
-            {
-                aqn = types[newIndex].AssemblyQualifiedName;
-                displayName = types[newIndex].Name;
-            }
             EditorGUILayout.EndVertical();
         }
 
@@ -319,16 +387,16 @@ namespace Abel.TowerDefense.EditorTools
         {
             Undo.RecordObject(database, "Add New Item");
 
-            // Auto-assign prefix based on current filter (if it's not All or Common)
             string prefix = "";
             if (currentFilterIndex > 1)
             {
                 prefix = database.definedPrefixes[currentFilterIndex - 2];
             }
 
-            var newProfile = new UnitRenderProfileData { unitID = prefix + "New_" + database.units.Count };
+            var newProfile = new UnitRenderProfileData { unitID = prefix + "new_" + database.units.Count };
             database.units.Add(newProfile);
             selectedProfile = newProfile;
+            lastPreviewedProfile = null;
         }
 
         private void DrawDeleteButton(Action onDelete)
@@ -343,53 +411,36 @@ namespace Abel.TowerDefense.EditorTools
             GUI.backgroundColor = Color.white;
         }
 
-        /// <summary>
-        /// Generates a stable pastel color based on the prefix string hash.
-        /// </summary>
         private Color GetColorForID(string id, bool isSelected)
         {
             if (isSelected) return Color.cyan;
 
-            // Find prefix to determine color
             string currentPrefix = "";
             foreach (string p in database.definedPrefixes)
             {
-                if (id.StartsWith(p))
-                {
-                    currentPrefix = p;
-                    break;
-                }
+                if (id.StartsWith(p)) { currentPrefix = p; break; }
             }
 
-            if (string.IsNullOrEmpty(currentPrefix)) return Color.white; // Common items are white
+            if (string.IsNullOrEmpty(currentPrefix)) return Color.white; 
 
-            // Generate a unique, stable pastel color from the prefix string
             UnityEngine.Random.InitState(currentPrefix.GetHashCode());
             float h = UnityEngine.Random.Range(0f, 1f);
-            return Color.HSVToRGB(h, 0.2f, 1.0f); // Low saturation, high value for pastel colors
+            return Color.HSVToRGB(h, 0.2f, 1.0f); 
         }
-        /// <summary>
-        /// Automatically finds and assigns Mesh, Material, and AnimData based on the baseName.
-        /// </summary>
+
         private void AutoFillVisualAssets(UnitRenderProfileData profile, string baseName)
         {
-            if (string.IsNullOrEmpty(baseName))
-            {
-                Debug.LogWarning("[Auto Fill] Base name is empty!");
-                return;
-            }
+            if (string.IsNullOrEmpty(baseName)) return;
 
             Undo.RecordObject(database, "Auto Fill Visuals");
             int filledCount = 0;
 
-            // 1. Auto assign Quad Mesh (Built-in Unity asset)
             if (profile.mesh == null)
             {
                 profile.mesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
                 if (profile.mesh != null) filledCount++;
             }
 
-            // 2. Auto assign Material (Searches for "baseName_Material")
             string matSearchString = $"{baseName}_Material t:Material";
             string[] matGuids = AssetDatabase.FindAssets(matSearchString);
             if (matGuids.Length > 0)
@@ -398,12 +449,7 @@ namespace Abel.TowerDefense.EditorTools
                 profile.baseMaterial = AssetDatabase.LoadAssetAtPath<Material>(path);
                 filledCount++;
             }
-            else
-            {
-                Debug.LogWarning($"[Auto Fill] Could not find Material named: {baseName}_Material");
-            }
 
-            // 3. Auto assign AnimData (Searches for "baseName_Data")
             string animSearchString = $"{baseName}_Data t:UnitAnimData";
             string[] animGuids = AssetDatabase.FindAssets(animSearchString);
             if (animGuids.Length > 0)
@@ -412,16 +458,8 @@ namespace Abel.TowerDefense.EditorTools
                 profile.animData = AssetDatabase.LoadAssetAtPath<UnitAnimData>(path);
                 filledCount++;
             }
-            else
-            {
-                Debug.LogWarning($"[Auto Fill] Could not find UnitAnimData named: {baseName}_Data");
-            }
 
-            // Notify user
-            if (filledCount > 0)
-            {
-                Debug.Log($"[Auto Fill] Successfully filled {filledCount} assets for {baseName}.");
-            }
+            if (filledCount > 0) Debug.Log($"[Auto Fill] Successfully filled {filledCount} assets for {baseName}.");
         }
     }
 }
