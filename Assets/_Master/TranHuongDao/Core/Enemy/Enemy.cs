@@ -75,7 +75,7 @@ namespace Abel.TranHuongDao.Core
         public void Initialize(
             int                    instanceID,
             string                 enemyID,
-            UnitConfigData         config,
+            UnitConfig         config,
             IReadOnlyList<Vector3> path,
             IRender2DService       renderService)
         {

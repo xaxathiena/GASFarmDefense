@@ -7,17 +7,17 @@ namespace Abel.TranHuongDao.Core
     public class UnitsConfig : BaseConfigSO
     {
         [Header("Runtime Database")]
-        public List<UnitConfigData> unitEntries = new List<UnitConfigData>();
+        public List<UnitConfig> unitEntries = new List<UnitConfig>();
 
         // Built once by InitializeConfig(); provides O(1) lookup at runtime.
-        private Dictionary<string, UnitConfigData> _lookup;
+        private Dictionary<string, UnitConfig> _lookup;
 
         /// <summary>
         /// Called once at startup by ConfigService. Builds the fast lookup dictionary.
         /// </summary>
         public override void InitializeConfig()
         {
-            _lookup = new Dictionary<string, UnitConfigData>(unitEntries.Count, System.StringComparer.Ordinal);
+            _lookup = new Dictionary<string, UnitConfig>(unitEntries.Count, System.StringComparer.Ordinal);
             foreach (var entry in unitEntries)
             {
                 if (!string.IsNullOrEmpty(entry.UnitID))
@@ -27,7 +27,7 @@ namespace Abel.TranHuongDao.Core
         }
 
         /// <summary>O(1) lookup after InitializeConfig() has run.</summary>
-        public bool TryGetConfig(string id, out UnitConfigData configData)
+        public bool TryGetConfig(string id, out UnitConfig configData)
         {
             if (_lookup != null)
                 return _lookup.TryGetValue(id, out configData);

@@ -27,9 +27,13 @@ namespace Abel.TranHuongDao.Core
         private readonly AbilitySystemComponent asc;
         private readonly UnitAttributeSet       attributeSet = new UnitAttributeSet();
 
-        // The AbilityData asset that represents our NormalAttack.
-        // Injected from TowerManager so it can be a ScriptableObject reference.
-        private TDTowerNormalAttackData normalAttackData;
+        // The attack ability data resolved from AbilitiesConfig at spawn time.
+        // Typed as the base class so any GameplayAbilityData subtype can be granted.
+        private GameplayAbilityData attackAbilityData;
+
+        // The skill ability data resolved from AbilitiesConfig at spawn time.
+        // Null for units that have no skill configured in UnitConfig.SkillAbilityID.
+        private GameplayAbilityData skillAbilityData;
 
         // ── Render ───────────────────────────────────────────────────────────────
         private IRender2DService renderService;
@@ -38,6 +42,12 @@ namespace Abel.TranHuongDao.Core
         // ── Proxy Transform (needed by ASC.GetOwner() for ability range checks) ──
         // A lightweight GameObject created once and destroyed on Cleanup().
         private GameObject proxyGO;
+
+        /// <summary>
+        /// The transform of the proxy GameObject created in Initialize().
+        /// External systems (e.g. TowerManager) may attach colliders or components to it.
+        /// </summary>
+        public Transform ProxyTransform => proxyGO != null ? proxyGO.transform : null;
 
         // ── Events ───────────────────────────────────────────────────────────────
         public event Action<Tower> OnDestroyed;
@@ -58,18 +68,20 @@ namespace Abel.TranHuongDao.Core
         // ── Public API ───────────────────────────────────────────────────────────
 
         public void Initialize(
-            int                      instanceID,
-            string                   towerID,
-            Vector3                  position,
-            UnitConfigData           config,
-            TDTowerNormalAttackData  normalAttackData,
-            IRender2DService         renderService)
+            int                  instanceID,
+            string               towerID,
+            Vector3              position,
+            UnitConfig           config,
+            GameplayAbilityData  attackAbilityData,
+            GameplayAbilityData  skillAbilityData,
+            IRender2DService     renderService)
         {
             InstanceID  = instanceID;
             TowerID     = towerID;
             Position    = position;
-            this.normalAttackData = normalAttackData;
-            this.renderService    = renderService;
+            this.attackAbilityData = attackAbilityData;
+            this.skillAbilityData  = skillAbilityData;
+            this.renderService     = renderService;
 
             // ── Proxy Transform ────────────────────────────────────────────────
             // The ASC needs a Transform so ability behaviours can read owner position.
@@ -88,10 +100,12 @@ namespace Abel.TranHuongDao.Core
             // Subscribe so HP changes are forwarded to the render pipeline automatically.
             attributeSet.Health.OnValueChanged += HandleHealthValueChanged;
 
-            // Grant the NormalAttack ability so the ASC can activate it.
-            if (normalAttackData != null)
-                asc.GiveAbility(normalAttackData);
-
+            // Grant the attack ability so the ASC can activate it.
+            if (attackAbilityData != null)
+                asc.GiveAbility(attackAbilityData);
+            // Grant the skill ability (optional — towers without a skill have this null).
+            if (skillAbilityData != null)
+                asc.GiveAbility(skillAbilityData);
             // ── Render ─────────────────────────────────────────────────────────
             renderService.RenderUnit(TowerID, InstanceID, Position);
             renderInitialized = true;
@@ -108,6 +122,7 @@ namespace Abel.TranHuongDao.Core
                 return;
 
             TryFireAtEnemy();
+            TryUseSkill();
         }
 
         /// <summary>Remove render layer and proxy Transform. Called by TowerManager.</summary>
@@ -132,11 +147,19 @@ namespace Abel.TranHuongDao.Core
 
         private void TryFireAtEnemy()
         {
-            if (normalAttackData == null) return;
+            if (attackAbilityData == null) return;
 
             // TryActivateAbility internally calls IAbilityBehaviour.CanActivate first.
             // The TowerAttackAbilityBehaviour will query IEnemyManager for closest target.
-            asc.TryActivateAbility(normalAttackData);
+            asc.TryActivateAbility(attackAbilityData);
+        }
+
+        private void TryUseSkill()
+        {
+            if (skillAbilityData == null) return;
+
+            // GAS cooldown on the skill SO governs the fire rate — no extra timer needed.
+            asc.TryActivateAbility(skillAbilityData);
         }
 
         private void HandleHealthValueChanged(float oldValue, float newValue)

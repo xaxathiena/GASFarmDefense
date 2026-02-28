@@ -51,7 +51,7 @@ namespace Abel.TranHuongDao.Core
         /// Seeds all GAS attributes from a balance config struct.
         /// Health is initialised to MaxHealth so the unit starts at full health.
         /// </summary>
-        public void InitializeFromConfig(UnitConfigData config)
+        public void InitializeFromConfig(UnitConfig config)
         {
             // Set BaseValue first; CurrentValue follows for unmodified attributes.
             MaxHealth.BaseValue       = config.MaxHealth;

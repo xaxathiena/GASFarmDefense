@@ -32,6 +32,20 @@ namespace GAS
         }
 
         /// <summary>
+        /// Register a pre-constructed behaviour instance for <typeparamref name="TData"/>.
+        /// The instance is added directly to the cache, so VContainer never needs to
+        /// resolve the behaviour type — no builder.Register call is required in the scope.
+        /// This is the preferred registration path for project-level ability setups.
+        /// </summary>
+        public void Register<TData>(IAbilityBehaviour instance) where TData : GameplayAbilityData
+        {
+            var dataKey      = typeof(TData).FullName;
+            var behaviourType = instance.GetType();
+            typeMap[dataKey]            = behaviourType;  // data → behaviour type
+            behaviourCache[behaviourType] = instance;      // pre-warm cache; skips container.Resolve
+        }
+
+        /// <summary>
         /// Gets the behaviour for a given ability data.
         /// Creates and caches the behaviour on first access.
         /// </summary>
@@ -86,7 +100,7 @@ namespace GAS
                     }
                     behaviourCache[behaviourType] = behaviour;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //Debug.LogError($"Failed to resolve behaviour {behaviourType.Name}: {e.Message}");
                     return null;

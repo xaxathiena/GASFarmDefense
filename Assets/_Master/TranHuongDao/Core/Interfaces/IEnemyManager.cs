@@ -57,11 +57,25 @@ namespace Abel.TranHuongDao.Core
         int GetClosestEnemyInRange(Vector3 origin, float range);
 
         /// <summary>
+        /// Fills <paramref name="results"/> with the instance IDs of every alive enemy
+        /// within <paramref name="range"/> of <paramref name="origin"/>.
+        /// The list is cleared before being populated.
+        /// Pass a cached List to avoid per-call allocation.
+        /// </summary>
+        void GetEnemiesInRange(Vector3 origin, float range, List<int> results);
+
+        /// <summary>
         /// Retrieves the <see cref="AbilitySystemComponent"/> belonging to the enemy
         /// with the given instanceID so abilities can apply <see cref="GAS.GameplayEffect"/>s.
         /// Returns false if the enemy does not exist or has no ASC.
         /// </summary>
         bool TryGetEnemyASC(int instanceID, out AbilitySystemComponent asc);
+
+        /// <summary>
+        /// Look up a live Enemy object by its unique instance ID.
+        /// Returns false if no enemy with that ID is currently active.
+        /// </summary>
+        bool TryGetEnemy(int instanceID, out Enemy enemy);
 
         /// <summary>
         /// Enqueue all spawn entries from <paramref name="config"/> and begin timed spawning

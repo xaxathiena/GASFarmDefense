@@ -16,9 +16,6 @@ namespace Abel.TranHuongDao.Core
        public class GameLifetimeScope : GameLifetimeScopeTDBase
        {
 
-              // ── Tower ability asset (drag the TDTowerNormalAttack SO here) ───────────
-              [Header("Tower Abilities")]
-              [SerializeField] private TDTowerNormalAttackData towerNormalAttackData;
 
               // ── Tower builder config (drag the TowerBuilderConfigSO asset here) ─────
               [Header("Tower Builder")]
@@ -31,6 +28,9 @@ namespace Abel.TranHuongDao.Core
               // ── Drag-and-drop system (scene MonoBehaviour with the preview SpriteRenderer) ──
               [Header("Tower Drag & Drop")]
               [SerializeField] private TowerDragDropManager towerDragDropManager;
+
+              [Header("Tower Selection UI")]
+              [SerializeField] private UnitSelectionUIView towerSelectionUIView;
 
               protected override void Configure(IContainerBuilder builder)
               {
@@ -50,21 +50,15 @@ namespace Abel.TranHuongDao.Core
                      // EnemyManager resolves these via IObjectResolver.
                      builder.Register<AbilitySystemComponent>(Lifetime.Transient);
 
-                     // ── Ability Behaviours (Singleton, stateless) ─────────────────────────
-                     // Register the tower attack behaviour so VContainer can inject it as
-                     // IAbilityBehaviour AND as the concrete type (needed by AbilityBehaviourRegistry).
-                     builder.Register<TDTowerNormalAttackBehaviour>(Lifetime.Singleton)
-                            .AsSelf()
-                            .As<IAbilityBehaviour>();
+                     // -- Ability Behaviours (Singleton, stateless) ---------------------------
+                     // Behaviours are constructed and registered inside TDAbilitySetup.Start().
+                     // To add a new ability: only TDAbilitySetup.cs needs to change.
 
-                     // ── GAS Initializer — explicit behaviour→data mapping ──────────────────
+                     // GAS ability setup -- constructs + registers all behaviour instances.
                      // Must run before any ability fires; IStartable fires it automatically.
-                     builder.RegisterEntryPoint<TDGASInitializer>(Lifetime.Singleton);
+                     builder.RegisterEntryPoint<TDAbilitySetup>(Lifetime.Singleton);
                      // Render2DService: ITickable flushes dirty buffers once per frame
                      builder.RegisterEntryPoint<Render2DService>(Lifetime.Singleton).As<IRender2DService>();
-
-                     // ── Tower ability SO (ScriptableObject → RegisterInstance) ────────────
-                     builder.RegisterInstance(towerNormalAttackData);
 
                      // ── Tower builder config — inject the inner plain-data class directly ──
                      // RegisterInstance pins the already-created TowerBuilderConfig value so any
@@ -84,7 +78,9 @@ namespace Abel.TranHuongDao.Core
                      // VContainer also calls [Inject] Construct() to supply IMapLayoutManager.
                      builder.RegisterComponent(towerDragDropManager)
                             .As<ITickable>();
-
+                     builder.RegisterComponent(towerSelectionUIView)
+                            .AsSelf(); // Inject into TowerSelectionManager, resolved by TowerManager
+                            
                      // EnemyManager: ITickable + IStartable + IDisposable exposed as IEnemyManager
                      builder.RegisterEntryPoint<EnemyManager>(Lifetime.Singleton).As<IEnemyManager>();
 
@@ -98,6 +94,7 @@ namespace Abel.TranHuongDao.Core
                      builder.RegisterEntryPoint<BulletManager>(Lifetime.Singleton).As<IBulletManager>();
                      builder.RegisterEntryPoint<WaveManager>(Lifetime.Singleton).As<IWaveManager>();
                      builder.RegisterEntryPoint<InstanceIDService>(Lifetime.Singleton).As<IInstanceIDService>();
+                     builder.RegisterEntryPoint<TowerSelectionManager>(Lifetime.Singleton).AsSelf();
               }
        }
 }

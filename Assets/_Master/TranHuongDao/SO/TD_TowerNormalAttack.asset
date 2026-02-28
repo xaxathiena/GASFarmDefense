@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c44a961ba7354ebb92afd2034d011, type: 3}
   m_Name: TD_TowerNormalAttack
   m_EditorClassIdentifier: Assembly-CSharp::Abel.TranHuongDao.Core.TDTowerNormalAttackData
+  abilityID: attack_towerbase
   abilityName: Tower Normal Attack
   description: 
   icon: {fileID: 0}
@@ -81,8 +82,5 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  attackRange: 8
-  damageAmount: 20
   damageEffect: {fileID: 11400000, guid: bac5b43ec2298445699a71dc0638d249, type: 2}
-  bulletSpeed: 12
   collisionThreshold: 0.35

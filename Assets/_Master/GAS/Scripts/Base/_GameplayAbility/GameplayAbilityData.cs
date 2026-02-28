@@ -29,6 +29,7 @@ namespace GAS
     /// </summary>
     public abstract class GameplayAbilityData : ScriptableObject
     {
+        public string abilityID; // Unique string ID for this ability, used for lookups. Can be auto-generated or manually assigned.
         [Header("Ability Info")]
         public string abilityName;
         [TextArea(2, 4)]

@@ -83,7 +83,7 @@ namespace Abel.TranHuongDao.EditorTools
                     int tier = int.Parse(cols[10]);
 
                     // Tạo Struct
-                    UnitConfigData parsedData = new UnitConfigData(
+                    UnitConfig parsedData = new UnitConfig(
                         id, maxHp, moveSpd, baseDmg, atkCooldown, atkRange, projSpd,
                         atkType, tgtType, buildCost, tier
                     );

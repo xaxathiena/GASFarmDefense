@@ -47,5 +47,11 @@ namespace Abel.TranHuongDao.Core
         /// Check whether a grid cell at <paramref name="gridPosition"/> is free to build on.
         /// </summary>
         bool IsCellAvailable(Vector3 gridPosition);
+
+        /// <summary>
+        /// Look up a live Tower object by its unique instance ID.
+        /// Returns false if no tower with that ID is currently active.
+        /// </summary>
+        bool TryGetTower(int instanceID, out Tower tower);
     }
 }

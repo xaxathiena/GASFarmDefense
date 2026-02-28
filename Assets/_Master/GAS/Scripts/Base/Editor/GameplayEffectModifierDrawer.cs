@@ -55,6 +55,9 @@ namespace GAS.Editor
                 case EModifierCalculationType.CustomCalculationClass:
                     SerializedProperty customCalculationProp = property.FindPropertyRelative("customCalculation");
                     totalHeight += EditorGUI.GetPropertyHeight(customCalculationProp, true) + VerticalSpacing;
+                    // Base Magnitude field — required seed value passed into CalculateMagnitude()
+                    SerializedProperty scalableMagnitudePropCC = property.FindPropertyRelative("scalableMagnitude");
+                    totalHeight += EditorGUI.GetPropertyHeight(scalableMagnitudePropCC, true) + VerticalSpacing;
                     totalHeight += LineHeight * 2 + VerticalSpacing; // Info/help box height
                     break;
 
@@ -160,14 +163,37 @@ namespace GAS.Editor
                     currentRect.height = EditorGUI.GetPropertyHeight(customCalculationProp, true);
                     EditorGUI.PropertyField(currentRect, customCalculationProp, new GUIContent("Custom Calculation"), true);
 
+                    // Base Magnitude: the seed value passed as `baseMagnitude` into CalculateMagnitude().
+                    // This field was previously hidden, causing baseMagnitude to always be 0.
+                    currentRect.y += currentRect.height + VerticalSpacing;
+                    float scalableMagnitudeHeightCC = EditorGUI.GetPropertyHeight(scalableMagnitudeProp, true);
+                    currentRect.height = scalableMagnitudeHeightCC;
+                    EditorGUI.PropertyField(currentRect, scalableMagnitudeProp, new GUIContent("Base Magnitude"), true);
+
                     currentRect.y += currentRect.height + VerticalSpacing;
                     currentRect.height = LineHeight;
 
                     bool hasCalculation = customCalculationProp.objectReferenceValue != null;
-                    string infoText = hasCalculation
-                        ? "Selected calculation asset will determine the final magnitude."
-                        : "Assign a DamageCalculation asset (e.g., WC3DamageCalculation).";
-                    MessageType infoType = hasCalculation ? MessageType.Info : MessageType.Warning;
+                    // Warn the designer if baseMagnitude is still 0 — the custom class will receive 0 as its seed.
+                    bool baseMagnitudeIsZero = scalableMagnitudeProp.FindPropertyRelative("baseValue") != null
+                        && scalableMagnitudeProp.FindPropertyRelative("baseValue").floatValue == 0f;
+                    string infoText;
+                    MessageType infoType;
+                    if (!hasCalculation)
+                    {
+                        infoText = "Assign a DamageCalculation asset (e.g., WC3DamageCalculation).";
+                        infoType = MessageType.Warning;
+                    }
+                    else if (baseMagnitudeIsZero)
+                    {
+                        infoText = "Base Magnitude is 0 — the custom class will receive 0 as its seed value. Set a non-zero value unless the class reads attributes itself.";
+                        infoType = MessageType.Warning;
+                    }
+                    else
+                    {
+                        infoText = "Selected calculation asset will determine the final magnitude.";
+                        infoType = MessageType.Info;
+                    }
                     EditorGUI.HelpBox(currentRect, infoText, infoType);
                     break;
 

@@ -21,12 +21,6 @@ namespace Abel.TranHuongDao.Core
         private readonly IObjectResolver         container;
         private readonly IRender2DService        renderService;
         private readonly IConfigService          configService;
-
-        /// <summary>
-        /// The NormalAttack ability asset shared by all basic towers.
-        /// Provided via RegisterInstance in GameLifetimeScope.
-        /// </summary>
-        private readonly TDTowerNormalAttackData normalAttackData;
         /// <summary>
         /// Service for generating unique instance IDs for towers.  Used for render mapping and GAS targeting.
         /// </summary>
@@ -46,16 +40,14 @@ namespace Abel.TranHuongDao.Core
 
         // ─────────────────────────────────────────────────────────────────────────
         public TowerManager(
-            IObjectResolver         container,
-            IRender2DService        renderService,
-            IConfigService          configService,
-            TDTowerNormalAttackData normalAttackData,
-            IInstanceIDService      instanceIDService)
+            IObjectResolver     container,
+            IRender2DService    renderService,
+            IConfigService      configService,
+            IInstanceIDService  instanceIDService)
         {
             this.container         = container;
             this.renderService     = renderService;
             this.configService     = configService;
-            this.normalAttackData  = normalAttackData;
             this.instanceIDService = instanceIDService;
         }
 
@@ -112,6 +104,9 @@ namespace Abel.TranHuongDao.Core
 
         public bool IsCellAvailable(Vector3 gridPosition) => !occupiedCells.Contains(gridPosition);
 
+        public bool TryGetTower(int instanceID, out Tower tower)
+            => activeTowers.TryGetValue(instanceID, out tower);
+
         // ── ITowerSpawner ──────────────────────────────────────────────────────────
 
         /// <summary>
@@ -128,7 +123,7 @@ namespace Abel.TranHuongDao.Core
         {
             // Look up authored stats from the shared config database.
             var unitsConfig = configService.GetConfig<UnitsConfig>();
-            if (unitsConfig == null || !unitsConfig.TryGetConfig(towerID, out UnitConfigData config))
+            if (unitsConfig == null || !unitsConfig.TryGetConfig(towerID, out UnitConfig config))
             {
                 Debug.LogWarning($"[TowerManager] No UnitConfigData found for '{towerID}'. Tower not spawned.");
                 return -1;
@@ -139,8 +134,35 @@ namespace Abel.TranHuongDao.Core
             var tower = new Tower(asc);
             int id    = instanceIDService.GetNextID();
 
-            tower.Initialize(id, towerID, position, config, normalAttackData, renderService);
+            // Look up the attack ability asset from the central AbilitiesConfig registry.
+            // The ID stored in the unit config must match the SO asset name exactly.
+            GameplayAbilityData attackAbility = null;
+            GameplayAbilityData skillAbility  = null;
+
+            if (!string.IsNullOrEmpty(config.AttackAbilityID) || !string.IsNullOrEmpty(config.SkillAbilityID))
+            {
+                var abilitiesConfig = configService.GetConfig<AbilitiesConfig>();
+
+                if (!string.IsNullOrEmpty(config.AttackAbilityID))
+                    if (abilitiesConfig == null || !abilitiesConfig.TryGetAbility(config.AttackAbilityID, out attackAbility))
+                        Debug.LogWarning($"[TowerManager] Attack ability '{config.AttackAbilityID}' not found in AbilitiesConfig for unit '{towerID}'.");
+
+                if (!string.IsNullOrEmpty(config.SkillAbilityID))
+                    if (abilitiesConfig == null || !abilitiesConfig.TryGetAbility(config.SkillAbilityID, out skillAbility))
+                        Debug.LogWarning($"[TowerManager] Skill ability '{config.SkillAbilityID}' not found in AbilitiesConfig for unit '{towerID}'.");
+            }
+
+            tower.Initialize(id, towerID, position, config, attackAbility, skillAbility, renderService);
             tower.OnDestroyed += HandleTowerDestroyed;
+
+            // Attach a physics collider and TowerClickProxy to the proxy GameObject so that
+            // 3D raycasts in TowerSelectionManager can identify which Tower was clicked.
+            if (tower.ProxyTransform != null)
+            {
+                tower.ProxyTransform.gameObject.AddComponent<BoxCollider>();
+                var clickProxy = tower.ProxyTransform.gameObject.AddComponent<TowerClickProxy>();
+                clickProxy.InstanceID = id;
+            }
 
             activeTowers.Add(id, tower);
             occupiedCells.Add(position);

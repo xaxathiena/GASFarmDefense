@@ -42,7 +42,7 @@ namespace Abel.TranHuongDao.Core
     // ---------------------------------------------------------------------------
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct UnitConfigData
+    public struct UnitConfig
     {
         public string UnitID;
         // ── GAS-mapped float stats ───────────────────────────────────────────────
@@ -90,9 +90,23 @@ namespace Abel.TranHuongDao.Core
         /// <summary>Upgrade tier: 1 = base form, higher values = upgraded forms.</summary>
         public int Tier;
 
+        // ── Ability IDs ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Asset name of the attack ability in AbilitiesConfig (e.g. "TD_TowerNormalAttack").
+        /// TowerManager looks this up at spawn time. Leave empty for units with no basic attack.
+        /// </summary>
+        public string AttackAbilityID;
+
+        /// <summary>
+        /// Asset name of the skill ability in AbilitiesConfig.
+        /// Leave empty for units with no skill.
+        /// </summary>
+        public string SkillAbilityID;
+
         // ── Constructor ─────────────────────────────────────────────────────────
 
-        public UnitConfigData(
+        public UnitConfig(
             string     unitID,
             float      maxHealth,
             float      moveSpeed,
@@ -103,7 +117,9 @@ namespace Abel.TranHuongDao.Core
             AttackType attackType,
             TargetType targetType,
             int        buildCost,
-            int        tier)
+            int        tier,
+            string     attackAbilityID = "",
+            string     skillAbilityID  = "")
         {
             UnitID          = unitID;
             MaxHealth       = maxHealth;
@@ -116,6 +132,8 @@ namespace Abel.TranHuongDao.Core
             TargetType      = targetType;
             BuildCost       = buildCost;
             Tier            = tier;
+            AttackAbilityID = attackAbilityID;
+            SkillAbilityID  = skillAbilityID;
             _pad0           = 0;
             _pad1           = 0;
         }

@@ -151,6 +151,21 @@ namespace Abel.TranHuongDao.Core
             return bestID;
         }
 
+        public void GetEnemiesInRange(Vector3 origin, float range, List<int> results)
+        {
+            results.Clear();
+            float rangeSqr = range * range;
+
+            foreach (var kvp in activeEnemies)
+            {
+                var enemy = kvp.Value;
+                if (!enemy.IsAlive || enemy.HasReachedEnd) continue;
+
+                if ((enemy.Position - origin).sqrMagnitude <= rangeSqr)
+                    results.Add(kvp.Key);
+            }
+        }
+
         public bool TryGetEnemyASC(int instanceID, out GAS.AbilitySystemComponent asc)
         {
             if (activeEnemies.TryGetValue(instanceID, out var enemy))
@@ -161,6 +176,10 @@ namespace Abel.TranHuongDao.Core
             asc = null;
             return false;
         }
+
+        public bool TryGetEnemy(int instanceID, out Enemy enemy)
+            => activeEnemies.TryGetValue(instanceID, out enemy);
+
 
         // ── Wave API (called by IWaveManager) ────────────────────────────────────
 
@@ -277,7 +296,7 @@ namespace Abel.TranHuongDao.Core
 
             // Look up authored stats from the shared config database.
             var unitsConfig = configService.GetConfig<UnitsConfig>();
-            if (unitsConfig == null || !unitsConfig.TryGetConfig(enemyID, out UnitConfigData config))
+            if (unitsConfig == null || !unitsConfig.TryGetConfig(enemyID, out UnitConfig config))
             {
                 Debug.LogWarning($"[EnemyManager] No UnitConfigData found for '{enemyID}'. Enemy not spawned.");
                 return -1;
