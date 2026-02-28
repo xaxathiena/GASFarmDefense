@@ -34,12 +34,15 @@ namespace Abel.TranHuongDao.Core
             AbilitySystemComponent asc,
             GameplayAbilitySpec spec)
         {
-            var attackData = data as TDTowerNormalAttackData;
-            if (attackData == null) return false;
+            if (data is not TDTowerNormalAttackData) return false;
+
+            // Read acquisition radius directly from the owner's live attribute —
+            // this automatically respects any range-buff or range-debuff applied via GAS.
+            var unitAttr = asc.GetAttributeSet<UnitAttributeSet>();
+            if (unitAttr == null) return false;
 
             Vector3 origin = GetOwnerPosition(asc);
-            int targetID   = _enemyManager.GetClosestEnemyInRange(origin, attackData.attackRange);
-            return targetID != -1;
+            return _enemyManager.GetClosestEnemyInRange(origin, unitAttr.AttackRange.CurrentValue) != -1;
         }
 
         public void OnActivated(
@@ -50,8 +53,17 @@ namespace Abel.TranHuongDao.Core
             var attackData = data as TDTowerNormalAttackData;
             if (attackData == null) return;
 
+            // All numeric stats come from the owner's UnitAttributeSet so they
+            // reflect buffs/debuffs applied through GAS at the exact moment of firing.
+            var unitAttr = asc.GetAttributeSet<UnitAttributeSet>();
+            if (unitAttr == null) return;
+
+            float range     = unitAttr.AttackRange.CurrentValue;
+            float damage    = unitAttr.Damage.CurrentValue;
+            float projSpeed = unitAttr.ProjectileSpeed.CurrentValue;
+
             Vector3 spawnPos = GetOwnerPosition(asc);
-            int targetID     = _enemyManager.GetClosestEnemyInRange(spawnPos, attackData.attackRange);
+            int targetID     = _enemyManager.GetClosestEnemyInRange(spawnPos, range);
             if (targetID == -1) return;
 
             // ── Spawn a bullet that will travel to the target ─────────────────────
@@ -60,11 +72,17 @@ namespace Abel.TranHuongDao.Core
                 spawnPosition         : spawnPos,
                 sourceASC             : asc,
                 damageEffect          : attackData.damageEffect,
-                damageAmount          : attackData.damageAmount,
-                bulletSpeed           : attackData.bulletSpeed,
+                damageAmount          : damage,
+                bulletSpeed           : projSpeed,
                 collisionThreshold    : attackData.collisionThreshold);
 
-            Debug.Log($"[TowerAttack] Bullet fired at enemy {targetID}");
+            // ── Dynamic cooldown override ─────────────────────────────────────────
+            // ApplyCooldown() already ran before this method (reading the SO's static
+            // cooldownDuration = 0). We now overwrite it with the live attribute value
+            // so attack speed buffs/debuffs take effect immediately on the next cycle.
+            asc.StartCooldown(attackData, unitAttr.AttackCooldown.CurrentValue);
+
+            Debug.Log($"[TowerAttack] Bullet fired at enemy {targetID} | cd={unitAttr.AttackCooldown.CurrentValue:F2}s");
         }
 
         public void OnEnded    (GameplayAbilityData _, AbilitySystemComponent __, GameplayAbilitySpec ___) { }

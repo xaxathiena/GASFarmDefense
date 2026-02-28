@@ -115,10 +115,10 @@ namespace Abel.TranHuongDao.Core
                 targetASC.ApplyGameplayEffectToSelf(_damageEffect, _sourceASC);
                 Debug.Log($"[Bullet] GE applied to enemy {_targetEnemyID}");
             }
-            // ── Fallback: direct damage via EnemyAttributeSet ────────────────────
+            // ── Fallback: direct damage via UnitAttributeSet ─────────────────────
             else if (_enemyManager.TryGetEnemyASC(_targetEnemyID, out AbilitySystemComponent fallbackASC))
             {
-                var attrSet = fallbackASC.GetAttributeSet<EnemyAttributeSet>();
+                var attrSet = fallbackASC.GetAttributeSet<UnitAttributeSet>();
                 if (attrSet != null)
                 {
                     attrSet.TakeDamage(_damageAmount);

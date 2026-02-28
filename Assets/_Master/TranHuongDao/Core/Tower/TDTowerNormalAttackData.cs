@@ -14,21 +14,20 @@ namespace Abel.TranHuongDao.Core
                      menuName  = "Abel/TranHuongDao/Tower Normal Attack")]
     public class TDTowerNormalAttackData : GameplayAbilityData
     {
-        [Header("Attack Configuration")]
-        [Tooltip("Radius around the tower that is checked for enemies each tick.")]
-        public float attackRange = 8f;
+        // attackRange, damageAmount, and bulletSpeed have been removed.
+        // Those values are now read at runtime from the owner's UnitAttributeSet
+        // (AttackRange, Damage, ProjectileSpeed) so they respond to buffs/debuffs.
 
-        [Tooltip("Flat damage applied when the bullet hits. Used as fallback if damageEffect is null.")]
-        public float damageAmount = 20f;
-
+        [Header("Damage Mechanic")]
         [Tooltip("GameplayEffect that carries the damage. If null, damage is applied directly.")]
         public GameplayEffect damageEffect;
 
-        [Header("Bullet Configuration")]
-        [Tooltip("Travel speed of the spawned bullet in world-units per second.")]
-        public float bulletSpeed = 12f;
-
+        [Header("Bullet Mechanic")]
         [Tooltip("Distance at which the bullet is considered to have hit its target.")]
         public float collisionThreshold = 0.35f;
+
+        // cooldownDuration (inherited from GameplayAbilityData) must be set to 0
+        // in the ScriptableObject. The behaviour overrides it dynamically via
+        // asc.StartCooldown using UnitAttributeSet.AttackCooldown.CurrentValue.
     }
 }

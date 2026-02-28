@@ -33,7 +33,7 @@ namespace Abel.TranHuongDao.Core
         public AbilitySystemComponent ASC => asc;
 
         private readonly AbilitySystemComponent asc;
-        private readonly EnemyAttributeSet      attributeSet = new EnemyAttributeSet();
+        private readonly UnitAttributeSet       attributeSet = new UnitAttributeSet();
 
         // ── Render ───────────────────────────────────────────────────────────────
         private IRender2DService renderService;

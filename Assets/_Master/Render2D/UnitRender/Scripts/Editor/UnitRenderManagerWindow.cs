@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Abel.TowerDefense.Config;
 using Abel.TowerDefense.Core;
 using Abel.TowerDefense.Data; // Ensure this is included for UnitAnimData
+using System.IO;
+using System.Text;
 
 namespace Abel.TowerDefense.EditorTools
 {
@@ -83,6 +85,15 @@ namespace Abel.TowerDefense.EditorTools
             EditorGUILayout.BeginHorizontal();
             DrawLeftPanel();
             DrawRightPanel();
+            EditorGUILayout.EndHorizontal();
+
+            // --- NEW: Global Toolbar ---
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUILayout.FlexibleSpace(); // Pushes the button to the right
+            if (GUILayout.Button("Export CSV Config (Template)", EditorStyles.toolbarButton, GUILayout.Width(180)))
+            {
+                ExportUnitConfigsToCSV();
+            }
             EditorGUILayout.EndHorizontal();
 
             if (GUI.changed) EditorUtility.SetDirty(database);
@@ -460,6 +471,64 @@ namespace Abel.TowerDefense.EditorTools
             }
 
             if (filledCount > 0) Debug.Log($"[Auto Fill] Successfully filled {filledCount} assets for {baseName}.");
+        }
+        // --- CSV EXPORT FUNCTION ---
+        private void ExportUnitConfigsToCSV()
+        {
+            // 1. Ask user where to save the file
+            string path = EditorUtility.SaveFilePanel("Export Unit Configs to CSV", "Assets", "UnitConfigs", "csv");
+            if (string.IsNullOrEmpty(path)) return;
+
+            StringBuilder sb = new StringBuilder();
+
+            // 2. Write CSV Header (Must match UnitConfigData fields + UnitID)
+            sb.AppendLine("UnitID,MaxHealth,MoveSpeed,BaseDamage,AttackCooldown,AttackRange,ProjectileSpeed,AttackType,TargetType,BuildCost,Tier");
+
+            int exportCount = 0;
+
+            // 3. Loop through all units in the visual database and create a row for each
+            foreach (var profile in database.units)
+            {
+                if (string.IsNullOrEmpty(profile.unitID)) continue;
+
+                // Extract known visual stats
+                string id = profile.unitID;
+                float moveSpeed = profile.baseMoveSpeed;
+                float attackCooldown = profile.baseAttackSpeed; // Mapping visual speed to cooldown
+
+                // Provide sensible default values for pure logic stats
+                float maxHealth = 100f;
+                float baseDamage = 10f;
+                float attackRange = 5f;
+                float projSpeed = 15f;
+                string attackType = "Normal"; // Must match AttackType enum name
+                string targetType = "Ground"; // Must match TargetType enum name
+                int buildCost = 100;
+                int tier = 1;
+
+                // 4. Construct the CSV row string
+                string row = $"{id},{maxHealth},{moveSpeed},{baseDamage},{attackCooldown},{attackRange},{projSpeed},{attackType},{targetType},{buildCost},{tier}";
+                sb.AppendLine(row);
+                
+                exportCount++;
+            }
+
+            // 5. Write to disk and refresh Unity
+            try
+            {
+                File.WriteAllText(path, sb.ToString());
+                AssetDatabase.Refresh();
+                Debug.Log($"[Unit Render Manager] Successfully exported {exportCount} unit configs to: {path}");
+                
+                // Highlight the file in the project window
+                string projectRelativePath = path.Substring(path.IndexOf("Assets"));
+                UnityEngine.Object fileObj = AssetDatabase.LoadAssetAtPath<TextAsset>(projectRelativePath);
+                if (fileObj != null) EditorGUIUtility.PingObject(fileObj);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[Unit Render Manager] Failed to export CSV: {ex.Message}");
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Abel.TranHuongDao.Core
         public AbilitySystemComponent ASC => asc;
 
         private readonly AbilitySystemComponent asc;
-        private readonly TowerAttributeSet      attributeSet = new TowerAttributeSet();
+        private readonly UnitAttributeSet       attributeSet = new UnitAttributeSet();
 
         // The AbilityData asset that represents our NormalAttack.
         // Injected from TowerManager so it can be a ScriptableObject reference.
