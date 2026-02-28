@@ -18,8 +18,9 @@ namespace Abel.TranHuongDao.Core
     public class TowerManager : ITowerManager, ITowerSpawner, ITickable, IDisposable
     {
         // ── Dependencies ─────────────────────────────────────────────────────────
-        private readonly IObjectResolver container;
-        private readonly IRender2DService renderService;
+        private readonly IObjectResolver         container;
+        private readonly IRender2DService        renderService;
+        private readonly IConfigService          configService;
 
         /// <summary>
         /// The NormalAttack ability asset shared by all basic towers.
@@ -45,13 +46,16 @@ namespace Abel.TranHuongDao.Core
 
         // ─────────────────────────────────────────────────────────────────────────
         public TowerManager(
-            IObjectResolver container,
-            IRender2DService renderService,
-            TDTowerNormalAttackData normalAttackData, IInstanceIDService instanceIDService)
+            IObjectResolver         container,
+            IRender2DService        renderService,
+            IConfigService          configService,
+            TDTowerNormalAttackData normalAttackData,
+            IInstanceIDService      instanceIDService)
         {
-            this.container = container;
-            this.renderService = renderService;
-            this.normalAttackData = normalAttackData;
+            this.container         = container;
+            this.renderService     = renderService;
+            this.configService     = configService;
+            this.normalAttackData  = normalAttackData;
             this.instanceIDService = instanceIDService;
         }
 
@@ -79,7 +83,7 @@ namespace Abel.TranHuongDao.Core
                 Debug.LogWarning($"[TowerManager] Cell {gridPosition} is already occupied.");
                 return -1;
             }
-            return SpawnTowerInternal(towerID, gridPosition, 500f);
+            return SpawnTowerInternal(towerID, gridPosition);
         }
 
         public void RemoveTower(int instanceID)
@@ -116,18 +120,26 @@ namespace Abel.TranHuongDao.Core
         /// via CanBuildAt and marking the cell with SetCellState before calling this.
         /// </summary>
         public void SpawnTower(string unitID, Vector3 position)
-            => SpawnTowerInternal(unitID, position, 500f);
+            => SpawnTowerInternal(unitID, position);
 
         // ── Private helpers ──────────────────────────────────────────────────────
 
-        private int SpawnTowerInternal(string towerID, Vector3 position, float maxHealth)
+        private int SpawnTowerInternal(string towerID, Vector3 position)
         {
-            // Resolve a fresh Transient AbilitySystemComponent for this tower
-            var asc = container.Resolve<AbilitySystemComponent>();
-            var tower = new Tower(asc);
-            int id = instanceIDService.GetNextID();
+            // Look up authored stats from the shared config database.
+            var unitsConfig = configService.GetConfig<UnitsConfig>();
+            if (unitsConfig == null || !unitsConfig.TryGetConfig(towerID, out UnitConfigData config))
+            {
+                Debug.LogWarning($"[TowerManager] No UnitConfigData found for '{towerID}'. Tower not spawned.");
+                return -1;
+            }
 
-            tower.Initialize(id, towerID, position, maxHealth, normalAttackData, renderService);
+            // Resolve a fresh Transient AbilitySystemComponent for this tower.
+            var asc   = container.Resolve<AbilitySystemComponent>();
+            var tower = new Tower(asc);
+            int id    = instanceIDService.GetNextID();
+
+            tower.Initialize(id, towerID, position, config, normalAttackData, renderService);
             tower.OnDestroyed += HandleTowerDestroyed;
 
             activeTowers.Add(id, tower);

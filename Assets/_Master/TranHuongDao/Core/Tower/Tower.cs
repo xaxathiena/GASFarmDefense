@@ -61,7 +61,7 @@ namespace Abel.TranHuongDao.Core
             int                      instanceID,
             string                   towerID,
             Vector3                  position,
-            float                    maxHealth,
+            UnitConfigData           config,
             TDTowerNormalAttackData  normalAttackData,
             IRender2DService         renderService)
         {
@@ -78,13 +78,12 @@ namespace Abel.TranHuongDao.Core
             asc.InitOwner(proxyGO.transform);
 
             // ── GAS setup ──────────────────────────────────────────────────────
-            attributeSet.MaxHealth.SetBaseValue(maxHealth);
-            attributeSet.Health.SetBaseValue(maxHealth);
-            attributeSet.FullRestore();
+            // Seed all GAS attributes from the authored balance config.
+            attributeSet.InitializeFromConfig(config);
             asc.InitializeAttributeSet(attributeSet);
 
             // Cache the reciprocal once so HP changes only cost a multiply, not a divide.
-            maxHealthInverse = maxHealth > 0f ? 1f / maxHealth : 1f;
+            maxHealthInverse = config.MaxHealth > 0f ? 1f / config.MaxHealth : 1f;
 
             // Subscribe so HP changes are forwarded to the render pipeline automatically.
             attributeSet.Health.OnValueChanged += HandleHealthValueChanged;

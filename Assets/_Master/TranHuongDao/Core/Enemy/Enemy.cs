@@ -75,16 +75,15 @@ namespace Abel.TranHuongDao.Core
         public void Initialize(
             int                    instanceID,
             string                 enemyID,
-            float                  maxHealth,
-            float                  moveSpeed,
+            UnitConfigData         config,
             IReadOnlyList<Vector3> path,
             IRender2DService       renderService)
         {
             InstanceID = instanceID;
             EnemyID    = enemyID;
 
-            this.path         = path;
-            this.moveSpeed    = moveSpeed;
+            this.path          = path;
+            this.moveSpeed     = config.MoveSpeed;   // cached for per-frame use in MoveAlongPath
             this.renderService = renderService;
 
             waypointIndex = 0;
@@ -93,13 +92,12 @@ namespace Abel.TranHuongDao.Core
             Rotation      = 0f;
 
             // ── GAS setup ──────────────────────────────────────────────────────
-            attributeSet.MaxHealth.SetBaseValue(maxHealth);
-            attributeSet.MoveSpeed.SetBaseValue(moveSpeed);
-            attributeSet.FullRestore();                                  // sets Health to MaxHealth
+            // Seed all GAS attributes from the authored balance config.
+            attributeSet.InitializeFromConfig(config);
             asc.InitializeAttributeSet(attributeSet);
 
             // Cache the reciprocal once so HP changes only cost a multiply, not a divide.
-            maxHealthInverse = maxHealth > 0f ? 1f / maxHealth : 1f;
+            maxHealthInverse = config.MaxHealth > 0f ? 1f / config.MaxHealth : 1f;
 
             // Subscribe AFTER InitializeAttributeSet so the ASC owner pointer is valid.
             attributeSet.OnHealthDepleted   += HandleHealthDepleted;

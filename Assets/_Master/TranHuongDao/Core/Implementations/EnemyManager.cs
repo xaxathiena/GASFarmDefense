@@ -20,10 +20,11 @@ namespace Abel.TranHuongDao.Core
         // ── Dependencies ─────────────────────────────────────────────────────────
         private readonly IObjectResolver  container;      // resolves Transient ASC per enemy
         private readonly IRender2DService renderService;
+        private readonly IConfigService   configService;
         /// <summary>
         /// Service for generating unique instance IDs for enemies.  Used for render mapping and GAS targeting.
         /// </summary>
-        private readonly IInstanceIDService instanceIDService; // generates unique instance IDs for enemies
+        private readonly IInstanceIDService instanceIDService;
 
         // ── Active enemies ────────────────────────────────────────────────────────
         private readonly Dictionary<int, Enemy> activeEnemies = new Dictionary<int, Enemy>(128);
@@ -47,19 +48,20 @@ namespace Abel.TranHuongDao.Core
         private struct SpawnQueueEntry
         {
             public string                 enemyID;
-            public float                  maxHealth;
-            public float                  moveSpeed;
             public IReadOnlyList<Vector3> waypoints;
             public float                  delayRemaining;   // seconds until this unit spawns
         }
 
         // ─────────────────────────────────────────────────────────────────────────
         public EnemyManager(
-            IObjectResolver  container,
-            IRender2DService renderService, IInstanceIDService instanceIDService)
+            IObjectResolver     container,
+            IRender2DService    renderService,
+            IConfigService      configService,
+            IInstanceIDService  instanceIDService)
         {
-            this.container     = container;
-            this.renderService = renderService;
+            this.container         = container;
+            this.renderService     = renderService;
+            this.configService     = configService;
             this.instanceIDService = instanceIDService;
         }
 
@@ -100,7 +102,7 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         public int SpawnEnemy(string enemyID, Vector3 spawnPoint, IReadOnlyList<Vector3> waypoints)
         {
-            return SpawnEnemyInternal(enemyID, 100f, .1f, waypoints);
+            return SpawnEnemyInternal(enemyID, waypoints);
         }
 
         public void RemoveEnemy(int instanceID)
@@ -188,8 +190,6 @@ namespace Abel.TranHuongDao.Core
                     spawnQueue.Add(new SpawnQueueEntry
                     {
                         enemyID        = entry.enemyID,
-                        maxHealth      = 100f,     // TODO: read from EnemyDataTable
-                        moveSpeed      = 1f,       // TODO: read from EnemyDataTable
                         waypoints      = waypoints,
                         delayRemaining = accumulated
                     });
@@ -227,7 +227,7 @@ namespace Abel.TranHuongDao.Core
                 // This entry is ready: consume it, carry any leftover dt into the next entry
                 dt = -entry.delayRemaining;  // leftover time after this spawn
                 spawnQueue.RemoveAt(0);
-                SpawnEnemyInternal(entry.enemyID, entry.maxHealth, entry.moveSpeed, entry.waypoints);
+                SpawnEnemyInternal(entry.enemyID, entry.waypoints);
             }
 
             if (spawnQueue.Count == 0) isSpawning = false;
@@ -267,8 +267,6 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         private int SpawnEnemyInternal(
             string                 enemyID,
-            float                  maxHealth,
-            float                  moveSpeed,
             IReadOnlyList<Vector3> waypoints)
         {
             if (waypoints == null || waypoints.Count == 0)
@@ -277,12 +275,20 @@ namespace Abel.TranHuongDao.Core
                 return -1;
             }
 
-            // VContainer injects all dependencies into the new ASC instance automatically
+            // Look up authored stats from the shared config database.
+            var unitsConfig = configService.GetConfig<UnitsConfig>();
+            if (unitsConfig == null || !unitsConfig.TryGetConfig(enemyID, out UnitConfigData config))
+            {
+                Debug.LogWarning($"[EnemyManager] No UnitConfigData found for '{enemyID}'. Enemy not spawned.");
+                return -1;
+            }
+
+            // VContainer injects all dependencies into the new ASC instance automatically.
             var asc   = container.Resolve<AbilitySystemComponent>();
             var enemy = new Enemy(asc);
             int id    = instanceIDService.GetNextID();
 
-            enemy.Initialize(id, enemyID, maxHealth, moveSpeed, waypoints, renderService);
+            enemy.Initialize(id, enemyID, config, waypoints, renderService);
 
             enemy.OnDeath      += HandleEnemyDeath;
             enemy.OnReachedEnd += HandleEnemyReachedEnd;
