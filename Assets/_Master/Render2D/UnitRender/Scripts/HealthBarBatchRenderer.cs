@@ -78,9 +78,13 @@ namespace Abel.TowerDefense.Render
         /// <param name="count">Number of valid entries to read from <paramref name="units"/>.</param>
         public void Render(NativeArray<UnitRenderData> units, int count)
         {
+            int renderCount = 0;
             for (int i = 0; i < count; i++)
             {
                 UnitRenderData u = units[i];
+
+                // Skip freed/empty slots — instanceID is zeroed by Render2DService.FreeSlot.
+                if (u.instanceID == 0) continue;
 
                 // Map the logical 2D position onto the 3D XZ plane, then lift in world-Y.
                 // This matches how UnitBatchRenderer positions sprites.
@@ -89,18 +93,21 @@ namespace Abel.TowerDefense.Render
                 // Build the TRS matrix by composing the constant RS block with the world translation.
                 // Equivalent to Matrix4x4.TRS(worldPos, BarRotation, BarScale) but avoids
                 // recomputing the rotation matrix every iteration.
-                matrices[i] = Matrix4x4.Translate(worldPos) * BarRS;
+                matrices[renderCount] = Matrix4x4.Translate(worldPos) * BarRS;
 
                 // Clamp to [0,1] as a defensive measure in case the logic system overshoots.
-                hpPercents[i] = Mathf.Clamp01(u.hpPercent);
+                hpPercents[renderCount] = Mathf.Clamp01(u.hpPercent);
+                renderCount++;
             }
+
+            if (renderCount == 0) return;
 
             // Upload HP data to the GPU via MaterialPropertyBlock.
             // The shader must declare: UNITY_INSTANCING_BUFFER_START / float _HPPercent
             renderParams.matProps.SetFloatArray("_HPPercent", hpPercents);
 
             // Single draw call renders all bars as instanced geometry.
-            Graphics.RenderMeshInstanced(renderParams, quadMesh, 0, matrices, count);
+            Graphics.RenderMeshInstanced(renderParams, quadMesh, 0, matrices, renderCount);
         }
 
         // ── IDisposable ───────────────────────────────────────────────────────

@@ -43,12 +43,17 @@ namespace Abel.TowerDefense.Render
 
         /// <summary>
         /// Main render loop: Converts RenderData -> GPU Data -> Draw Command.
+        /// Dead/freed slots (instanceID == 0) are skipped so they never appear at (0,0,0).
         /// </summary>
         public void Render(NativeArray<UnitRenderData> units, int count)
         {
+            int renderCount = 0;
             for (int i = 0; i < count; i++)
             {
                 UnitRenderData u = units[i];
+
+                // Skip freed/empty slots — instanceID is zeroed by Render2DService.FreeSlot.
+                if (u.instanceID == 0) continue;
 
                 // 1. Calculate Animation Frame
                 // Ensure the animIndex is valid to prevent out-of-bounds errors
@@ -87,13 +92,16 @@ namespace Abel.TowerDefense.Render
                 // Apply flip and aspect ratio to the final scale
                 Vector3 finalScale = new Vector3(safeAspectRatio * baseScale * flipMultiplier, baseScale, 1f);
 
-                matrices[i].SetTRS(pos, rot, finalScale);
-                frameIndices[i] = currentFrame;
+                matrices[renderCount].SetTRS(pos, rot, finalScale);
+                frameIndices[renderCount] = currentFrame;
+                renderCount++;
             }
+
+            if (renderCount == 0) return;
 
             // 3. Send Data to GPU
             renderParams.matProps.SetFloatArray("_FrameIndex", frameIndices);
-            Graphics.RenderMeshInstanced(renderParams, mesh, 0, matrices, count);
+            Graphics.RenderMeshInstanced(renderParams, mesh, 0, matrices, renderCount);
         }
 
         public void Dispose()
