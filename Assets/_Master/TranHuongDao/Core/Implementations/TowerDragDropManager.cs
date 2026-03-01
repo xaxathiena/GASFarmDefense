@@ -18,14 +18,15 @@ namespace Abel.TranHuongDao.Core
 
         // ── Preview colors ────────────────────────────────────────────────────
 
-        private static readonly Color ColorValid   = new Color(0f,  1f, 0f, 0.6f); // semi-transparent green
-        private static readonly Color ColorInvalid = new Color(1f,  0f, 0f, 0.6f); // semi-transparent red
+        private static readonly Color ColorValid = new Color(0f, 1f, 0f, 0.6f); // semi-transparent green
+        private static readonly Color ColorInvalid = new Color(1f, 0f, 0f, 0.6f); // semi-transparent red
 
         // ── Injected dependencies ─────────────────────────────────────────────
 
         private IMapLayoutManager _map;
         private TowerBuilderConfig _config;
-        private ITowerSpawner      _spawner;
+        private ITowerSpawner _spawner;
+        private IConfigService _configService;
 
         // ── State machine ─────────────────────────────────────────────────────
 
@@ -36,6 +37,7 @@ namespace Abel.TranHuongDao.Core
         // The grid uses the XY plane (GridToWorldPosition outputs X=col, Y=row, Z=const),
         // so we must intersect the Z=originZ plane, NOT the horizontal Y=0 plane.
         private Plane _groundPlane;
+        private UnitsConfig _unitsConfig;
 
         // ── VContainer injection ──────────────────────────────────────────────
 
@@ -44,12 +46,13 @@ namespace Abel.TranHuongDao.Core
         /// Preferred over Awake/Start for injected MonoBehaviours.
         /// </summary>
         [VContainer.Inject]
-        public void Construct(IMapLayoutManager map, TowerBuilderConfig config, ITowerSpawner spawner)
+        public void Construct(IMapLayoutManager map, TowerBuilderConfig config, ITowerSpawner spawner, IConfigService iConfigService)
         {
-            _map     = map;
-            _config  = config;
+            _map = map;
+            _config = config;
             _spawner = spawner;
-
+            _configService = iConfigService;
+            _unitsConfig = _configService.GetConfig<UnitsConfig>();
             // Build the raycast plane that matches the grid's coordinate system.
             // GridToWorldPosition(x, y) returns Vector3(X, Y, Z=originZ), so the
             // playing field lies on the XY plane at a fixed Z depth.
@@ -120,8 +123,8 @@ namespace Abel.TranHuongDao.Core
 
             // --- Snap to grid centre ---------------------------------------------
             // Convert to grid indices, then back to world to get the cell centre.
-            Vector2Int gridPos    = _map.WorldToGridPosition(worldPos);
-            Vector3    snappedPos = _map.GridToWorldPosition(gridPos.x, gridPos.y);
+            Vector2Int gridPos = _map.WorldToGridPosition(worldPos);
+            Vector3 snappedPos = _map.GridToWorldPosition(gridPos.x, gridPos.y);
 
             // Keep the preview on the same layer/height as the grid.
             previewSprite.transform.position = snappedPos;
@@ -163,8 +166,12 @@ namespace Abel.TranHuongDao.Core
                 _map.SetCellState(gridPos, GridCellType.TowerOccupied);
 
                 // Step 2: Pick a random tower type from the config data.
-                string randomID = _config.GetRandomTowerID();
-
+                string randomID = _config.GetTowerIDWithTier(1, _unitsConfig);
+                if (string.IsNullOrEmpty(randomID))
+                {
+                    Debug.LogError($"[TowerDragDropManager] No tower ID found for tier 1 in config!");
+                    return;
+                }
                 // Step 3: Delegate actual unit creation to the spawner (DOD layer).
                 _spawner.SpawnTower(randomID, snappedWorldPos);
 

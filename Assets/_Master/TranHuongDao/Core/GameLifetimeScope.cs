@@ -31,7 +31,6 @@ namespace Abel.TranHuongDao.Core
 
               [Header("Tower Selection UI")]
               [SerializeField] private UnitSelectionUIView towerSelectionUIView;
-
               protected override void Configure(IContainerBuilder builder)
               {
                      base.Configure(builder); // Registers Render2DService, GameRenderManager, UnitDebugger, and UnitRenderDatabase

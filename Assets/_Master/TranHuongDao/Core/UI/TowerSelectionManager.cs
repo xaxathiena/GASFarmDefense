@@ -23,12 +23,12 @@ namespace Abel.TranHuongDao.Core
     {
         // ── Dependencies ──────────────────────────────────────────────────────────
 
-        private readonly ITowerManager       _towerManager;
-        private readonly ITowerSpawner        _towerSpawner;
-        private readonly IEnemyManager        _enemyManager;
-        private readonly IConfigService       _configService;
-        private readonly UnitSelectionUIView  _uiView;
-        private readonly GameRenderManager    _renderManager;
+        private readonly ITowerManager _towerManager;
+        private readonly ITowerSpawner _towerSpawner;
+        private readonly IEnemyManager _enemyManager;
+        private readonly IConfigService _configService;
+        private readonly UnitSelectionUIView _uiView;
+        private readonly GameRenderManager _renderManager;
 
         // ── Tuning ────────────────────────────────────────────────────────────────
 
@@ -59,23 +59,23 @@ namespace Abel.TranHuongDao.Core
         // Cached Camera.main — resolved once in Initialize() to avoid per-frame lookup.
         private Camera _mainCamera;
         // Live data of the currently selected unit — used for per-frame stat refresh.
-        private UnitConfig         _selectedConfig;
-        private UnitAttributeSet   _selectedAttributes;
+        private UnitConfig _selectedConfig;
+        private UnitAttributeSet _selectedAttributes;
         // ── Constructor ───────────────────────────────────────────────────────────
 
         public TowerSelectionManager(
-            ITowerManager       towerManager,
-            ITowerSpawner       towerSpawner,
-            IEnemyManager       enemyManager,
-            IConfigService      configService,
+            ITowerManager towerManager,
+            ITowerSpawner towerSpawner,
+            IEnemyManager enemyManager,
+            IConfigService configService,
             UnitSelectionUIView uiView,
-            GameRenderManager   renderManager)
+            GameRenderManager renderManager)
         {
-            _towerManager  = towerManager;
-            _towerSpawner  = towerSpawner;
-            _enemyManager  = enemyManager;
+            _towerManager = towerManager;
+            _towerSpawner = towerSpawner;
+            _enemyManager = enemyManager;
             _configService = configService;
-            _uiView        = uiView;
+            _uiView = uiView;
             _renderManager = renderManager;
         }
 
@@ -122,12 +122,17 @@ namespace Abel.TranHuongDao.Core
             if (!Input.GetMouseButtonDown(0))
                 return;
 
+            // Do not raycast if the mouse is clicking on the Canvas UI (like the Merge button)
+            if (UnityEngine.EventSystems.EventSystem.current != null &&
+                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                return;
+
             if (_mainCamera == null || _renderManager == null)
                 return;
 
-            int    bestInstanceID = -1;
-            float  bestDist       = ClickRadiusPixels;
-            string bestGroupKey   = "";
+            int bestInstanceID = -1;
+            float bestDist = ClickRadiusPixels;
+            string bestGroupKey = "";
 
             Vector2 mousePos = Input.mousePosition;
 
@@ -157,9 +162,16 @@ namespace Abel.TranHuongDao.Core
 
                     if (dist < bestDist)
                     {
-                        bestDist       = dist;
-                        bestInstanceID = dataArray[i].instanceID;
-                        bestGroupKey   = kvp.Key;
+                        // Verify this instance actually exists in logic managers
+                        // to prevent selecting "ghost" frames from recently destroyed units
+                        // which would block selecting the new merged tower underneath.
+                        if (_towerManager.TryGetTower(dataArray[i].instanceID, out _) ||
+                            _enemyManager.TryGetEnemy(dataArray[i].instanceID, out _))
+                        {
+                            bestDist = dist;
+                            bestInstanceID = dataArray[i].instanceID;
+                            bestGroupKey = kvp.Key;
+                        }
                     }
                 }
             }
@@ -214,11 +226,11 @@ namespace Abel.TranHuongDao.Core
         /// from the ASC, then pushes both to the UI view.
         /// </summary>
         private void SelectUnit(
-            string                unitTypeID,
+            string unitTypeID,
             GAS.AbilitySystemComponent asc,
-            bool                  isTower,
-            Tower                 tower,
-            Enemy                 enemy)
+            bool isTower,
+            Tower tower,
+            Enemy enemy)
         {
             // Update the selected-unit references.
             SelectedTower = tower;
@@ -243,7 +255,7 @@ namespace Abel.TranHuongDao.Core
             }
 
             // Cache for per-frame refresh in Tick().
-            _selectedConfig     = config;
+            _selectedConfig = config;
             _selectedAttributes = attributes;
 
             _uiView.ShowUnit(config, attributes);
@@ -277,13 +289,16 @@ namespace Abel.TranHuongDao.Core
                 return;
             }
 
-            bool sameTier    = configA.Tier == configB.Tier;
+            bool sameTier = configA.Tier == configB.Tier;
             bool belowMaxTier = configA.Tier < MaxMergeTier;
 
             if (sameTier && belowMaxTier)
             {
                 // ── VALID MERGE ──────────────────────────────────────────────────
-                ExecuteMerge(towerA, towerB, configA.Tier, unitsConfig);
+                _uiView.SetMergeButtonActive(true, () =>
+                {
+                    ExecuteMerge(towerA, towerB, configA.Tier, unitsConfig);
+                });
             }
             else
             {
@@ -304,8 +319,8 @@ namespace Abel.TranHuongDao.Core
         /// <summary>Clears selection state and hides the info panel.</summary>
         private void Deselect()
         {
-            SelectedTower       = null;
-            SelectedEnemy       = null;
+            SelectedTower = null;
+            SelectedEnemy = null;
             _selectedAttributes = null;
             _uiView.Hide();
         }
@@ -354,8 +369,8 @@ namespace Abel.TranHuongDao.Core
             _towerSpawner.SpawnTower(nextTierID, spawnPosition);
 
             // Clear selection — the new tower is not automatically selected.
-            SelectedTower       = null;
-            SelectedEnemy       = null;
+            SelectedTower = null;
+            SelectedEnemy = null;
             _selectedAttributes = null;
             _uiView.Hide();
         }

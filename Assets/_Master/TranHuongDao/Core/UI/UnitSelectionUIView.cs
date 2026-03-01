@@ -35,6 +35,9 @@ namespace Abel.TranHuongDao.Core
         [Header("Panel")]
         [SerializeField] private GameObject panelRoot;
 
+        [Header("Merge Button")]
+        [SerializeField] private Button mergeBtn;
+
         // ── Runtime state ────────────────────────────────────────────────────────
 
         private UIPortraitAnimator _portraitAnimator;
@@ -46,6 +49,16 @@ namespace Abel.TranHuongDao.Core
             // UIPortraitAnimator lives on the same GameObject as the RawImage reference.
             if (portraitImage != null)
                 _portraitAnimator = portraitImage.GetComponent<UIPortraitAnimator>();
+
+            // Attempt to auto-find the MergeButton if not assigned.
+            if (mergeBtn == null)
+            {
+                var tr = panelRoot != null ? panelRoot.transform : transform;
+                var found = tr.Find("MergeButton");
+                if (found != null) mergeBtn = found.GetComponent<Button>();
+            }
+            if (mergeBtn != null)
+                mergeBtn.gameObject.SetActive(false); // Default hidden
         }
 
         // ── Public property ──────────────────────────────────────────────────────
@@ -68,6 +81,10 @@ namespace Abel.TranHuongDao.Core
             // Activate the root panel first so all child widgets are enabled.
             SetPanelActive(true);
 
+            // Hide merge button on fresh selection
+            if (mergeBtn != null)
+                mergeBtn.gameObject.SetActive(false);
+
             // Name
             if (nameText != null)
                 nameText.text = config.UnitID;
@@ -76,7 +93,7 @@ namespace Abel.TranHuongDao.Core
             if (hpText != null)
             {
                 int current = Mathf.CeilToInt(attributes.Health.CurrentValue);
-                int max     = Mathf.CeilToInt(attributes.MaxHealth.CurrentValue);
+                int max = Mathf.CeilToInt(attributes.MaxHealth.CurrentValue);
                 hpText.text = $"{current} / {max}";
             }
 
@@ -96,11 +113,25 @@ namespace Abel.TranHuongDao.Core
             UpdatePortrait(config.UnitID);
         }
 
+        public void SetMergeButtonActive(bool active, UnityEngine.Events.UnityAction onClickAction = null)
+        {
+            if (mergeBtn == null) return;
+
+            mergeBtn.gameObject.SetActive(active);
+            mergeBtn.onClick.RemoveAllListeners();
+            if (active && onClickAction != null)
+            {
+                mergeBtn.onClick.AddListener(onClickAction);
+            }
+        }
+
         /// <summary>Deactivates the panel and stops the portrait animation.</summary>
         public void Hide()
         {
             _portraitAnimator?.Stop();
             SetPanelActive(false);
+            if (mergeBtn != null)
+                mergeBtn.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -113,7 +144,7 @@ namespace Abel.TranHuongDao.Core
             if (hpText != null)
             {
                 int current = Mathf.CeilToInt(attributes.Health.CurrentValue);
-                int max     = Mathf.CeilToInt(attributes.MaxHealth.CurrentValue);
+                int max = Mathf.CeilToInt(attributes.MaxHealth.CurrentValue);
                 hpText.text = $"{current} / {max}";
             }
 
