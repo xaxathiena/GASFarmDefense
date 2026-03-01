@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer.Unity;
+using Abel.TowerDefense.Config;
 
 namespace Abel.TranHuongDao.Core
 {
     /// <summary>
     /// Controls wave progression: queues waves, delegates spawning to IEnemyManager,
-    /// and tracks when a wave is fully cleared.
+    /// tracks when a wave is fully cleared, and handles preparation delays between waves.
     /// </summary>
-    public class WaveManager : IWaveManager, IInitializable, IStartable
+    public class WaveManager : IWaveManager, IInitializable, IStartable, ITickable
     {
         // ── State ─────────────────────────────────────────────────────────────────
         public int CurrentWaveIndex { get; private set; }
@@ -24,16 +25,21 @@ namespace Abel.TranHuongDao.Core
         // ── Dependencies ──────────────────────────────────────────────────────────
         private readonly IEnemyManager _enemyManager;
         private readonly IMapLayoutManager _mapManager;
+        private readonly IConfigService _configService;
 
         // ── Internal ──────────────────────────────────────────────────────────────
         private IReadOnlyList<WaveConfig> _waveConfigs;
         private int _enemiesRemaining;
+        private float _currentWaitTimer;
+        private bool _isWaitingForNextWave;
 
         // ── Constructor ───────────────────────────────────────────────────────────
-        public WaveManager(IEnemyManager enemyManager, IMapLayoutManager mapManager)
+        public WaveManager(IEnemyManager enemyManager, IMapLayoutManager mapManager, IConfigService configService)
         {
             _enemyManager = enemyManager;
             _mapManager = mapManager;
+            _configService = configService;
+
             _enemyManager.OnEnemyRemoved += NotifyEnemyDefeated;
         }
 
@@ -45,43 +51,29 @@ namespace Abel.TranHuongDao.Core
         // ── IInitializable ────────────────────────────────────────────────────────
         /// <summary>
         /// Called by VContainer after all dependencies are injected.
-        /// Bootstraps a hardcoded demo wave. Replace with data-driven configs when ready.
+        /// Loads wave data from WavesConfig for the current map.
         /// </summary>
         public void Initialize()
         {
-            var demoWaves = new List<WaveConfig>
+            var wavesConfig = _configService.GetConfig<WavesConfig>();
+            if (wavesConfig == null)
             {
-                new WaveConfig
-                {
-                    waveName     = "Wave 1",
-                    startDelay   = 2f,
-                    spawnEntries = new List<SpawnEntry>
-                    {
-                        new SpawnEntry { enemyID = "unit_champion_boar", count = 1000,  intervalBetweenSpawns = 0.1f, pathIndex = 0 },
-                    }
-                },
-                new WaveConfig
-                {
-                    waveName     = "Wave 2",
-                    startDelay   = 1f,
-                    spawnEntries = new List<SpawnEntry>
-                    {
-                        new SpawnEntry { enemyID = "unit_champion_boar", count = 1000,  intervalBetweenSpawns = 0.1f, pathIndex = 0 },
-                    }
-                },
-                new WaveConfig
-                {
-                    waveName     = "Wave 3 — Boss",
-                    startDelay   = 1f,
-                    spawnEntries = new List<SpawnEntry>
-                    {
-                        new SpawnEntry { enemyID = "unit_champion_boar", count = 1000, intervalBetweenSpawns = 0.1f, pathIndex = 0 },
-                    }
-                },
-            };
+                Debug.LogError("[WaveManager] Fatal: WavesConfig not found in ConfigService.");
+                return;
+            }
 
-            Initialize(demoWaves);
-            Debug.Log($"[WaveManager] Initialized with {TotalWaves} demo waves.");
+            // Future proofing for reading the MapID from IMapLayoutManager
+            // For now, hardcode to Map_1 as it serves as the default map testing phase
+            string mapId = "Map_1";
+
+            if (!wavesConfig.TryGetWavesForMap(mapId, out IReadOnlyList<WaveConfig> mapWaves))
+            {
+                Debug.LogError($"[WaveManager] No wave configuration found for MapID: {mapId}");
+                return;
+            }
+
+            Initialize(mapWaves);
+            Debug.Log($"[WaveManager] Initialized with {TotalWaves} waves for map {mapId}.");
         }
 
         // ── IWaveManager ──────────────────────────────────────────────────────────
@@ -89,15 +81,51 @@ namespace Abel.TranHuongDao.Core
         public void Initialize(IReadOnlyList<WaveConfig> waveConfigs)
         {
             _waveConfigs = waveConfigs;
-            TotalWaves = waveConfigs.Count;
+            TotalWaves = waveConfigs?.Count ?? 0;
             CurrentWaveIndex = 0;
             IsWaveRunning = false;
             _enemiesRemaining = 0;
+            _isWaitingForNextWave = false;
+            _currentWaitTimer = 0f;
         }
+
         public void Start()
         {
-            StartNextWave();
+            if (TotalWaves > 0)
+            {
+                PrepareForNextWave();
+            }
         }
+
+        /// <summary>
+        /// Handles the countdown timer between waves.
+        /// </summary>
+        public void Tick()
+        {
+            if (!_isWaitingForNextWave) return;
+
+            _currentWaitTimer -= Time.deltaTime;
+
+            if (_currentWaitTimer <= 0f)
+            {
+                _isWaitingForNextWave = false;
+                StartNextWave();
+            }
+        }
+
+        /// <summary>
+        /// Starts the timer for the upcoming wave based on its preparationTime.
+        /// </summary>
+        private void PrepareForNextWave()
+        {
+            if (CurrentWaveIndex >= TotalWaves) return;
+
+            WaveConfig nextWave = _waveConfigs[CurrentWaveIndex];
+            _currentWaitTimer = nextWave.preparationTime;
+            _isWaitingForNextWave = true;
+            Debug.Log($"[WaveManager] Waiting {_currentWaitTimer}s before starting wave {CurrentWaveIndex} ({nextWave.waveName}).");
+        }
+
         public void StartNextWave()
         {
             if (IsWaveRunning)
@@ -112,13 +140,19 @@ namespace Abel.TranHuongDao.Core
                 return;
             }
 
+            _isWaitingForNextWave = false; // Ensure we are no longer waiting just in case manually triggered
+
             var config = _waveConfigs[CurrentWaveIndex];
 
             // Count total enemies for this wave
             _enemiesRemaining = 0;
             if (config.spawnEntries != null)
+            {
                 foreach (var entry in config.spawnEntries)
+                {
                     if (entry != null) _enemiesRemaining += entry.count;
+                }
+            }
 
             // Delegate spawning to EnemyManager
             var paths = _mapManager.GetEnemyPath();
@@ -150,6 +184,10 @@ namespace Abel.TranHuongDao.Core
             {
                 OnAllWavesCompleted?.Invoke();
                 Debug.Log("[WaveManager] All waves completed!");
+            }
+            else
+            {
+                PrepareForNextWave();
             }
         }
     }

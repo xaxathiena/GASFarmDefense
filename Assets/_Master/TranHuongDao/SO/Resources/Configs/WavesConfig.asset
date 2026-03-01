@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4170ff5fab1cd345a926d8fd9a8e02d, type: 3}
+  m_Name: WavesConfig
+  m_EditorClassIdentifier: 
+  mapProfiles:
+  - MapID: Map_1
+    waves:
+    - waveName: Wave 1
+      preparationTime: 5
+      startDelay: 2
+      spawnEntries:
+      - enemyID: unit_champion_boar
+        count: 10
+        intervalBetweenSpawns: 1
+        pathIndex: 0
+    - waveName: Wave 2
+      preparationTime: 5
+      startDelay: 2
+      spawnEntries:
+      - enemyID: unit_champion_shank_0056
+        count: 20
+        intervalBetweenSpawns: 1
+        pathIndex: 0
+    - waveName: Wave 3
+      preparationTime: 5
+      startDelay: 2
+      spawnEntries:
+      - enemyID: unit_champion_sten_0007
+        count: 50
+        intervalBetweenSpawns: 1
+        pathIndex: 0
