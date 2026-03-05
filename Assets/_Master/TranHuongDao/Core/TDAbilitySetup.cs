@@ -1,5 +1,6 @@
 ﻿using VContainer.Unity;
 using GAS;
+using Abel.TranHuongDao.Core.Abilities;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -15,17 +16,19 @@ namespace Abel.TranHuongDao.Core
     public sealed class TDAbilitySetup : IStartable
     {
         private readonly AbilityBehaviourRegistry _registry;
-        private readonly IEnemyManager            _enemyManager;
-        private readonly IBulletManager           _bulletManager;
+        private readonly IEnemyManager _enemyManager;
+        private readonly IBulletManager _bulletManager;
+        private readonly GameplayAbilityLogic _gameplayAbilityLogic;
 
         public TDAbilitySetup(
             AbilityBehaviourRegistry registry,
-            IEnemyManager            enemyManager,
-            IBulletManager           bulletManager)
+            IEnemyManager enemyManager,
+            IBulletManager bulletManager, GameplayAbilityLogic gameplayAbilityLogic)
         {
-            _registry      = registry;
-            _enemyManager  = enemyManager;
+            _registry = registry;
+            _enemyManager = enemyManager;
             _bulletManager = bulletManager;
+            _gameplayAbilityLogic = gameplayAbilityLogic;
         }
 
         public void Start()
@@ -38,7 +41,14 @@ namespace Abel.TranHuongDao.Core
 
             _registry.Register<TDTowerSkillData>(
                 new TDTowerSkillBehaviour(_enemyManager));
-
+            _registry.Register<TD_MultiAttackData>(
+                new TD_MultiAttackBehaviour(_enemyManager, _bulletManager));
+            _registry.Register<TD_NormalAttackData>(
+                new TD_NormalAttackBehaviour(_enemyManager, _bulletManager));
+            _registry.Register<TD_BaseProcData>(
+                new TD_BaseProcBehaviour(_enemyManager, _gameplayAbilityLogic));
+            _registry.Register<TD_AuraData>(
+                new TD_AuraBehaviour(_enemyManager));
             // Add new abilities below as the project grows:
             // _registry.Register<TDFrostTowerData>(new TDFrostTowerBehaviour(_enemyManager));
         }

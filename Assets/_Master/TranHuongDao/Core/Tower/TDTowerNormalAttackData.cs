@@ -11,7 +11,7 @@ namespace Abel.TranHuongDao.Core
     /// by name — register that class in <see cref="GameLifetimeScope"/>.
     /// </summary>
     [CreateAssetMenu(fileName = "TD_TowerNormalAttack",
-                     menuName  = "Abel/TranHuongDao/Tower Normal Attack")]
+                     menuName = "Abel/TranHuongDao/Tower Normal Attack")]
     public class TDTowerNormalAttackData : GameplayAbilityData
     {
         // attackRange, damageAmount, and bulletSpeed have been removed.
@@ -23,6 +23,9 @@ namespace Abel.TranHuongDao.Core
         public GameplayEffect damageEffect;
 
         [Header("Bullet Mechanic")]
+        [Tooltip("The ID of the visual trail/projectile to use.")]
+        public string trailID = "bullet_normal";
+
         [Tooltip("Distance at which the bullet is considered to have hit its target.")]
         public float collisionThreshold = 0.35f;
 

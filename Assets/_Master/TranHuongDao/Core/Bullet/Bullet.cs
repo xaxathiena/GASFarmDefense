@@ -12,26 +12,27 @@ namespace Abel.TranHuongDao.Core
     public sealed class Bullet
     {
         // ── Constants ────────────────────────────────────────────────────────────
-        private const string RenderUnitID = "bullet_normal";
+        private const string DefaultRenderUnitID = "bullet_normal";
 
         // ── Static ID counter ────────────────────────────────────────────────────
         private static int _idCounter;
 
         // ── Identity ─────────────────────────────────────────────────────────────
         public readonly int InstanceID;
+        public readonly string TrailID;
 
         /// <summary>True until this bullet hits a target or the target disappears.</summary>
         public bool IsAlive { get; private set; } = true;
 
         // ── Runtime dependencies ─────────────────────────────────────────────────
-        private readonly int             _targetEnemyID;
+        private readonly int _targetEnemyID;
         private readonly AbilitySystemComponent _sourceASC;
-        private readonly GameplayEffect  _damageEffect;
-        private readonly float           _damageAmount;
-        private readonly float           _speed;
-        private readonly float           _collisionSqr; // collisionThreshold²
+        private readonly GameplayEffect _damageEffect;
+        private readonly float _damageAmount;
+        private readonly float _speed;
+        private readonly float _collisionSqr; // collisionThreshold²
 
-        private readonly IEnemyManager   _enemyManager;
+        private readonly IEnemyManager _enemyManager;
         private readonly IRender2DService _renderService;
 
         // ── State ────────────────────────────────────────────────────────────────
@@ -40,30 +41,32 @@ namespace Abel.TranHuongDao.Core
         // ── Constructor ──────────────────────────────────────────────────────────
 
         public Bullet(
-            int              targetEnemyInstanceID,
-            Vector3          spawnPosition,
+            string trailID,
+            int targetEnemyInstanceID,
+            Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,
-            GameplayEffect   damageEffect,
-            float            damageAmount,
-            float            bulletSpeed,
-            float            collisionThreshold,
-            IEnemyManager    enemyManager,
+            GameplayEffect damageEffect,
+            float damageAmount,
+            float bulletSpeed,
+            float collisionThreshold,
+            IEnemyManager enemyManager,
             IRender2DService renderService)
         {
-            InstanceID     = ++_idCounter;
+            InstanceID = ++_idCounter;
 
-            _targetEnemyID  = targetEnemyInstanceID;
-            _position       = spawnPosition;
-            _sourceASC      = sourceASC;
-            _damageEffect   = damageEffect;
-            _damageAmount   = damageAmount;
-            _speed          = bulletSpeed;
-            _collisionSqr   = collisionThreshold * collisionThreshold;
-            _enemyManager   = enemyManager;
-            _renderService  = renderService;
+            TrailID = string.IsNullOrEmpty(trailID) ? DefaultRenderUnitID : trailID;
+            _targetEnemyID = targetEnemyInstanceID;
+            _position = spawnPosition;
+            _sourceASC = sourceASC;
+            _damageEffect = damageEffect;
+            _damageAmount = damageAmount;
+            _speed = bulletSpeed;
+            _collisionSqr = collisionThreshold * collisionThreshold;
+            _enemyManager = enemyManager;
+            _renderService = renderService;
 
             // Register with the render pipeline
-            _renderService.RenderUnit(RenderUnitID, InstanceID, _position);
+            _renderService.RenderUnit(TrailID, InstanceID, _position);
         }
 
         // ── Update ───────────────────────────────────────────────────────────────
@@ -101,7 +104,7 @@ namespace Abel.TranHuongDao.Core
             _position += delta.normalized * stepDist;
 
             // ── Update renderer ──────────────────────────────────────────────────
-            _renderService.UpdateRender(RenderUnitID, InstanceID, _position);
+            _renderService.UpdateRender(TrailID, InstanceID, _position);
         }
 
         // ── Private helpers ──────────────────────────────────────────────────────
@@ -133,7 +136,7 @@ namespace Abel.TranHuongDao.Core
         {
             if (!IsAlive) return;
             IsAlive = false;
-            _renderService.RemoveRender(RenderUnitID, InstanceID);
+            _renderService.RemoveRender(TrailID, InstanceID);
         }
     }
 }

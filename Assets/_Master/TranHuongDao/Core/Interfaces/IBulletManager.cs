@@ -23,13 +23,15 @@ namespace Abel.TranHuongDao.Core
         /// <param name="damageAmount">Fallback flat damage when <paramref name="damageEffect"/> is null.</param>
         /// <param name="bulletSpeed">Travel speed in units per second.</param>
         /// <param name="collisionThreshold">Distance threshold that counts as a hit.</param>
+        /// <param name="trailID">ID of the trail/projectile visual to use.</param>
         void SpawnBullet(
-            int              targetEnemyInstanceID,
-            Vector3          spawnPosition,
+            string trailID,
+            int targetEnemyInstanceID,
+            Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,
             GAS.GameplayEffect damageEffect,
-            float            damageAmount,
-            float            bulletSpeed,
-            float            collisionThreshold);
+            float damageAmount,
+            float bulletSpeed,
+            float collisionThreshold);
     }
 }

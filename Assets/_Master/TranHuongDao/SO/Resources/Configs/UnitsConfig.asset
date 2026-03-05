@@ -271,7 +271,7 @@ MonoBehaviour:
     TargetType: 1
     BuildCost: 100
     Tier: 1
-    AttackAbilityID: attack_towerbase
+    AttackAbilityID: single_attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_ultimate_morgan
     MaxHealth: 100
@@ -284,7 +284,7 @@ MonoBehaviour:
     TargetType: 1
     BuildCost: 100
     Tier: 3
-    AttackAbilityID: attack_towerbase
+    AttackAbilityID: single_attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_champion_guinevere
     MaxHealth: 100
@@ -300,6 +300,19 @@ MonoBehaviour:
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_champion_vivian
+    MaxHealth: 100
+    MoveSpeed: 5
+    BaseDamage: 10
+    AttackCooldown: 1
+    AttackRange: 5
+    ProjectileSpeed: 15
+    AttackType: 0
+    TargetType: 1
+    BuildCost: 100
+    Tier: 1
+    AttackAbilityID: attack_towerbase
+    SkillAbilityID: 
+  - UnitID: NewUnit_23
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10

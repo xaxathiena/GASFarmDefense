@@ -55,6 +55,8 @@ namespace GAS
         // Internal accessor for logic layer
         internal AbilitySystemData GetData() => data;
 
+        public IReadOnlyList<GameplayAbilityData> GrantedAbilities => data.GrantedAbilities;
+
 #if UNITY_EDITOR
         // Editor-only accessors for debug tools
         public List<GameplayAbilityData> EditorGetGrantedAbilities() => data.GrantedAbilities;

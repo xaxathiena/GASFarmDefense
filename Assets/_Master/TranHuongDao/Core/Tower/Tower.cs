@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using GAS;
+using Abel.TranHuongDao.Core.Abilities;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -16,8 +17,8 @@ namespace Abel.TranHuongDao.Core
     public class Tower
     {
         // ── Identity ─────────────────────────────────────────────────────────────
-        public int    InstanceID { get; private set; }
-        public string TowerID   { get; private set; }
+        public int InstanceID { get; private set; }
+        public string TowerID { get; private set; }
         public Vector3 Position { get; private set; }
 
         // ── GAS ──────────────────────────────────────────────────────────────────
@@ -25,7 +26,8 @@ namespace Abel.TranHuongDao.Core
         public AbilitySystemComponent ASC => asc;
 
         private readonly AbilitySystemComponent asc;
-        private readonly UnitAttributeSet       attributeSet = new UnitAttributeSet();
+        private readonly AbilityBehaviourRegistry behaviourRegistry;
+        private readonly UnitAttributeSet attributeSet = new UnitAttributeSet();
 
         // The attack ability data resolved from AbilitiesConfig at spawn time.
         // Typed as the base class so any GameplayAbilityData subtype can be granted.
@@ -37,7 +39,7 @@ namespace Abel.TranHuongDao.Core
 
         // ── Render ───────────────────────────────────────────────────────────────
         private IRender2DService renderService;
-        private bool             renderInitialized;
+        private bool renderInitialized;
 
         // ── Proxy Transform (needed by ASC.GetOwner() for ability range checks) ──
         // A lightweight GameObject created once and destroyed on Cleanup().
@@ -60,32 +62,33 @@ namespace Abel.TranHuongDao.Core
         private float maxHealthInverse;
 
         // ─────────────────────────────────────────────────────────────────────────
-        public Tower(AbilitySystemComponent asc)
+        public Tower(AbilitySystemComponent asc, AbilityBehaviourRegistry behaviourRegistry)
         {
             this.asc = asc;
+            this.behaviourRegistry = behaviourRegistry;
         }
 
         // ── Public API ───────────────────────────────────────────────────────────
 
         public void Initialize(
-            int                  instanceID,
-            string               towerID,
-            Vector3              position,
-            UnitConfig           config,
-            GameplayAbilityData  attackAbilityData,
-            GameplayAbilityData  skillAbilityData,
-            IRender2DService     renderService)
+            int instanceID,
+            string towerID,
+            Vector3 position,
+            UnitConfig config,
+            GameplayAbilityData attackAbilityData,
+            GameplayAbilityData skillAbilityData,
+            IRender2DService renderService)
         {
-            InstanceID  = instanceID;
-            TowerID     = towerID;
-            Position    = position;
+            InstanceID = instanceID;
+            TowerID = towerID;
+            Position = position;
             this.attackAbilityData = attackAbilityData;
-            this.skillAbilityData  = skillAbilityData;
-            this.renderService     = renderService;
+            this.skillAbilityData = skillAbilityData;
+            this.renderService = renderService;
 
             // ── Proxy Transform ────────────────────────────────────────────────
             // The ASC needs a Transform so ability behaviours can read owner position.
-            proxyGO                   = new GameObject($"TowerProxy_{instanceID}");
+            proxyGO = new GameObject($"TowerProxy_{instanceID}");
             proxyGO.transform.position = position;
             asc.InitOwner(proxyGO.transform);
 
@@ -151,7 +154,12 @@ namespace Abel.TranHuongDao.Core
 
             // TryActivateAbility internally calls IAbilityBehaviour.CanActivate first.
             // The TowerAttackAbilityBehaviour will query IEnemyManager for closest target.
-            asc.TryActivateAbility(attackAbilityData);
+            bool activated = asc.TryActivateAbility(attackAbilityData);
+            if (activated)
+            {
+                TriggerProcs(EProcTriggerCondition.OnAttackStart);
+                TriggerProcs(Abilities.EProcTriggerCondition.EveryNthAttack);
+            }
         }
 
         private void TryUseSkill()
@@ -167,6 +175,33 @@ namespace Abel.TranHuongDao.Core
             // Event-driven: called only when HP changes, never every frame.
             if (renderInitialized)
                 renderService.SetHpPercent(TowerID, InstanceID, newValue * maxHealthInverse);
+        }
+
+        // ── Procs ────────────────────────────────────────────────────────────────
+
+        public void OnEnemyHit(AbilitySystemComponent targetAsc)
+        {
+            TriggerProcs(EProcTriggerCondition.OnHit, targetAsc);
+        }
+
+        public void OnEnemyKilled(AbilitySystemComponent targetAsc)
+        {
+            TriggerProcs(EProcTriggerCondition.OnKill, targetAsc);
+        }
+
+        private void TriggerProcs(EProcTriggerCondition condition, AbilitySystemComponent targetAsc = null)
+        {
+            foreach (var ability in asc.GrantedAbilities)
+            {
+                if (ability is TD_BaseProcData procData)
+                {
+                    var behaviour = behaviourRegistry.GetBehaviour(procData) as TD_BaseProcBehaviour;
+                    if (behaviour != null)
+                    {
+                        behaviour.EvaluateProc(procData, asc, condition, targetAsc);
+                    }
+                }
+            }
         }
     }
 }

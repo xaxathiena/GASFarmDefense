@@ -16,14 +16,14 @@ namespace Abel.TranHuongDao.Core
     /// </summary>
     public class TDTowerNormalAttackBehaviour : IAbilityBehaviour
     {
-        private readonly IEnemyManager  _enemyManager;
+        private readonly IEnemyManager _enemyManager;
         private readonly IBulletManager _bulletManager;
 
         public TDTowerNormalAttackBehaviour(
-            IEnemyManager  enemyManager,
+            IEnemyManager enemyManager,
             IBulletManager bulletManager)
         {
-            _enemyManager  = enemyManager;
+            _enemyManager = enemyManager;
             _bulletManager = bulletManager;
         }
 
@@ -58,23 +58,24 @@ namespace Abel.TranHuongDao.Core
             var unitAttr = asc.GetAttributeSet<UnitAttributeSet>();
             if (unitAttr == null) return;
 
-            float range     = unitAttr.AttackRange.CurrentValue;
-            float damage    = unitAttr.Damage.CurrentValue;
+            float range = unitAttr.AttackRange.CurrentValue;
+            float damage = unitAttr.Damage.CurrentValue;
             float projSpeed = unitAttr.ProjectileSpeed.CurrentValue;
 
             Vector3 spawnPos = GetOwnerPosition(asc);
-            int targetID     = _enemyManager.GetClosestEnemyInRange(spawnPos, range);
+            int targetID = _enemyManager.GetClosestEnemyInRange(spawnPos, range);
             if (targetID == -1) return;
 
             // ── Spawn a bullet that will travel to the target ─────────────────────
             _bulletManager.SpawnBullet(
-                targetEnemyInstanceID : targetID,
-                spawnPosition         : spawnPos,
-                sourceASC             : asc,
-                damageEffect          : attackData.damageEffect,
-                damageAmount          : damage,
-                bulletSpeed           : projSpeed,
-                collisionThreshold    : attackData.collisionThreshold);
+                trailID: attackData.trailID,
+                targetEnemyInstanceID: targetID,
+                spawnPosition: spawnPos,
+                sourceASC: asc,
+                damageEffect: attackData.damageEffect,
+                damageAmount: damage,
+                bulletSpeed: projSpeed,
+                collisionThreshold: attackData.collisionThreshold);
 
             // ── Dynamic cooldown override ─────────────────────────────────────────
             // ApplyCooldown() already ran before this method (reading the SO's static
@@ -85,7 +86,7 @@ namespace Abel.TranHuongDao.Core
             Debug.Log($"[TowerAttack] Bullet fired at enemy {targetID} | cd={unitAttr.AttackCooldown.CurrentValue:F2}s");
         }
 
-        public void OnEnded    (GameplayAbilityData _, AbilitySystemComponent __, GameplayAbilitySpec ___) { }
+        public void OnEnded(GameplayAbilityData _, AbilitySystemComponent __, GameplayAbilitySpec ___) { }
         public void OnCancelled(GameplayAbilityData _, AbilitySystemComponent __, GameplayAbilitySpec ___) { }
 
         // ── Private ──────────────────────────────────────────────────────────────

@@ -38,6 +38,7 @@ namespace Abel.TranHuongDao.Core
                 {
                     config.InitializeConfig(); // Trigger internal dictionary building
                     _configDict.Add(configType, config);
+                    Debug.Log($"[ConfigService] Loaded config: {configType.Name}");
                 }
                 else
                 {

@@ -18,9 +18,9 @@ namespace Abel.TranHuongDao.Core
     public class TowerManager : ITowerManager, ITowerSpawner, ITickable, IDisposable
     {
         // ── Dependencies ─────────────────────────────────────────────────────────
-        private readonly IObjectResolver         container;
-        private readonly IRender2DService        renderService;
-        private readonly IConfigService          configService;
+        private readonly IObjectResolver container;
+        private readonly IRender2DService renderService;
+        private readonly IConfigService configService;
         /// <summary>
         /// Service for generating unique instance IDs for towers.  Used for render mapping and GAS targeting.
         /// </summary>
@@ -40,14 +40,14 @@ namespace Abel.TranHuongDao.Core
 
         // ─────────────────────────────────────────────────────────────────────────
         public TowerManager(
-            IObjectResolver     container,
-            IRender2DService    renderService,
-            IConfigService      configService,
-            IInstanceIDService  instanceIDService)
+            IObjectResolver container,
+            IRender2DService renderService,
+            IConfigService configService,
+            IInstanceIDService instanceIDService)
         {
-            this.container         = container;
-            this.renderService     = renderService;
-            this.configService     = configService;
+            this.container = container;
+            this.renderService = renderService;
+            this.configService = configService;
             this.instanceIDService = instanceIDService;
         }
 
@@ -130,14 +130,15 @@ namespace Abel.TranHuongDao.Core
             }
 
             // Resolve a fresh Transient AbilitySystemComponent for this tower.
-            var asc   = container.Resolve<AbilitySystemComponent>();
-            var tower = new Tower(asc);
-            int id    = instanceIDService.GetNextID();
+            var asc = container.Resolve<AbilitySystemComponent>();
+            var behaviourRegistry = container.Resolve<AbilityBehaviourRegistry>();
+            var tower = new Tower(asc, behaviourRegistry);
+            int id = instanceIDService.GetNextID();
 
             // Look up the attack ability asset from the central AbilitiesConfig registry.
             // The ID stored in the unit config must match the SO asset name exactly.
             GameplayAbilityData attackAbility = null;
-            GameplayAbilityData skillAbility  = null;
+            GameplayAbilityData skillAbility = null;
 
             if (!string.IsNullOrEmpty(config.AttackAbilityID) || !string.IsNullOrEmpty(config.SkillAbilityID))
             {

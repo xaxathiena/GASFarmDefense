@@ -37,9 +37,12 @@ namespace Abel.TranHuongDao.Core
         public void Construct(IConfigService configService)
         {
             _configService = configService;
-            LoadMap("Map_1"); // Temporary default
         }
-
+        void Start()
+        {
+            LoadMap("Map_1"); // Temporary default
+            
+        }
         /// <summary>
         /// Loads map layout configuration from MapConfigSO via ConfigService.
         /// </summary>

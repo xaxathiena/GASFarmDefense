@@ -17,18 +17,18 @@ namespace Abel.TranHuongDao.Core
     public sealed class BulletManager : IBulletManager, ITickable, IDisposable
     {
         // ── Dependencies ─────────────────────────────────────────────────────────
-        private readonly IEnemyManager    _enemyManager;
+        private readonly IEnemyManager _enemyManager;
         private readonly IRender2DService _renderService;
 
         // ── State ────────────────────────────────────────────────────────────────
-        private readonly List<Bullet> _activeBullets  = new List<Bullet>(64);
-        private readonly List<Bullet> _removalBuffer  = new List<Bullet>(16);
+        private readonly List<Bullet> _activeBullets = new List<Bullet>(64);
+        private readonly List<Bullet> _removalBuffer = new List<Bullet>(16);
 
         // ── Constructor ──────────────────────────────────────────────────────────
 
         public BulletManager(IEnemyManager enemyManager, IRender2DService renderService)
         {
-            _enemyManager  = enemyManager;
+            _enemyManager = enemyManager;
             _renderService = renderService;
         }
 
@@ -36,15 +36,17 @@ namespace Abel.TranHuongDao.Core
 
         /// <inheritdoc/>
         public void SpawnBullet(
-            int              targetEnemyInstanceID,
-            Vector3          spawnPosition,
+            string trailID,
+            int targetEnemyInstanceID,
+            Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,
-            GameplayEffect   damageEffect,
-            float            damageAmount,
-            float            bulletSpeed,
-            float            collisionThreshold)
+            GameplayEffect damageEffect,
+            float damageAmount,
+            float bulletSpeed,
+            float collisionThreshold)
         {
             var bullet = new Bullet(
+                trailID,
                 targetEnemyInstanceID,
                 spawnPosition,
                 sourceASC,
@@ -56,7 +58,7 @@ namespace Abel.TranHuongDao.Core
                 _renderService);
 
             _activeBullets.Add(bullet);
-            Debug.Log($"[BulletManager] Spawned bullet #{bullet.InstanceID} → enemy {targetEnemyInstanceID}");
+            Debug.Log($"[BulletManager] Spawned bullet #{bullet.InstanceID} → enemy {targetEnemyInstanceID} using trail '{trailID}'");
         }
 
         // ── ITickable ─────────────────────────────────────────────────────────────
