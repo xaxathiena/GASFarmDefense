@@ -16,12 +16,12 @@ MonoBehaviour:
   - MapID: Map_1
     waves:
     - waveName: Wave 1
-      preparationTime: 5
-      startDelay: 2
+      preparationTime: 0
+      startDelay: 0
       spawnEntries:
       - enemyID: unit_champion_boar
-        count: 10
-        intervalBetweenSpawns: 1
+        count: 1000
+        intervalBetweenSpawns: 0.3
         pathIndex: 0
     - waveName: Wave 2
       preparationTime: 5

@@ -12,7 +12,7 @@ namespace Abel.TranHuongDao.Core.Abilities
     {
         private readonly IEnemyManager _enemyManager;
         private readonly IBulletManager _bulletManager;
-        
+
         // Cache to avoid runtime GC alloc during Overlap requests
         private readonly List<int> _enemyCache = new List<int>(16);
 
@@ -50,12 +50,14 @@ namespace Abel.TranHuongDao.Core.Abilities
                 // bounces it dynamically. We pass bounce limits to the bullet manager if API allowed.
                 // Assuming BulletManager handles single target spawn, and relies on an event for bounce logic.
                 // We'll spawn the initial projectile for the closest enemy here.
-                
+
                 int closestID = _enemyManager.GetClosestEnemyInRange(originPos, multiData.attackRange);
                 if (closestID != -1)
                 {
                     _bulletManager.SpawnBullet(
                         trailID: multiData.trailID, // The chained trail ID
+                        trailVfxID: multiData.trailVfxID,
+                        hitVfxID: multiData.hitVfxID,
                         targetEnemyInstanceID: closestID,
                         spawnPosition: originPos,
                         sourceASC: asc,
@@ -77,6 +79,8 @@ namespace Abel.TranHuongDao.Core.Abilities
 
                     _bulletManager.SpawnBullet(
                         trailID: multiData.trailID,
+                        trailVfxID: multiData.trailVfxID,
+                        hitVfxID: multiData.hitVfxID,
                         targetEnemyInstanceID: enemyID,
                         spawnPosition: originPos,
                         sourceASC: asc,
@@ -85,7 +89,7 @@ namespace Abel.TranHuongDao.Core.Abilities
                         bulletSpeed: 20f,
                         collisionThreshold: 0.5f
                     );
-                    
+
                     targetsFired++;
                 }
             }

@@ -26,6 +26,10 @@ namespace Abel.TranHuongDao.Core
         [Tooltip("The ID of the visual trail/projectile to use.")]
         public string trailID = "bullet_normal";
 
+        [Header("VFX Options (Effekseer)")]
+        public string trailVfxID = "";
+        public string hitVfxID = "";
+
         [Tooltip("Distance at which the bullet is considered to have hit its target.")]
         public float collisionThreshold = 0.35f;
 

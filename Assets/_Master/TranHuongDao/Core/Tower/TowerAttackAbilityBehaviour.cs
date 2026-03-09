@@ -69,6 +69,8 @@ namespace Abel.TranHuongDao.Core
             // ── Spawn a bullet that will travel to the target ─────────────────────
             _bulletManager.SpawnBullet(
                 trailID: attackData.trailID,
+                trailVfxID: attackData.trailVfxID,
+                hitVfxID: attackData.hitVfxID,
                 targetEnemyInstanceID: targetID,
                 spawnPosition: spawnPos,
                 sourceASC: asc,

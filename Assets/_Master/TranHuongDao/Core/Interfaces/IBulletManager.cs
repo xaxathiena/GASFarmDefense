@@ -23,9 +23,13 @@ namespace Abel.TranHuongDao.Core
         /// <param name="damageAmount">Fallback flat damage when <paramref name="damageEffect"/> is null.</param>
         /// <param name="bulletSpeed">Travel speed in units per second.</param>
         /// <param name="collisionThreshold">Distance threshold that counts as a hit.</param>
-        /// <param name="trailID">ID of the trail/projectile visual to use.</param>
+        /// <param name="trailID">ID of the trail/projectile visual to use (Render2D).</param>
+        /// <param name="trailVfxID">ID of the Effekseer VFX to use for the bullet (optional).</param>
+        /// <param name="hitVfxID">ID of the Effekseer VFX to play on hit (optional).</param>
         void SpawnBullet(
             string trailID,
+            string trailVfxID,
+            string hitVfxID,
             int targetEnemyInstanceID,
             Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,

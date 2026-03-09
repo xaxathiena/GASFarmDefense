@@ -11,6 +11,9 @@ namespace Abel.TranHuongDao.Core.Abilities
     {
         [Header("Weapon Config")]
         public string trailID = "bullet_chain";
+        [Header("VFX Options (Effekseer)")]
+        public string trailVfxID = "";
+        public string hitVfxID = "";
         public float attackRange = 5f;
         public GameplayEffect hitEffect;
         public float baseDamage = 15f;
@@ -18,13 +21,13 @@ namespace Abel.TranHuongDao.Core.Abilities
         [Header("Multi-Target Settings")]
         [Tooltip("If true, fires chaining projectiles. If false, fires simultaneously to multiple targets.")]
         public bool isSequential = false;
-        
+
         [Tooltip("Max dynamic targets (or bounces if sequential).")]
         public int maxTargets = 3;
-        
+
         [Tooltip("Max times the same target can be hit (used in sequential mode).")]
         public int maxHitsPerTarget = 1;
-        
+
         [Tooltip("Bounce range if sequential mode is enabled.")]
         public float searchRadius = 4f;
     }

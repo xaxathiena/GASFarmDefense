@@ -44,6 +44,8 @@ namespace Abel.TranHuongDao.Core.Abilities
             // Clean logical separation: request spawn by trailID.
             _bulletManager.SpawnBullet(
                 trailID: attackData.trailID,
+                trailVfxID: attackData.trailVfxID,
+                hitVfxID: attackData.hitVfxID,
                 targetEnemyInstanceID: targetEnemyID,
                 spawnPosition: ownerTransform.position,
                 sourceASC: asc,

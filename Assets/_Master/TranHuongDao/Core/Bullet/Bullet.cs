@@ -20,6 +20,9 @@ namespace Abel.TranHuongDao.Core
         // ── Identity ─────────────────────────────────────────────────────────────
         public readonly int InstanceID;
         public readonly string TrailID;
+        private readonly string _trailVfxID;
+        private readonly string _hitVfxID;
+        private readonly int _trailVfxHandleID; // Holds the ID if Effekseer handles it
 
         /// <summary>True until this bullet hits a target or the target disappears.</summary>
         public bool IsAlive { get; private set; } = true;
@@ -34,6 +37,7 @@ namespace Abel.TranHuongDao.Core
 
         private readonly IEnemyManager _enemyManager;
         private readonly IRender2DService _renderService;
+        private readonly FD.Modules.VFX.IVFXManager _vfxManager;
 
         // ── State ────────────────────────────────────────────────────────────────
         private Vector3 _position;
@@ -42,6 +46,8 @@ namespace Abel.TranHuongDao.Core
 
         public Bullet(
             string trailID,
+            string trailVfxID,
+            string hitVfxID,
             int targetEnemyInstanceID,
             Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,
@@ -50,11 +56,14 @@ namespace Abel.TranHuongDao.Core
             float bulletSpeed,
             float collisionThreshold,
             IEnemyManager enemyManager,
-            IRender2DService renderService)
+            IRender2DService renderService,
+            FD.Modules.VFX.IVFXManager vfxManager)
         {
             InstanceID = ++_idCounter;
 
             TrailID = string.IsNullOrEmpty(trailID) ? DefaultRenderUnitID : trailID;
+            _trailVfxID = trailVfxID;
+            _hitVfxID = hitVfxID;
             _targetEnemyID = targetEnemyInstanceID;
             _position = spawnPosition;
             _sourceASC = sourceASC;
@@ -64,9 +73,19 @@ namespace Abel.TranHuongDao.Core
             _collisionSqr = collisionThreshold * collisionThreshold;
             _enemyManager = enemyManager;
             _renderService = renderService;
+            _vfxManager = vfxManager;
 
             // Register with the render pipeline
-            _renderService.RenderUnit(TrailID, InstanceID, _position);
+            if (string.IsNullOrEmpty(_trailVfxID))
+            {
+                // Only render 2D if no Effekseer trail is provided
+                _renderService.RenderUnit(TrailID, InstanceID, _position);
+            }
+            else
+            {
+                // Play Effekseer VFX for bullet trail
+                _trailVfxHandleID = _vfxManager.PlayEffectAt(_trailVfxID, _position);
+            }
         }
 
         // ── Update ───────────────────────────────────────────────────────────────
@@ -103,8 +122,15 @@ namespace Abel.TranHuongDao.Core
 
             _position += delta.normalized * stepDist;
 
-            // ── Update renderer ──────────────────────────────────────────────────
-            _renderService.UpdateRender(TrailID, InstanceID, _position);
+            // ── Update renderer / VFX ────────────────────────────────────────────
+            if (string.IsNullOrEmpty(_trailVfxID))
+            {
+                _renderService.UpdateRender(TrailID, InstanceID, _position);
+            }
+            else if (_trailVfxHandleID > 0)
+            {
+                _vfxManager.UpdateEffectPosition(_trailVfxHandleID, _position);
+            }
         }
 
         // ── Private helpers ──────────────────────────────────────────────────────
@@ -129,6 +155,12 @@ namespace Abel.TranHuongDao.Core
                 }
             }
 
+            // ── Trigger Hit VFX ───────────────────────────────────────────────────
+            if (!string.IsNullOrEmpty(_hitVfxID))
+            {
+                _vfxManager.PlayEffectAt(_hitVfxID, _position);
+            }
+
             Destroy();
         }
 
@@ -136,7 +168,15 @@ namespace Abel.TranHuongDao.Core
         {
             if (!IsAlive) return;
             IsAlive = false;
-            _renderService.RemoveRender(TrailID, InstanceID);
+
+            if (string.IsNullOrEmpty(_trailVfxID))
+            {
+                _renderService.RemoveRender(TrailID, InstanceID);
+            }
+            else if (_trailVfxHandleID > 0)
+            {
+                _vfxManager.StopEffect(_trailVfxHandleID);
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ namespace Abel.TranHuongDao.Core
         // ── Dependencies ─────────────────────────────────────────────────────────
         private readonly IEnemyManager _enemyManager;
         private readonly IRender2DService _renderService;
+        private readonly FD.Modules.VFX.IVFXManager _vfxManager;
 
         // ── State ────────────────────────────────────────────────────────────────
         private readonly List<Bullet> _activeBullets = new List<Bullet>(64);
@@ -26,10 +27,11 @@ namespace Abel.TranHuongDao.Core
 
         // ── Constructor ──────────────────────────────────────────────────────────
 
-        public BulletManager(IEnemyManager enemyManager, IRender2DService renderService)
+        public BulletManager(IEnemyManager enemyManager, IRender2DService renderService, FD.Modules.VFX.IVFXManager vfxManager)
         {
             _enemyManager = enemyManager;
             _renderService = renderService;
+            _vfxManager = vfxManager;
         }
 
         // ── IBulletManager ───────────────────────────────────────────────────────
@@ -37,6 +39,8 @@ namespace Abel.TranHuongDao.Core
         /// <inheritdoc/>
         public void SpawnBullet(
             string trailID,
+            string trailVfxID,
+            string hitVfxID,
             int targetEnemyInstanceID,
             Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,
@@ -47,6 +51,8 @@ namespace Abel.TranHuongDao.Core
         {
             var bullet = new Bullet(
                 trailID,
+                trailVfxID,
+                hitVfxID,
                 targetEnemyInstanceID,
                 spawnPosition,
                 sourceASC,
@@ -55,7 +61,8 @@ namespace Abel.TranHuongDao.Core
                 bulletSpeed,
                 collisionThreshold,
                 _enemyManager,
-                _renderService);
+                _renderService,
+                _vfxManager);
 
             _activeBullets.Add(bullet);
             Debug.Log($"[BulletManager] Spawned bullet #{bullet.InstanceID} → enemy {targetEnemyInstanceID} using trail '{trailID}'");

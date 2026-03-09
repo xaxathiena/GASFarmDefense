@@ -53,8 +53,8 @@ MonoBehaviour:
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_champion_boar
-    MaxHealth: 100
-    MoveSpeed: 1
+    MaxHealth: 1000
+    MoveSpeed: 0.7
     BaseDamage: 10
     AttackCooldown: 1
     AttackRange: 5
@@ -193,7 +193,7 @@ MonoBehaviour:
     TargetType: 1
     BuildCost: 100
     Tier: 2
-    AttackAbilityID: attack_towerbase
+    AttackAbilityID: multiple_attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_rookie_ganieda
     MaxHealth: 100
@@ -205,7 +205,7 @@ MonoBehaviour:
     AttackType: 0
     TargetType: 1
     BuildCost: 100
-    Tier: 2
+    Tier: 3
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_rookie_guinevere
@@ -231,7 +231,7 @@ MonoBehaviour:
     AttackType: 0
     TargetType: 1
     BuildCost: 100
-    Tier: 2
+    Tier: 4
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_ultimate_guinevere
