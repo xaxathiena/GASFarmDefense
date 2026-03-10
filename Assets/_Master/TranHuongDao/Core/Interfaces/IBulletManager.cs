@@ -26,6 +26,7 @@ namespace Abel.TranHuongDao.Core
         /// <param name="trailID">ID of the trail/projectile visual to use (Render2D).</param>
         /// <param name="trailVfxID">ID of the Effekseer VFX to use for the bullet (optional).</param>
         /// <param name="hitVfxID">ID of the Effekseer VFX to play on hit (optional).</param>
+        /// <param name="onHit">Optional callback triggered when the bullet hits the target. Provides hit position and target ID.</param>
         void SpawnBullet(
             string trailID,
             string trailVfxID,
@@ -36,6 +37,7 @@ namespace Abel.TranHuongDao.Core
             GAS.GameplayEffect damageEffect,
             float damageAmount,
             float bulletSpeed,
-            float collisionThreshold);
+            float collisionThreshold,
+            System.Action<Vector3, int> onHit = null);
     }
 }

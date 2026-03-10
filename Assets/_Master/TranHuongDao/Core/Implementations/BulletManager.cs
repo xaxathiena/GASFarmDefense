@@ -47,7 +47,8 @@ namespace Abel.TranHuongDao.Core
             GameplayEffect damageEffect,
             float damageAmount,
             float bulletSpeed,
-            float collisionThreshold)
+            float collisionThreshold,
+            System.Action<Vector3, int> onHit = null)
         {
             var bullet = new Bullet(
                 trailID,
@@ -62,7 +63,8 @@ namespace Abel.TranHuongDao.Core
                 collisionThreshold,
                 _enemyManager,
                 _renderService,
-                _vfxManager);
+                _vfxManager,
+                onHit);
 
             _activeBullets.Add(bullet);
             Debug.Log($"[BulletManager] Spawned bullet #{bullet.InstanceID} → enemy {targetEnemyInstanceID} using trail '{trailID}'");

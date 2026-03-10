@@ -38,6 +38,7 @@ namespace Abel.TranHuongDao.Core
         private readonly IEnemyManager _enemyManager;
         private readonly IRender2DService _renderService;
         private readonly FD.Modules.VFX.IVFXManager _vfxManager;
+        private readonly System.Action<Vector3, int> _onHitCallback;
 
         // ── State ────────────────────────────────────────────────────────────────
         private Vector3 _position;
@@ -57,7 +58,8 @@ namespace Abel.TranHuongDao.Core
             float collisionThreshold,
             IEnemyManager enemyManager,
             IRender2DService renderService,
-            FD.Modules.VFX.IVFXManager vfxManager)
+            FD.Modules.VFX.IVFXManager vfxManager,
+            System.Action<Vector3, int> onHit = null)
         {
             InstanceID = ++_idCounter;
 
@@ -74,6 +76,7 @@ namespace Abel.TranHuongDao.Core
             _enemyManager = enemyManager;
             _renderService = renderService;
             _vfxManager = vfxManager;
+            _onHitCallback = onHit;
 
             // Register with the render pipeline
             if (string.IsNullOrEmpty(_trailVfxID))
@@ -160,6 +163,8 @@ namespace Abel.TranHuongDao.Core
             {
                 _vfxManager.PlayEffectAt(_hitVfxID, _position);
             }
+
+            _onHitCallback?.Invoke(_position, _targetEnemyID);
 
             Destroy();
         }

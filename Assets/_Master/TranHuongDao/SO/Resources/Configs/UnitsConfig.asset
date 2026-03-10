@@ -265,13 +265,13 @@ MonoBehaviour:
     MoveSpeed: 5
     BaseDamage: 50
     AttackCooldown: 1
-    AttackRange: 50
-    ProjectileSpeed: 15
+    AttackRange: 300
+    ProjectileSpeed: 5
     AttackType: 0
     TargetType: 1
     BuildCost: 100
     Tier: 1
-    AttackAbilityID: single_attack_towerbase
+    AttackAbilityID: multiple_attack_sequence
     SkillAbilityID: 
   - UnitID: unit_ultimate_morgan
     MaxHealth: 100
@@ -312,7 +312,20 @@ MonoBehaviour:
     Tier: 1
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
-  - UnitID: NewUnit_23
+  - UnitID: ultimate_boar_0381
+    MaxHealth: 100
+    MoveSpeed: 5
+    BaseDamage: 10
+    AttackCooldown: 1
+    AttackRange: 5
+    ProjectileSpeed: 15
+    AttackType: 0
+    TargetType: 1
+    BuildCost: 100
+    Tier: 1
+    AttackAbilityID: attack_towerbase
+    SkillAbilityID: 
+  - UnitID: ultimate_boar_0381_
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10

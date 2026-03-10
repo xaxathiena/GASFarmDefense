@@ -15,6 +15,7 @@ namespace Abel.TranHuongDao.Core.Abilities
         public string trailVfxID = "";
         public string hitVfxID = "";
         public float attackRange = 5f;
+        public float bulletSpeed = 10f;
         public GameplayEffect hitEffect;
         public float baseDamage = 15f;
 

@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a5c44a961ba7354ebb92afd2034d011, type: 3}
-  m_Name: TD_TowerNormalAttack
-  m_EditorClassIdentifier: Assembly-CSharp::Abel.TranHuongDao.Core.TDTowerNormalAttackData
-  abilityID: attack_towerbase
-  abilityName: Tower Normal Attack
+  m_Script: {fileID: 11500000, guid: 4c9d71b2b9e68cc4db2e3cfd6dceee6a, type: 3}
+  m_Name: TD_MultiSequenceAttackData
+  m_EditorClassIdentifier: 
+  abilityID: multiple_attack_sequence
+  abilityName: 
   description: 
   icon: {fileID: 0}
   cooldownDuration:
@@ -82,5 +82,14 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  damageEffect: {fileID: 11400000, guid: bac5b43ec2298445699a71dc0638d249, type: 2}
-  collisionThreshold: 0.35
+  trailID: bullet_normal
+  trailVfxID: bullet_vfx_new_6
+  hitVfxID: hit_vfx_new_2
+  attackRange: 5
+  bulletSpeed: 10
+  hitEffect: {fileID: 11400000, guid: bac5b43ec2298445699a71dc0638d249, type: 2}
+  baseDamage: 15
+  isSequential: 1
+  maxTargets: 6
+  maxHitsPerTarget: 1
+  searchRadius: 4

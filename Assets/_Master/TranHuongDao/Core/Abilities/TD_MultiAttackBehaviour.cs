@@ -46,27 +46,65 @@ namespace Abel.TranHuongDao.Core.Abilities
             if (multiData.isSequential)
             {
                 // Sequential (Chain) Mode
-                // Typically fires 1 bullet first, when that bullet hits, the BulletManager 
-                // bounces it dynamically. We pass bounce limits to the bullet manager if API allowed.
-                // Assuming BulletManager handles single target spawn, and relies on an event for bounce logic.
-                // We'll spawn the initial projectile for the closest enemy here.
+                // Find nearest valid target dynamically from the collision point.
 
-                int closestID = _enemyManager.GetClosestEnemyInRange(originPos, multiData.attackRange);
-                if (closestID != -1)
+                // Track IDs we have already hit or targeted, to avoid bouncing to the same enemy.
+                HashSet<int> hitTargets = new HashSet<int>();
+                int targetsHit = 0;
+
+                System.Action<Vector3> spawnNextChainedBullet = null;
+                spawnNextChainedBullet = (currentPos) =>
                 {
+                    if (targetsHit >= multiData.maxTargets) return;
+                    if (asc == null || asc.GetOwner() == null) return; // safety against tower removal
+
+                    // We allocate a local list for the callback because multiple chains 
+                    // could be running concurrently, making a shared class-level list unsafe.
+                    List<int> localCache = new List<int>(16);
+                    _enemyManager.GetEnemiesInRange(currentPos, multiData.attackRange, localCache);
+
+                    int nextTargetID = -1;
+                    float minSqrDist = float.MaxValue;
+
+                    foreach (int id in localCache)
+                    {
+                        if (hitTargets.Contains(id)) continue;
+                        if (_enemyManager.TryGetEnemyPosition(id, out Vector3 enemyPos))
+                        {
+                            float sqrDist = (enemyPos - currentPos).sqrMagnitude;
+                            if (sqrDist < minSqrDist)
+                            {
+                                minSqrDist = sqrDist;
+                                nextTargetID = id;
+                            }
+                        }
+                    }
+
+                    if (nextTargetID == -1) return; // Discontinue chain if no valid targets left
+
+                    hitTargets.Add(nextTargetID);
+                    targetsHit++;
+
                     _bulletManager.SpawnBullet(
-                        trailID: multiData.trailID, // The chained trail ID
+                        trailID: multiData.trailID,
                         trailVfxID: multiData.trailVfxID,
                         hitVfxID: multiData.hitVfxID,
-                        targetEnemyInstanceID: closestID,
-                        spawnPosition: originPos,
+                        targetEnemyInstanceID: nextTargetID,
+                        spawnPosition: currentPos,
                         sourceASC: asc,
                         damageEffect: multiData.hitEffect,
                         damageAmount: multiData.baseDamage,
-                        bulletSpeed: 25f,
-                        collisionThreshold: 0.5f
+                        bulletSpeed: multiData.bulletSpeed,
+                        collisionThreshold: 0.5f,
+                        onHit: (hitPos, _) =>
+                        {
+                            spawnNextChainedBullet(hitPos);
+                        }
                     );
-                }
+                };
+
+                // Start the chain from the tower's origin position
+                spawnNextChainedBullet(originPos);
             }
             else
             {

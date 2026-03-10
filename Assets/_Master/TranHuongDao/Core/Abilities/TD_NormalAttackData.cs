@@ -24,6 +24,9 @@ namespace Abel.TranHuongDao.Core.Abilities
         [Tooltip("Maximum range to search for an enemy.")]
         public float attackRange = 5f;
 
+        [Tooltip("Speed of the bullet.")]
+        public float bulletSpeed = 10f;
+
         [Tooltip("Effect applied to target on hit (optional).")]
         public GameplayEffect hitEffect;
 
