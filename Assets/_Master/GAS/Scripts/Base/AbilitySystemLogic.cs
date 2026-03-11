@@ -13,11 +13,13 @@ namespace GAS
     {
         private readonly GameplayAbilityLogic _abilityLogic;
         private readonly GameplayEffectService _effectService;
+        private readonly FD.IEventBus _eventBus;
 
-        public AbilitySystemLogic(GameplayAbilityLogic abilityLogic, GameplayEffectService effectService)
+        public AbilitySystemLogic(GameplayAbilityLogic abilityLogic, GameplayEffectService effectService, FD.IEventBus eventBus)
         {
             this._abilityLogic = abilityLogic;
             this._effectService = effectService;
+            this._eventBus = eventBus;
         }
         #region Cooldowns
 
@@ -68,13 +70,20 @@ namespace GAS
                 if (tag != GameplayTag.None)
                 {
                     byte tagByte = (byte)tag;
+                    int newCount = 0;
                     if (data.ActiveTagCounts.ContainsKey(tagByte))
                     {
-                        data.ActiveTagCounts[tagByte]++;
+                        newCount = ++data.ActiveTagCounts[tagByte];
                     }
                     else
                     {
+                        newCount = 1;
                         data.ActiveTagCounts[tagByte] = 1;
+                    }
+
+                    if (data.Owner != null)
+                    {
+                        _eventBus.Publish(new GameplayTagChangedEvent(data.Owner.gameObject.GetInstanceID(), tag, newCount));
                     }
                 }
             }
@@ -90,11 +99,16 @@ namespace GAS
                 byte tagByte = (byte)tag;
                 if (data.ActiveTagCounts.ContainsKey(tagByte))
                 {
-                    data.ActiveTagCounts[tagByte]--;
+                    int newCount = --data.ActiveTagCounts[tagByte];
 
-                    if (data.ActiveTagCounts[tagByte] <= 0)
+                    if (newCount <= 0)
                     {
                         data.ActiveTagCounts.Remove(tagByte);
+                    }
+
+                    if (data.Owner != null)
+                    {
+                        _eventBus.Publish(new GameplayTagChangedEvent(data.Owner.gameObject.GetInstanceID(), tag, newCount));
                     }
                 }
             }

@@ -6,6 +6,7 @@ using Abel.TowerDefense.Render;    // GameRenderManager
 using Abel.TowerDefense.Config;    // UnitRenderDatabase
 using Abel.TowerDefense.DebugTools;
 using Abel.TowerDefense; // UnitDebugger
+
 // Recompile trigger: Feb 22 2026
 
 namespace Abel.TranHuongDao.Core
@@ -35,6 +36,9 @@ namespace Abel.TranHuongDao.Core
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder); // Registers Render2DService, GameRenderManager, UnitDebugger, and UnitRenderDatabase
+
+            // ── Event System ──────────────────────────────────────────────────────
+            builder.Register<FD.EventBus>(Lifetime.Singleton).As<FD.IEventBus>().As<System.IDisposable>();
 
             // ── VFX System ────────────────────────────────────────────────────────
             builder.RegisterEntryPoint<FD.Modules.VFX.VFXManager>(Lifetime.Singleton).As<FD.Modules.VFX.IVFXManager>();

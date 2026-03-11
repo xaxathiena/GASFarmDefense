@@ -18,22 +18,25 @@ namespace Abel.TranHuongDao.Core
     public class EnemyManager : IEnemyManager, ITickable, IStartable, IDisposable
     {
         // ── Dependencies ─────────────────────────────────────────────────────────
-        private readonly IObjectResolver  container;      // resolves Transient ASC per enemy
+        private readonly IObjectResolver container;      // resolves Transient ASC per enemy
         private readonly IRender2DService renderService;
-        private readonly IConfigService   configService;
+        private readonly IConfigService configService;
         /// <summary>
         /// Service for generating unique instance IDs for enemies.  Used for render mapping and GAS targeting.
         /// </summary>
         private readonly IInstanceIDService instanceIDService;
 
+        private readonly FD.IEventBus eventBus;
+        private readonly FD.Modules.VFX.IVFXManager vfxManager;
+
         // ── Active enemies ────────────────────────────────────────────────────────
         private readonly Dictionary<int, Enemy> activeEnemies = new Dictionary<int, Enemy>(128);
-        private readonly List<int>              activeIDBuffer = new List<int>(128);
+        private readonly List<int> activeIDBuffer = new List<int>(128);
         // Enemies that died this frame – removed after the Tick loop
-        private readonly List<Enemy>            pendingRemoval = new List<Enemy>(16);
+        private readonly List<Enemy> pendingRemoval = new List<Enemy>(16);
 
         // ── IEnemyManager events ─────────────────────────────────────────────────
-        public event Action<int>       OnEnemySpawned;
+        public event Action<int> OnEnemySpawned;
         public event Action<int, bool> OnEnemyRemoved;   // (instanceID, reachedBase)
 
         // ── Active count ─────────────────────────────────────────────────────────
@@ -47,22 +50,26 @@ namespace Abel.TranHuongDao.Core
 
         private struct SpawnQueueEntry
         {
-            public string                 enemyID;
+            public string enemyID;
             public IReadOnlyList<Vector3> waypoints;
-            public float                  delayRemaining;   // seconds until this unit spawns
+            public float delayRemaining;   // seconds until this unit spawns
         }
 
         // ─────────────────────────────────────────────────────────────────────────
         public EnemyManager(
-            IObjectResolver     container,
-            IRender2DService    renderService,
-            IConfigService      configService,
-            IInstanceIDService  instanceIDService)
+            IObjectResolver container,
+            IRender2DService renderService,
+            IConfigService configService,
+            IInstanceIDService instanceIDService,
+            FD.IEventBus eventBus,
+            FD.Modules.VFX.IVFXManager vfxManager)
         {
-            this.container         = container;
-            this.renderService     = renderService;
-            this.configService     = configService;
+            this.container = container;
+            this.renderService = renderService;
+            this.configService = configService;
             this.instanceIDService = instanceIDService;
+            this.eventBus = eventBus;
+            this.vfxManager = vfxManager;
         }
 
         // ── VContainer entry points ──────────────────────────────────────────────
@@ -131,9 +138,9 @@ namespace Abel.TranHuongDao.Core
 
         public int GetClosestEnemyInRange(Vector3 origin, float range)
         {
-            float rangeSqr  = range * range;
+            float rangeSqr = range * range;
             float minDistSqr = float.MaxValue;
-            int   bestID    = -1;
+            int bestID = -1;
 
             foreach (var kvp in activeEnemies)
             {
@@ -144,7 +151,7 @@ namespace Abel.TranHuongDao.Core
                 if (distSqr <= rangeSqr && distSqr < minDistSqr)
                 {
                     minDistSqr = distSqr;
-                    bestID     = kvp.Key;
+                    bestID = kvp.Key;
                 }
             }
 
@@ -201,15 +208,15 @@ namespace Abel.TranHuongDao.Core
             {
                 if (entry == null) continue;
 
-                int pathIdx   = Mathf.Clamp(entry.pathIndex, 0, paths.Length - 1);
+                int pathIdx = Mathf.Clamp(entry.pathIndex, 0, paths.Length - 1);
                 var waypoints = paths[pathIdx];
 
                 for (int i = 0; i < entry.count; i++)
                 {
                     spawnQueue.Add(new SpawnQueueEntry
                     {
-                        enemyID        = entry.enemyID,
-                        waypoints      = waypoints,
+                        enemyID = entry.enemyID,
+                        waypoints = waypoints,
                         delayRemaining = accumulated
                     });
 
@@ -269,7 +276,7 @@ namespace Abel.TranHuongDao.Core
             {
                 bool reachedBase = enemy.HasReachedEnd;
 
-                enemy.OnDeath      -= HandleEnemyDeath;
+                enemy.OnDeath -= HandleEnemyDeath;
                 enemy.OnReachedEnd -= HandleEnemyReachedEnd;
                 enemy.Cleanup();                              // removes render layer
                 activeEnemies.Remove(enemy.InstanceID);
@@ -285,7 +292,7 @@ namespace Abel.TranHuongDao.Core
         /// from VContainer, wires an <see cref="Enemy"/>, then registers it.
         /// </summary>
         private int SpawnEnemyInternal(
-            string                 enemyID,
+            string enemyID,
             IReadOnlyList<Vector3> waypoints)
         {
             if (waypoints == null || waypoints.Count == 0)
@@ -303,13 +310,15 @@ namespace Abel.TranHuongDao.Core
             }
 
             // VContainer injects all dependencies into the new ASC instance automatically.
-            var asc   = container.Resolve<AbilitySystemComponent>();
+            var asc = container.Resolve<AbilitySystemComponent>();
             var enemy = new Enemy(asc);
-            int id    = instanceIDService.GetNextID();
+            int id = instanceIDService.GetNextID();
 
-            enemy.Initialize(id, enemyID, config, waypoints, renderService);
+            var tagVFXConfig = configService.GetConfig<TagVFXConfig>();
 
-            enemy.OnDeath      += HandleEnemyDeath;
+            enemy.Initialize(id, enemyID, config, waypoints, renderService, eventBus, vfxManager, tagVFXConfig);
+
+            enemy.OnDeath += HandleEnemyDeath;
             enemy.OnReachedEnd += HandleEnemyReachedEnd;
 
             activeEnemies.Add(id, enemy);
@@ -320,7 +329,7 @@ namespace Abel.TranHuongDao.Core
 
         private void KillEnemy(Enemy enemy, bool reachedBase, bool notify)
         {
-            enemy.OnDeath      -= HandleEnemyDeath;
+            enemy.OnDeath -= HandleEnemyDeath;
             enemy.OnReachedEnd -= HandleEnemyReachedEnd;
             enemy.Cleanup();
             activeEnemies.Remove(enemy.InstanceID);

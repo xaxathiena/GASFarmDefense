@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using GAS;
 using Abel.TranHuongDao.Core.Abilities;
+using Abel.TranHuongDao.Core.VFX;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -41,6 +42,9 @@ namespace Abel.TranHuongDao.Core
         private IRender2DService renderService;
         private bool renderInitialized;
 
+        // ── VFX ──────────────────────────────────────────────────────────────────
+        private StatusEffectVFXController vfxController;
+
         // ── Proxy Transform (needed by ASC.GetOwner() for ability range checks) ──
         // A lightweight GameObject created once and destroyed on Cleanup().
         private GameObject proxyGO;
@@ -77,7 +81,10 @@ namespace Abel.TranHuongDao.Core
             UnitConfig config,
             GameplayAbilityData attackAbilityData,
             GameplayAbilityData skillAbilityData,
-            IRender2DService renderService)
+            IRender2DService renderService,
+            FD.IEventBus eventBus,
+            FD.Modules.VFX.IVFXManager vfxManager,
+            TagVFXConfig vfxConfig)
         {
             InstanceID = instanceID;
             TowerID = towerID;
@@ -112,6 +119,15 @@ namespace Abel.TranHuongDao.Core
             // ── Render ─────────────────────────────────────────────────────────
             renderService.RenderUnit(TowerID, InstanceID, Position);
             renderInitialized = true;
+
+            // ── VFX ────────────────────────────────────────────────────────────
+            vfxController = new StatusEffectVFXController(
+                instanceID,
+                () => Position,
+                eventBus,
+                vfxManager,
+                vfxConfig
+            );
         }
 
         /// <summary>Called every frame by TowerManager.Tick().</summary>
@@ -126,6 +142,8 @@ namespace Abel.TranHuongDao.Core
 
             TryFireAtEnemy();
             TryUseSkill();
+
+            vfxController?.Tick(dt);
         }
 
         /// <summary>Remove render layer and proxy Transform. Called by TowerManager.</summary>
@@ -144,6 +162,8 @@ namespace Abel.TranHuongDao.Core
                 UnityEngine.Object.Destroy(proxyGO);
                 proxyGO = null;
             }
+
+            vfxController?.Dispose();
         }
 
         // ── Private ──────────────────────────────────────────────────────────────

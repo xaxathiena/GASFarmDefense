@@ -26,6 +26,9 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         private readonly IInstanceIDService instanceIDService;
 
+        private readonly FD.IEventBus eventBus;
+        private readonly FD.Modules.VFX.IVFXManager vfxManager;
+
         // ── Tower registry ────────────────────────────────────────────────────────
         private readonly Dictionary<int, Tower> activeTowers = new Dictionary<int, Tower>(32);
         private readonly List<int> activeIDBuffer = new List<int>(32);
@@ -43,12 +46,16 @@ namespace Abel.TranHuongDao.Core
             IObjectResolver container,
             IRender2DService renderService,
             IConfigService configService,
-            IInstanceIDService instanceIDService)
+            IInstanceIDService instanceIDService,
+            FD.IEventBus eventBus,
+            FD.Modules.VFX.IVFXManager vfxManager)
         {
             this.container = container;
             this.renderService = renderService;
             this.configService = configService;
             this.instanceIDService = instanceIDService;
+            this.eventBus = eventBus;
+            this.vfxManager = vfxManager;
         }
 
         public void Tick()
@@ -153,7 +160,9 @@ namespace Abel.TranHuongDao.Core
                         Debug.LogWarning($"[TowerManager] Skill ability '{config.SkillAbilityID}' not found in AbilitiesConfig for unit '{towerID}'.");
             }
 
-            tower.Initialize(id, towerID, position, config, attackAbility, skillAbility, renderService);
+            var tagVFXConfig = configService.GetConfig<TagVFXConfig>();
+
+            tower.Initialize(id, towerID, position, config, attackAbility, skillAbility, renderService, eventBus, vfxManager, tagVFXConfig);
             tower.OnDestroyed += HandleTowerDestroyed;
 
             // Attach a physics collider and TowerClickProxy to the proxy GameObject so that

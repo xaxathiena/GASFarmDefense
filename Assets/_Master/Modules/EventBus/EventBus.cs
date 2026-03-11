@@ -3,63 +3,85 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices; // Required for IsReadOnlyAttribute
 using UnityEngine;
+using R3;
 
 namespace FD
 {
-    public class EventBus : IEventBus
+    public class EventBus : IEventBus, IDisposable
     {
-        // Dictionary to store subscribers.
-        // Key: Type of the Event (struct).
-        // Value: The delegate (Action<T>) containing all listeners.
-        private readonly Dictionary<Type, Delegate> _subscribers = new Dictionary<Type, Delegate>();
+        // Maintains a dictionary mapping the Event Type to its corresponding R3 Subject.
+        private readonly Dictionary<Type, object> _subjects = new Dictionary<Type, object>();
+
+        // Backwards compatibility mappings for Action subscriptions
+        private readonly Dictionary<Delegate, IDisposable> _actionBindings = new Dictionary<Delegate, IDisposable>();
 
         // Cache to store types that have already been validated (optimization for Editor).
         private static readonly HashSet<Type> _validatedTypes = new HashSet<Type>();
 
+        /// <inheritdoc />
+        public Observable<T> Receive<T>() where T : struct
+        {
+#if UNITY_EDITOR
+            ValidateReadonlyStruct<T>();
+#endif
+            var type = typeof(T);
+            if (!_subjects.TryGetValue(type, out var subject))
+            {
+                subject = new Subject<T>();
+                _subjects[type] = subject;
+            }
+
+            return ((Subject<T>)subject).AsObservable();
+        }
+
         public void Publish<T>(T eventMessage) where T : struct
         {
 #if UNITY_EDITOR
-            // Validate that the struct is readonly (Editor only).
             ValidateReadonlyStruct<T>();
 #endif
-
             var type = typeof(T);
-            if (_subscribers.TryGetValue(type, out var del))
+            if (_subjects.TryGetValue(type, out var subject))
             {
-                // Safe cast and invoke.
-                // Since T is a struct, this does not cause boxing/unboxing allocation.
-                (del as Action<T>)?.Invoke(eventMessage);
+                ((Subject<T>)subject).OnNext(eventMessage);
             }
         }
 
         public void Subscribe<T>(Action<T> listener) where T : struct
         {
-#if UNITY_EDITOR
-            ValidateReadonlyStruct<T>();
-#endif
-            var type = typeof(T);
-            if (!_subscribers.ContainsKey(type))
-            {
-                _subscribers[type] = null;
-            }
-            // Combine delegates (Multicast).
-            _subscribers[type] = Delegate.Combine(_subscribers[type], listener);
+            if (listener == null) return;
+            if (_actionBindings.ContainsKey(listener)) return;
+
+            var subscription = Receive<T>().Subscribe(listener);
+            _actionBindings[listener] = subscription;
         }
 
         public void Unsubscribe<T>(Action<T> listener) where T : struct
         {
-            var type = typeof(T);
-            if (_subscribers.ContainsKey(type))
-            {
-                var current = _subscribers[type];
-                _subscribers[type] = Delegate.Remove(current, listener);
+            if (listener == null) return;
 
-                // If no listeners remain, remove the key to keep the dictionary clean.
-                if (_subscribers[type] == null)
+            if (_actionBindings.TryGetValue(listener, out var subscription))
+            {
+                subscription.Dispose();
+                _actionBindings.Remove(listener);
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (var binding in _actionBindings.Values)
+            {
+                binding.Dispose();
+            }
+            _actionBindings.Clear();
+
+            foreach (var subject in _subjects.Values)
+            {
+                if (subject is IDisposable disposable)
                 {
-                    _subscribers.Remove(type);
+                    disposable.Dispose();
                 }
             }
+            _subjects.Clear();
         }
 
         // --- VALIDATION LOGIC (EDITOR ONLY) ---
@@ -68,7 +90,7 @@ namespace FD
         private void ValidateReadonlyStruct<T>()
         {
             var type = typeof(T);
-            
+
             // Skip if already checked.
             if (_validatedTypes.Contains(type)) return;
 
