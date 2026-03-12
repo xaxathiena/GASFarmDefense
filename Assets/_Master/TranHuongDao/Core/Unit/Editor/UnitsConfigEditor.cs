@@ -8,7 +8,7 @@ using Abel.TranHuongDao.Core;
 namespace Abel.TranHuongDao.EditorTools
 {
     [CustomEditor(typeof(UnitsConfig))]
-    public class UnitsConfigEditor : Editor
+    public class UnitsConfigEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

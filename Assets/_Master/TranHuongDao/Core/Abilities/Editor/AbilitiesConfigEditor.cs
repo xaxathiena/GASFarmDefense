@@ -11,7 +11,7 @@ namespace Abel.TranHuongDao.EditorTools
     /// Displays a searchable, scrollable list of all registered abilities.
     /// </summary>
     [CustomEditor(typeof(AbilitiesConfig))]
-    public class AbilitiesConfigEditor : Editor
+    public class AbilitiesConfigEditor : UnityEditor.Editor
     {
         // ── State ────────────────────────────────────────────────────────────
         private string searchText = "";

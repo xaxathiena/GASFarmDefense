@@ -42,7 +42,14 @@ namespace Abel.TranHuongDao.Core.Abilities
         [Tooltip("Optional sub-ability to trigger upon successful proc.")]
         public GameplayAbilityData abilityToTrigger;
 
-        [Tooltip("If > 0, effect is applied dynamically in an AoE radius. If 0, only pure single target.")]
+        [Header("Modular Proc Actions")]
+        [Tooltip("If > 0, an AoE radius check is performed on the target's location instead of just single-target.")]
         public float aoeRadius = 0f;
+
+        [Tooltip("Direct flat damage to deal upon proc (bypasses GameplayEffect complexity for simple nukes/strikes).")]
+        public float flatDamage = 0f;
+
+        [Tooltip("Prefab to instantiate upon proc (e.g. Goblin, Nuke VFX, Fireball).")]
+        public GameObject prefabToSpawn;
     }
 }

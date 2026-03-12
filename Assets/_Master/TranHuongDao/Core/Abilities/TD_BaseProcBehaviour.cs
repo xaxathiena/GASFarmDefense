@@ -38,19 +38,19 @@ namespace Abel.TranHuongDao.Core.Abilities
             var procData = data as TD_BaseProcData;
             if (procData == null) return;
             
-            // Execute the outcome based on constraints
-            ProcessProc(procData, asc);
+            // Note: Since OnActivated doesn't pass the custom trigger target payload implicitly in basic GAS yet,
+            // we bypass OnActivated for data-driven procs and directly evaluate them through EvaluateProc -> ProcessProc.
+            // This is a common pattern for fast on-hit triggers.
         }
 
         // Logic block executed when proc conditions are met through external game events
-        private void ProcessProc(TD_BaseProcData procData, AbilitySystemComponent sourceASC)
+        private void ProcessProc(TD_BaseProcData procData, AbilitySystemComponent sourceASC, AbilitySystemComponent targetASC)
         {
-            Vector3 centerPos = sourceASC.GetOwner().position;
+            if (targetASC == null) return; // Need a target to proceed
             
-            // Handling Target resolution (Simplified to current tracked/latest enemy for AoE demonstration)
-            // Ideally, the external trigger should pass target ASC via Payload or Context.
+            Vector3 centerPos = targetASC.GetOwner().position;
             
-            // Get all in AoE or single closest
+            // 1. AoE Handling vs Single Target
             if (procData.aoeRadius > 0f)
             {
                 List<int> enemiesInRadius = new List<int>();
@@ -58,37 +58,52 @@ namespace Abel.TranHuongDao.Core.Abilities
                 
                 foreach (var enemyID in enemiesInRadius)
                 {
-                    if (_enemyManager.TryGetEnemyASC(enemyID, out var targetASC))
+                    if (_enemyManager.TryGetEnemyASC(enemyID, out var aoeTargetASC))
                     {
-                        ApplyEffect(procData, sourceASC, targetASC);
+                        ApplyProcActions(procData, sourceASC, aoeTargetASC);
                     }
                 }
             }
             else
             {
-                // Single execution fallback 
-                int closestID = _enemyManager.GetClosestEnemyInRange(centerPos, 10f);
-                if (closestID != -1 && _enemyManager.TryGetEnemyASC(closestID, out var targetASC))
-                {
-                    if (procData.executionTarget == EProcContextTarget.Target)
-                        ApplyEffect(procData, sourceASC, targetASC);
-                    else
-                        ApplyEffect(procData, sourceASC, sourceASC); // Self
-                }
+                // Single-target execution
+                if (procData.executionTarget == EProcContextTarget.Target)
+                    ApplyProcActions(procData, sourceASC, targetASC);
+                else
+                    ApplyProcActions(procData, sourceASC, sourceASC); // Self
             }
 
-            // Trigger secondary ability recursively if configured
+            // 2. Trigger secondary ability recursively if configured
             if (procData.abilityToTrigger != null)
             {
                 sourceASC.TryActivateAbility(procData.abilityToTrigger);
             }
         }
 
-        private void ApplyEffect(TD_BaseProcData procData, AbilitySystemComponent source, AbilitySystemComponent target)
+        private void ApplyProcActions(TD_BaseProcData procData, AbilitySystemComponent source, AbilitySystemComponent target)
         {
+            // A. Apply Gameplay Effect (Buffs, Debuffs, DoTs, CC)
             if (procData.effectToApply != null)
             {
                 _logic.ApplyEffectToTarget(procData.effectToApply, source, target, procData, null);
+            }
+
+            // B. Instantly apply Flat Damage directly to the UnitAttributeSet
+            if (procData.flatDamage > 0f)
+            {
+                var targetAttrSet = target.GetAttributeSet<UnitAttributeSet>();
+                if (targetAttrSet != null)
+                {
+                    targetAttrSet.TakeDamage(procData.flatDamage);
+                }
+            }
+
+            // C. Instantiate external Prefab (e.g. Goblin, Nuke VFX)
+            if (procData.prefabToSpawn != null && target.GetOwner() != null)
+            {
+                // For spawning, we instantiate exactly at the target's position.
+                // The prefab should have its own logic for cleanup or subsequent actions.
+                Object.Instantiate(procData.prefabToSpawn, target.GetOwner().position, Quaternion.identity);
             }
         }
 
@@ -125,7 +140,9 @@ namespace Abel.TranHuongDao.Core.Abilities
 
             if (isTriggered)
             {
-                asc.TryActivateAbility(procData);
+                // Instead of TryActivateAbility (which loses the `targetAsc` payload in base GAS),
+                // we directly process the action with the valid target payload here.
+                ProcessProc(procData, asc, targetAsc);
             }
         }
     }
