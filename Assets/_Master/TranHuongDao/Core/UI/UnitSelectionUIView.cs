@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Abel.TowerDefense.Config;
+using FD.Ability;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -26,11 +27,17 @@ namespace Abel.TranHuongDao.Core
         [SerializeField] private TextMeshProUGUI nameText;
         [SerializeField] private TextMeshProUGUI hpText;
         [SerializeField] private TextMeshProUGUI damageText;
+        [SerializeField] private TextMeshProUGUI normalAttackRateText;
         [SerializeField] private TextMeshProUGUI armorText;
         [SerializeField] private TextMeshProUGUI tierText;
+        [SerializeField] private TextMeshProUGUI speedText;
+        [SerializeField] private TextMeshProUGUI rofText;
 
         [Header("Inventory")]
         [SerializeField] private Transform inventoryGridRoot;
+
+        [Header("Active Effects")]
+        [SerializeField] private ActiveEffectsPanel activeEffectsPanel;
 
         [Header("Panel")]
         [SerializeField] private GameObject panelRoot;
@@ -76,7 +83,7 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         /// <param name="config">Authored balance snapshot — used for static meta only.</param>
         /// <param name="attributes">Live GAS attribute set — source of truth for all modifiable stats.</param>
-        public void ShowUnit(UnitConfig config, UnitAttributeSet attributes)
+        public void ShowUnit(UnitConfig config, UnitAttributeSet attributes, GAS.AbilitySystemComponent asc = null)
         {
             // Activate the root panel first so all child widgets are enabled.
             SetPanelActive(true);
@@ -100,10 +107,13 @@ namespace Abel.TranHuongDao.Core
             // Damage — dynamic: reflects active buffs/debuffs applied by GameplayEffects
             if (damageText != null)
                 damageText.text = Mathf.CeilToInt(attributes.Damage.CurrentValue).ToString();
-
+            if (speedText != null)
+                speedText.text = attributes.MoveSpeed.CurrentValue.ToString("0.##");
             // Armor — no dedicated attribute yet; placeholder until the field is added.
             if (armorText != null)
                 armorText.text = "0";
+            if (rofText != null)
+                rofText.text = attributes.ROF.CurrentValue.ToString("0.##");
 
             // Tier — static meta from config; GAS never modifies this.
             if (tierText != null)
@@ -111,6 +121,9 @@ namespace Abel.TranHuongDao.Core
 
             // Portrait animation — look up idle clip from render database.
             UpdatePortrait(config.UnitID);
+
+            // Active effects panel
+            activeEffectsPanel?.Refresh(asc);
         }
 
         public void SetMergeButtonActive(bool active, UnityEngine.Events.UnityAction onClickAction = null)
@@ -129,6 +142,7 @@ namespace Abel.TranHuongDao.Core
         public void Hide()
         {
             _portraitAnimator?.Stop();
+            activeEffectsPanel?.Clear();
             SetPanelActive(false);
             if (mergeBtn != null)
                 mergeBtn.gameObject.SetActive(false);
@@ -139,7 +153,7 @@ namespace Abel.TranHuongDao.Core
         /// the portrait animation or toggling panel visibility.
         /// Called every frame while a unit is selected.
         /// </summary>
-        public void RefreshStats(UnitConfig config, UnitAttributeSet attributes)
+        public void RefreshStats(UnitConfig config, UnitAttributeSet attributes, GAS.AbilitySystemComponent asc = null)
         {
             if (hpText != null)
             {
@@ -149,7 +163,16 @@ namespace Abel.TranHuongDao.Core
             }
 
             if (damageText != null)
-                damageText.text = Mathf.CeilToInt(attributes.Damage.CurrentValue).ToString();
+                damageText.text = attributes.Damage.CurrentValue.ToString();
+            if (normalAttackRateText != null)
+                normalAttackRateText.text = attributes.NormalCooldownRate.CurrentValue.ToString("0.##");
+            if (speedText != null)
+                speedText.text = attributes.MoveSpeed.CurrentValue.ToString("0.##");
+            if (rofText != null) rofText.text = attributes.ROF.CurrentValue.ToString("0.##");
+
+            // Keep active-effect slots in sync (re-bind in case list changed, then tick bars)
+            activeEffectsPanel.Refresh(asc);
+            activeEffectsPanel.Tick();
         }
 
         // ── Private helpers ───────────────────────────────────────────────────────

@@ -14,18 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectName: 
   description: 
+  icon: {fileID: 0}
   durationType: 1
   durationMagnitude: 5
   isPeriodic: 0
   period: 1
   modifiers:
   - attribute:
-      attributeType: 0
+      attributeType: 15
     operation: 1
     calculationType: 0
     scalableMagnitude:
       scalingMode: 0
-      flatValue: 0.9
+      flatValue: 1.1
       scalingCurve:
         serializedVersion: 2
         m_Curve:
@@ -63,11 +64,11 @@ MonoBehaviour:
     postMultiplyAdditiveValue: 0
     customCalculation: {fileID: 0}
     setByCallerTag: 
-    magnitude: 0.9
   grantedTags: 
   applicationRequiredTags: 
   applicationBlockedByTags: 
   removeTagsOnApplication: 
-  allowStacking: 0
-  maxStacks: 1
+  allowStacking: 1
+  maxStacks: 10
   refreshDurationOnStack: 1
+  stackingDurationPolicy: 2

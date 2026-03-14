@@ -4,6 +4,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using GAS;
+using System.Linq;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -114,7 +115,40 @@ namespace Abel.TranHuongDao.Core
         public bool TryGetTower(int instanceID, out Tower tower)
             => activeTowers.TryGetValue(instanceID, out tower);
 
-        // ── ITowerSpawner ──────────────────────────────────────────────────────────
+        public void GetTowersInRange(Vector3 center, float radius, List<GAS.AbilitySystemComponent> ignoreList, List<GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue)
+        {
+            float sqrRadius = radius * radius;
+
+            // 1. Collect candidates that are actually in range first.
+            var candidates = new List<Tower>();
+            foreach (var tower in activeTowers.Values)
+            {
+                if ((tower.Position - center).sqrMagnitude <= sqrRadius && !ignoreList.Contains(tower.ASC))
+                {
+                    candidates.Add(tower);
+                }
+            }
+
+            if (candidates.Count == 0) return;
+
+            // 2. If we have fewer candidates than requested, just return all of them.
+            if (candidates.Count <= maxCount)
+            {
+                foreach (var c in candidates) results.Add(c.ASC);
+                return;
+            }
+
+            // 3. Otherwise, pick 'maxCount' random candidates using a partial Fisher-Yates shuffle.
+            for (int i = 0; i < maxCount; i++)
+            {
+                int randomIndex = UnityEngine.Random.Range(i, candidates.Count);
+                (candidates[i], candidates[randomIndex]) = (candidates[randomIndex], candidates[i]);
+
+                results.Add(candidates[i].ASC);
+            }
+        }
+
+
 
         /// <summary>
         /// Spawns a tower without re-checking cell availability.

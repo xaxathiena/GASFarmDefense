@@ -23,6 +23,7 @@ namespace GAS.Editor
         private SerializedProperty allowStackingProp;
         private SerializedProperty maxStacksProp;
         private SerializedProperty refreshDurationOnStackProp;
+        private SerializedProperty stackingDurationPolicy;
 
         private bool showDurationSettings = true;
         private bool showModifiers = true;
@@ -45,6 +46,7 @@ namespace GAS.Editor
             allowStackingProp = serializedObject.FindProperty("allowStacking");
             maxStacksProp = serializedObject.FindProperty("maxStacks");
             refreshDurationOnStackProp = serializedObject.FindProperty("refreshDurationOnStack");
+            stackingDurationPolicy = serializedObject.FindProperty("stackingDurationPolicy");
         }
 
         public override void OnInspectorGUI()
@@ -95,16 +97,16 @@ namespace GAS.Editor
         private void DrawEffectHeader()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             GUIStyle titleStyle = new GUIStyle(EditorStyles.boldLabel)
             {
                 fontSize = 14,
                 alignment = TextAnchor.MiddleCenter
             };
-            
+
             EditorGUILayout.LabelField("Gameplay Effect", titleStyle);
             EditorGUILayout.LabelField("Based on Unreal Engine GAS", EditorStyles.centeredGreyMiniLabel);
-            
+
             EditorGUILayout.EndVertical();
         }
 
@@ -112,38 +114,38 @@ namespace GAS.Editor
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.LabelField("Effect Info", EditorStyles.boldLabel);
-            
+
             EditorGUILayout.PropertyField(effectNameProp);
             EditorGUILayout.PropertyField(descriptionProp);
-            
+
             EditorGUILayout.EndVertical();
         }
 
         private void DrawDurationSettings()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             EditorGUILayout.PropertyField(durationTypeProp);
-            
+
             var durationType = (EGameplayEffectDurationType)durationTypeProp.enumValueIndex;
-            
+
             // Show duration only for Duration type
             if (durationType == EGameplayEffectDurationType.Duration)
             {
                 EditorGUILayout.PropertyField(durationMagnitudeProp, new GUIContent("Duration (seconds)"));
             }
-            
+
             // Show periodic options for Duration and Infinite
             if (durationType != EGameplayEffectDurationType.Instant)
             {
                 EditorGUILayout.Space(5);
                 EditorGUILayout.LabelField("Periodic Execution", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(isPeriodicProp, new GUIContent("Is Periodic"));
-                
+
                 if (isPeriodicProp.boolValue)
                 {
                     EditorGUILayout.PropertyField(periodProp, new GUIContent("Period (seconds)"));
-                    
+
                     EditorGUILayout.HelpBox(
                         "Periodic effects execute modifiers every X seconds. " +
                         "Useful for damage/healing over time (DOT/HOT).",
@@ -159,14 +161,14 @@ namespace GAS.Editor
                     MessageType.Info
                 );
             }
-            
+
             EditorGUILayout.EndVertical();
         }
 
         private void DrawModifiers()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             EditorGUILayout.HelpBox(
                 "Modifiers change attributes. Each modifier can use:\n" +
                 "• ScalableFloat: Fixed or curve-based values\n" +
@@ -175,60 +177,61 @@ namespace GAS.Editor
                 "• Custom Calculation: Advanced logic (future)",
                 MessageType.Info
             );
-            
+
             EditorGUILayout.Space(5);
             EditorGUILayout.PropertyField(modifiersProp, true);
-            
+
             if (modifiersProp.arraySize == 0)
             {
                 EditorGUILayout.HelpBox("No modifiers defined. Add at least one to affect attributes.", MessageType.Warning);
             }
-            
+
             EditorGUILayout.EndVertical();
         }
 
         private void DrawGameplayTags()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             EditorGUILayout.PropertyField(grantedTagsProp, new GUIContent("Granted Tags"));
             EditorGUILayout.HelpBox("Tags added while effect is active", MessageType.None);
-            
+
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.PropertyField(applicationRequiredTagsProp, new GUIContent("Required Tags"));
             EditorGUILayout.HelpBox("Target must have ALL these tags to apply", MessageType.None);
-            
+
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.PropertyField(applicationBlockedByTagsProp, new GUIContent("Blocked By Tags"));
             EditorGUILayout.HelpBox("Effect blocked if target has ANY of these tags", MessageType.None);
-            
+
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.PropertyField(removeTagsOnApplicationProp, new GUIContent("Remove Tags"));
             EditorGUILayout.HelpBox("Tags removed when effect is applied", MessageType.None);
-            
+
             EditorGUILayout.EndVertical();
         }
 
         private void DrawStacking()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            
+
             EditorGUILayout.PropertyField(allowStackingProp);
-            
+
             if (allowStackingProp.boolValue)
             {
                 EditorGUILayout.PropertyField(maxStacksProp);
                 EditorGUILayout.PropertyField(refreshDurationOnStackProp, new GUIContent("Refresh Duration"));
-                
+                EditorGUILayout.PropertyField(stackingDurationPolicy, new GUIContent("Stacking Duration Policy"));
+
                 EditorGUILayout.HelpBox(
                     "Stacking multiplies modifier magnitudes by stack count.",
                     MessageType.Info
                 );
             }
-            
+
             EditorGUILayout.EndVertical();
         }
     }

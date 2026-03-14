@@ -17,7 +17,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -30,7 +30,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -43,7 +43,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
     MaxHealth: 1000
     MoveSpeed: 0.7
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 10
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -82,7 +82,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -108,7 +108,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -121,7 +121,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -134,7 +134,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -147,7 +147,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -186,7 +186,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -199,7 +199,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -212,20 +212,20 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
     TargetType: 1
     BuildCost: 100
     Tier: 1
-    AttackAbilityID: attack_towerbase
+    AttackAbilityID: HoangThuong_AtkSpeed
     SkillAbilityID: 
   - UnitID: unit_ultimate_ganieda
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -238,7 +238,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -251,7 +251,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -264,7 +264,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 50
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 300
     ProjectileSpeed: 5
     AttackType: 0
@@ -272,12 +272,12 @@ MonoBehaviour:
     BuildCost: 100
     Tier: 1
     AttackAbilityID: multiple_attack_sequence
-    SkillAbilityID: 
+    SkillAbilityID: HoangThuong_AtkSpeed
   - UnitID: unit_ultimate_morgan
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -290,7 +290,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -303,7 +303,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -316,7 +316,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0
@@ -329,7 +329,7 @@ MonoBehaviour:
     MaxHealth: 100
     MoveSpeed: 5
     BaseDamage: 10
-    AttackCooldown: 1
+    ROF: 1
     AttackRange: 5
     ProjectileSpeed: 15
     AttackType: 0

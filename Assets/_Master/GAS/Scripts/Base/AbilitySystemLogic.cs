@@ -25,25 +25,40 @@ namespace GAS
 
         public void UpdateCooldowns(AbilitySystemData data, float deltaTime)
         {
+            if (data.AbilityCooldowns.Count == 0) return;
+
             var cooldownKeys = data.AbilityCooldowns.Keys.ToList();
             foreach (var ability in cooldownKeys)
             {
-                data.AbilityCooldowns[ability] -= deltaTime;
+                var spec = GetAbilitySpec(data, ability);
+                float multiplier = GetCooldownMultiplier(data, spec);
+
+                // If multiplier is near 0 (infinite cooldown/paused), we don't decrement
+                if (multiplier > 0.0001f)
+                {
+                    // Scale the time decrement: if multiplier is 0.5 (2x fast), 
+                    // we remove 1.0s of "base time" for every 0.5s of "real time".
+                    data.AbilityCooldowns[ability] -= deltaTime / multiplier;
+                }
+
                 if (data.AbilityCooldowns[ability] <= 0)
                     data.AbilityCooldowns.Remove(ability);
             }
         }
 
-        public void StartCooldown(AbilitySystemData data, GameplayAbilityData ability, float duration)
+        public void StartCooldown(AbilitySystemData data, GameplayAbilityData ability, float baseDuration)
         {
-            data.AbilityCooldowns[ability] = duration;
+            // Stores the duration as "Base Time". 
+            // The actual real-world time it takes to expire will be (baseDuration * currentMultiplier).
+            data.AbilityCooldowns[ability] = baseDuration;
         }
 
         public bool IsAbilityOnCooldown(AbilitySystemData data, GameplayAbilityData ability)
         {
             if (ability == null)
                 return false;
-            return data.AbilityCooldowns.ContainsKey(ability) && data.AbilityCooldowns[ability] > 0;
+
+            return GetAbilityCooldownRemaining(data, ability) > 0.001f;
         }
 
         public float GetAbilityCooldownRemaining(AbilitySystemData data, GameplayAbilityData ability)
@@ -51,9 +66,21 @@ namespace GAS
             if (ability == null)
                 return 0f;
 
-            if (data.AbilityCooldowns.TryGetValue(ability, out float remaining))
-                return remaining;
+            if (data.AbilityCooldowns.TryGetValue(ability, out float remainingBaseTime))
+            {
+                var spec = GetAbilitySpec(data, ability);
+                float multiplier = GetCooldownMultiplier(data, spec);
+                return remainingBaseTime * multiplier;
+            }
             return 0f;
+        }
+
+        private float GetCooldownMultiplier(AbilitySystemData data, GameplayAbilitySpec spec)
+        {
+            if (spec == null || data.AttributeSet == null) return 1f;
+
+            var attr = data.AttributeSet.GetAttribute(spec.cooldownRateAttr);
+            return attr != null ? Mathf.Max(0f, attr.CurrentValue) : 1f;
         }
 
         #endregion
@@ -331,18 +358,62 @@ namespace GAS
                 {
                     if (existingEffect.AddStack())
                     {
-#if UNITY_EDITOR
-                        //Debug.Log($"Stacked {effect.effectName} on {targetData.Owner.name} (x{existingEffect.StackCount})");
-#endif
-                        return existingEffect;
+                        // CRITICAL FIX: Refresh attribute modifiers with new stack count
+                        _effectService.RefreshModifiers(existingEffect);
                     }
+                    
+#if UNITY_EDITOR
+                    //Debug.Log($"Stacked {effect.effectName} on {targetData.Owner.name} (x{existingEffect.StackCount})");
+#endif
+                    // Always return the existing effect to prevent duplicate instances bypassing maxStacks
+                    // Even if AddStack returns false (max stacks reached), we shouldn't create a new instance
+                    return existingEffect;
+                }
+            }
+            else
+            {
+                // Non-stacking: if this exact effect is already active, remove the old instance
+                // before adding a fresh one (duration refresh). Prevents duplicate accumulation.
+                var existingEffect = targetData.ActiveGameplayEffects.FirstOrDefault(e => e.Effect == effect);
+                if (existingEffect != null)
+                {
+                    RemoveGameplayEffect(targetData, existingEffect);
                 }
             }
 
-            // Create active effect
-            var activeEffect = new ActiveGameplayEffect(effect, source, target, effectLevel, _effectService);
+            // Create context for this application
+            var context = new GameplayEffectContext
+            {
+                SourceASC = source,
+                TargetASC = target,
+                Level = effectLevel
+            };
 
-            // Apply tags
+            // Create active effect
+            var activeEffect = new ActiveGameplayEffect(effect, source, target, effectLevel, _effectService, context);
+
+            // Handle Instant effects directly without giving them persistent tags
+            if (effect.durationType == EGameplayEffectDurationType.Instant)
+            {
+                if (targetData.AttributeSet != null)
+                {
+                    foreach (var modifier in effect.modifiers)
+                    {
+                        _effectService.ApplyModifierWithAggregation(
+                            effect, modifier, source, target, effectLevel, 1f, null, true, null);
+                    }
+                }
+
+                // Clean up tags that should be removed
+                if (effect.removeTagsOnApplication != null && effect.removeTagsOnApplication.Length > 0)
+                {
+                    RemoveTags(targetData, effect.removeTagsOnApplication);
+                }
+
+                return activeEffect; // Does not add to ActiveGameplayEffects
+            }
+
+            // Apply tags (only for Duration/Infinite effects)
             if (effect.grantedTags != null && effect.grantedTags.Length > 0)
             {
                 AddTags(targetData, effect.grantedTags);
@@ -352,29 +423,6 @@ namespace GAS
             if (effect.removeTagsOnApplication != null && effect.removeTagsOnApplication.Length > 0)
             {
                 RemoveTags(targetData, effect.removeTagsOnApplication);
-            }
-
-            // Apply modifiers for instant effects
-            if (effect.durationType == EGameplayEffectDurationType.Instant)
-            {
-                if (targetData.AttributeSet != null)
-                {
-                    foreach (var modifier in effect.modifiers)
-                    {
-                        _effectService.ApplyModifierWithAggregation(
-                            effect,
-                            modifier,
-                            source,
-                            target,
-                            effectLevel,
-                            1f,
-                            null,
-                            true,
-                            null);
-                    }
-                }
-
-                return activeEffect;
             }
 
             // Apply initial modifiers for non-periodic duration/infinite effects

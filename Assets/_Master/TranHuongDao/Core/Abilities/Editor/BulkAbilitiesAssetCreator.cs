@@ -16,10 +16,10 @@ namespace Abel.TranHuongDao.Editor
             EnsureFolderExists();
 
             // 1. Kích hoạt Hoàng Thượng, tăng tốc đánh 10% trong phạm vi 500
-            CreateBuffProc("HoangThuong_AtkSpeed", 100f, EProcTriggerCondition.OnAttackStart, "AttackCooldown", 0.9f, 500f, 5f);
+            CreateBuffProc("HoangThuong_AtkSpeed", 100f, EProcTriggerCondition.OnAttackStart, "ROF", 0.9f, 500f, 5f);
 
             // 2. Mắt diều hâu: 30% tạo phép chú lên đồng minh tăng 20% tốc đánh (Giả sử buff vào bản thân/đồng minh gần)
-            CreateBuffProc("MatDieuHau_AtkSpeedBuff", 30f, EProcTriggerCondition.OnAttackStart, "AttackCooldown", 0.8f, 0f, 5f, EProcContextTarget.Source);
+            CreateBuffProc("MatDieuHau_AtkSpeedBuff", 30f, EProcTriggerCondition.OnAttackStart, "ROF", 0.8f, 0f, 5f, EProcContextTarget.Source);
 
             // 3. 5% đóng băng kẻ thù 2.5s, sát thương 50
             CreateCCProc("DongBang_50Dmg", 5f, 50f, "MoveSpeed", 0f, 2.5f);
@@ -35,7 +35,7 @@ namespace Abel.TranHuongDao.Editor
             CreateSpawnProc("GoblinBomber_OnKill", 50f, EProcTriggerCondition.OnKill);
 
             // 7. Tăng tốc đánh của đồng minh trong phạm vi 700
-            CreateBuffProc("BuffAtkSpeed_Range700", 100f, EProcTriggerCondition.OnAttackStart, "AttackCooldown", 0.8f, 700f, 5f);
+            CreateBuffProc("BuffAtkSpeed_Range700", 100f, EProcTriggerCondition.OnAttackStart, "ROF", 0.8f, 700f, 5f);
 
             // 8. Khi tấn công, 10% phát ra độc tố gây sát thương 125
             CreateDamageProc("DocTo_125Dmg", 10f, 125f, 0f);
@@ -57,7 +57,7 @@ namespace Abel.TranHuongDao.Editor
             CreateSpawnProc("SauBang_Kill", 50f, EProcTriggerCondition.OnKill);
 
             // 14. 10% kích hoạt thiên tướng, tăng gấp đôi tốc đánh
-            CreateBuffProc("ThienTuong_DoubleAtk", 10f, EProcTriggerCondition.OnAttackStart, "AttackCooldown", 0.5f, 0f, 5f, EProcContextTarget.Source);
+            CreateBuffProc("ThienTuang_DoubleAtk", 10f, EProcTriggerCondition.OnAttackStart, "ROF", 0.5f, 0f, 5f, EProcContextTarget.Source);
 
             // 15. Khi tấn công, 10% nhốt kẻ thù vào lồng băng, sát thương 600, 2s
             CreateCCProc("LongBang_600Dmg", 10f, 600f, "MoveSpeed", 0f, 2f);
@@ -119,7 +119,6 @@ namespace Abel.TranHuongDao.Editor
             procData.abilityID = name;
             procData.chance = chance;
             procData.flatDamage = damage;
-            procData.aoeRadius = aoeRadius;
             procData.triggerType = EProcTriggerCondition.OnHit;
 
             SaveProcAsset(procData, $"Proc_DMG_{name}");
@@ -135,7 +134,6 @@ namespace Abel.TranHuongDao.Editor
             procData.chance = chance;
             procData.flatDamage = damage;
             procData.effectToApply = effect;
-            procData.aoeRadius = aoeRadius;
             procData.triggerType = EProcTriggerCondition.OnHit;
 
             SaveProcAsset(procData, $"Proc_CC_{name}");
@@ -152,7 +150,6 @@ namespace Abel.TranHuongDao.Editor
             procData.abilityID = name;
             procData.chance = chance;
             procData.effectToApply = effect;
-            procData.aoeRadius = aoeRadius;
             procData.triggerType = EProcTriggerCondition.OnHit;
 
             SaveProcAsset(procData, $"Proc_DoT_{name}");
@@ -168,7 +165,6 @@ namespace Abel.TranHuongDao.Editor
             procData.chance = chance;
             procData.triggerType = trigger;
             procData.effectToApply = effect;
-            procData.aoeRadius = aoeRadius;
             procData.executionTarget = target;
 
             SaveProcAsset(procData, $"Proc_Buff_{name}");

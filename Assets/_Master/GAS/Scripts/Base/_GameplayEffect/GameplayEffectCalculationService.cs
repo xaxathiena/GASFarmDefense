@@ -28,31 +28,52 @@ namespace GAS
             GameplayEffectContext context)
         {
             float rawMagnitude = 0f;
-            
+
             switch (modifier.calculationType)
             {
                 case EModifierCalculationType.ScalableFloat:
                     rawMagnitude = modifier.scalableMagnitude.GetValueAtLevel(level, sourceASC);
                     break;
-                    
+
                 case EModifierCalculationType.AttributeBased:
                     rawMagnitude = CalculateAttributeBasedMagnitude(modifier, sourceASC, targetASC);
                     break;
-                    
+
                 case EModifierCalculationType.CustomCalculationClass:
                     rawMagnitude = CalculateCustomMagnitude(modifier, sourceASC, targetASC, level, context);
                     break;
-                    
+
                 case EModifierCalculationType.SetByCaller:
                     // Should be set by caller via GameplayEffectSpec
                     Debug.LogWarning($"SetByCaller '{modifier.setByCallerTag}' magnitude not yet implemented");
                     rawMagnitude = 0f;
                     break;
             }
-            
-            return rawMagnitude * stackCount;
+
+            // Apply stacking logic based on operation type
+            switch (modifier.operation)
+            {
+                case EGameplayModifierOp.Multiply:
+                    // For multipliers, we stack the "bonus" part additively
+                    // Example: 1.1x (10% bonus) stacked 8 times = 1.0 + (0.1 * 8) = 1.8x
+                    return 1.0f + (rawMagnitude - 1.0f) * stackCount;
+
+                case EGameplayModifierOp.Divide:
+                    // Similar to multiply, but for division
+                    float divisorBonus = rawMagnitude - 1.0f;
+                    return 1.0f + (divisorBonus * stackCount);
+
+                case EGameplayModifierOp.Add:
+                    // Direct linear stacking for addition
+                    return rawMagnitude * stackCount;
+
+                case EGameplayModifierOp.Override:
+                default:
+                    // Override usually doesn't stack by count, or just returns raw
+                    return rawMagnitude;
+            }
         }
-        
+
         /// <summary>
         /// Calculate magnitude based on a backing attribute.
         /// Formula: ((BackingAttribute + PreAdd) * Coefficient) + PostAdd
@@ -62,33 +83,33 @@ namespace GAS
             AbilitySystemComponent sourceASC,
             AbilitySystemComponent targetASC)
         {
-            AbilitySystemComponent relevantASC = modifier.attributeSource == EAttributeSource.Source 
-                ? sourceASC 
+            AbilitySystemComponent relevantASC = modifier.attributeSource == EAttributeSource.Source
+                ? sourceASC
                 : targetASC;
-            
+
             if (relevantASC == null || relevantASC.AttributeSet == null)
             {
                 Debug.LogWarning($"Cannot calculate attribute-based magnitude: {modifier.attributeSource} ASC is null");
                 return 0f;
             }
-            
+
             var backingAttr = relevantASC.AttributeSet.GetAttribute(modifier.backingAttribute.GetAttribute());
             if (backingAttr == null)
             {
                 Debug.LogWarning($"Backing attribute {modifier.backingAttribute.GetAttribute()} not found on {modifier.attributeSource}");
                 return 0f;
             }
-            
+
             // Use snapshot or current value
             float attributeValue = modifier.snapshotAttribute ? backingAttr.BaseValue : backingAttr.CurrentValue;
-            
+
             // Apply formula: ((attribute + preAdd) * coefficient) + postAdd
-            float magnitude = ((attributeValue + modifier.preMultiplyAdditiveValue) * modifier.coefficient) 
+            float magnitude = ((attributeValue + modifier.preMultiplyAdditiveValue) * modifier.coefficient)
                             + modifier.postMultiplyAdditiveValue;
-            
+
             return magnitude;
         }
-        
+
         /// <summary>
         /// Calculate magnitude using custom calculation class.
         /// </summary>
@@ -104,16 +125,16 @@ namespace GAS
                 Debug.LogWarning("CustomCalculationClass selected but no calculation assigned!");
                 return 0f;
             }
-            
+
             if (context == null)
             {
                 Debug.LogWarning("[CustomCalculation] No context provided! Using base magnitude.");
                 return modifier.scalableMagnitude.GetValueAtLevel(level, sourceASC);
             }
-            
+
             // Get base magnitude from scalableMagnitude
             float baseMagnitude = modifier.scalableMagnitude.GetValueAtLevel(level, sourceASC);
-            
+
             // Calculate using custom class
             return modifier.customCalculation.CalculateMagnitude(
                 context,

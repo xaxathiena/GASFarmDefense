@@ -16,6 +16,7 @@ MonoBehaviour:
   abilityName: AoESlow_12
   description: 
   icon: {fileID: 0}
+  activationPolicy: 1
   cooldownDuration:
     scalingMode: 0
     flatValue: 0
@@ -78,10 +79,12 @@ MonoBehaviour:
     csvColumn: 
     previewLevel: 1
     attributeType: 0
-  endPolicy: 0
+  endPolicy: 1
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  captureRadius: 800
+  targetType: 0
+  captureRadius: 2
+  auraUpdateRate: 0.2
   effectToApply: {fileID: 11400000, guid: ff930fac85ccf4a5ca6e1b137348cd52, type: 2}
   castVfxPrefab: {fileID: 0}

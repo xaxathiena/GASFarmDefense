@@ -23,6 +23,9 @@ namespace GAS
         CriticalChance,
         CriticalMultiplier,
         BaseDamage,
+        ROF,              // Rate of Fire: attacks per second
+        NormalCooldownRate, // Multiplier for normal ability cooldowns
+        SkillCooldownRate,  // Multiplier for skill ability cooldowns
         
         // Add more attributes as needed for your game
         // MagicResist,

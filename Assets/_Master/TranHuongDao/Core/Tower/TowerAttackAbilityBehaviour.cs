@@ -8,11 +8,12 @@ namespace Abel.TranHuongDao.Core
     /// Registered as a Singleton in VContainer and mapped explicitly by
     /// <see cref="TDGASInitializer"/>.
     ///
-    /// Flow each time the tower calls TryActivateAbility:
+    /// Flow each time TryActivateAbility is called by Tower:
     ///   CanActivate → verify at least one enemy is within range
     ///   OnActivated → spawn a <see cref="Bullet"/> via <see cref="IBulletManager"/>
     ///
-    /// The bullet travels toward the target and applies damage on impact.
+    /// Attack rate is controlled by Tower's internal ROF timer — this behaviour
+    /// does NOT set any GAS cooldown, so the GAS cooldown is free for skills.
     /// </summary>
     public class TDTowerNormalAttackBehaviour : IAbilityBehaviour
     {
@@ -79,13 +80,7 @@ namespace Abel.TranHuongDao.Core
                 bulletSpeed: projSpeed,
                 collisionThreshold: attackData.collisionThreshold);
 
-            // ── Dynamic cooldown override ─────────────────────────────────────────
-            // ApplyCooldown() already ran before this method (reading the SO's static
-            // cooldownDuration = 0). We now overwrite it with the live attribute value
-            // so attack speed buffs/debuffs take effect immediately on the next cycle.
-            asc.StartCooldown(attackData, unitAttr.AttackCooldown.CurrentValue);
-
-            Debug.Log($"[TowerAttack] Bullet fired at enemy {targetID} | cd={unitAttr.AttackCooldown.CurrentValue:F2}s");
+            Debug.Log($"[TowerAttack] Bullet fired at enemy {targetID}");
         }
 
         public void OnEnded(GameplayAbilityData _, AbilitySystemComponent __, GameplayAbilitySpec ___) { }

@@ -35,6 +35,6 @@ namespace Abel.TranHuongDao.Core
 
         // cooldownDuration (inherited from GameplayAbilityData) must be set to 0
         // in the ScriptableObject. The behaviour overrides it dynamically via
-        // asc.StartCooldown using UnitAttributeSet.AttackCooldown.CurrentValue.
+        // asc.StartCooldown() using cooldown = 1 / UnitAttributeSet.ROF.CurrentValue.
     }
 }

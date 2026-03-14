@@ -18,8 +18,10 @@ namespace Abel.TranHuongDao.Core
         public readonly GameplayAttribute MoveSpeed       = new GameplayAttribute(0f);
         public readonly GameplayAttribute Damage          = new GameplayAttribute(0f);
         public readonly GameplayAttribute AttackRange     = new GameplayAttribute(0f);
-        public readonly GameplayAttribute AttackCooldown  = new GameplayAttribute(0f);
-        public readonly GameplayAttribute ProjectileSpeed = new GameplayAttribute(0f);
+        public readonly GameplayAttribute ROF             = new GameplayAttribute(1f);
+        public readonly GameplayAttribute ProjectileSpeed   = new GameplayAttribute(0f);
+        public readonly GameplayAttribute NormalCooldownRate = new GameplayAttribute(1f);
+        public readonly GameplayAttribute SkillCooldownRate  = new GameplayAttribute(1f);
 
         // ── Events ───────────────────────────────────────────────────────────────
 
@@ -35,8 +37,10 @@ namespace Abel.TranHuongDao.Core
             RegisterAttribute(nameof(MoveSpeed),       MoveSpeed);
             RegisterAttribute(nameof(Damage),          Damage);
             RegisterAttribute(nameof(AttackRange),     AttackRange);
-            RegisterAttribute(nameof(AttackCooldown),  AttackCooldown);
-            RegisterAttribute(nameof(ProjectileSpeed), ProjectileSpeed);
+            RegisterAttribute(nameof(ROF),             ROF);
+            RegisterAttribute(nameof(ProjectileSpeed),   ProjectileSpeed);
+            RegisterAttribute(nameof(NormalCooldownRate), NormalCooldownRate);
+            RegisterAttribute(nameof(SkillCooldownRate),  SkillCooldownRate);
 
             Health.OnValueChanged += HandleHealthChanged;
         }
@@ -70,11 +74,17 @@ namespace Abel.TranHuongDao.Core
             AttackRange.BaseValue     = config.AttackRange;
             AttackRange.CurrentValue  = config.AttackRange;
 
-            AttackCooldown.BaseValue  = config.AttackCooldown;
-            AttackCooldown.CurrentValue = config.AttackCooldown;
+            ROF.BaseValue             = config.ROF;
+            ROF.CurrentValue          = config.ROF;
 
             ProjectileSpeed.BaseValue    = config.ProjectileSpeed;
             ProjectileSpeed.CurrentValue = config.ProjectileSpeed;
+
+            NormalCooldownRate.BaseValue = 1f;
+            NormalCooldownRate.CurrentValue = 1f;
+
+            SkillCooldownRate.BaseValue = 1f;
+            SkillCooldownRate.CurrentValue = 1f;
         }
 
         /// <summary>Apply damage, clamping Health to a minimum of 0.</summary>

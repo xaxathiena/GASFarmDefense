@@ -13,7 +13,7 @@ namespace GAS
         CustomCalculationClass, // Use custom calculation (placeholder for future)
         SetByCaller             // Value set at runtime via GameplayTag
     }
-    
+
     /// <summary>
     /// Source of the attribute for attribute-based calculations
     /// </summary>
@@ -28,11 +28,11 @@ namespace GAS
     [Serializable]
     public class AttributeSelector
     {
-        
+
         [Tooltip("Select from predefined attributes")]
         public EGameplayAttributeType attributeType = EGameplayAttributeType.Health;
-        
-        
+
+
         /// <summary>
         /// Get the attribute name as string
         /// </summary>
@@ -40,15 +40,15 @@ namespace GAS
         {
             return attributeType;
         }
-        
+
         public AttributeSelector() { }
-        
+
         public AttributeSelector(EGameplayAttributeType type)
         {
             attributeType = type;
         }
     }
-    
+
     /// <summary>
     /// Types of gameplay effect duration
     /// </summary>
@@ -60,6 +60,16 @@ namespace GAS
     }
     
     /// <summary>
+    /// Policy for how stacks handle duration
+    /// </summary>
+    public enum EGameplayEffectStackingDurationPolicy
+    {
+        RefreshEntireStack,    // Any new stack resets the timer for the entire stack (Default)
+        FixedDurationEntireStack, // New stacks don't reset the timer; all expire when the first one ends
+        IndividualStackDuration   // Each stack has its own independent timer
+    }
+
+    /// <summary>
     /// How the modifier affects the attribute
     /// </summary>
     public enum EGameplayModifierOp
@@ -69,7 +79,7 @@ namespace GAS
         Divide,         // Divide current value
         Override        // Set to new value
     }
-    
+
     /// <summary>
     /// Defines how an attribute should be modified
     /// </summary>
@@ -79,61 +89,56 @@ namespace GAS
         [Header("Target")]
         [Tooltip("Attribute to modify")]
         public AttributeSelector attribute = new AttributeSelector();
-        
+
         [Tooltip("Operation to perform")]
         public EGameplayModifierOp operation = EGameplayModifierOp.Add;
-        
+
         [Header("Magnitude Calculation")]
         [Tooltip("How to calculate the magnitude")]
         public EModifierCalculationType calculationType = EModifierCalculationType.ScalableFloat;
-        
+
         // ScalableFloat calculation
         [Tooltip("Magnitude using ScalableFloat (supports flat, curve, or attribute-based)")]
         public ScalableFloat scalableMagnitude = new ScalableFloat(0f);
-        
+
         // Attribute Based calculation
         [Tooltip("Source attribute for attribute-based calculation")]
         public AttributeSelector backingAttribute = new AttributeSelector();
-        
+
         [Tooltip("Get attribute from Source (caster) or Target (receiver)")]
         public EAttributeSource attributeSource = EAttributeSource.Source;
-        
+
         [Tooltip("Capture attribute when GE is created (true) or when applied (false)")]
         public bool snapshotAttribute = false;
-        
+
         [Tooltip("Coefficient to multiply the attribute value")]
         public float coefficient = 1f;
-        
+
         [Tooltip("Value added before applying coefficient")]
         public float preMultiplyAdditiveValue = 0f;
-        
+
         [Tooltip("Value added after applying coefficient")]
         public float postMultiplyAdditiveValue = 0f;
-        
+
         // Custom Calculation Class
         [Header("Custom Calculation (Optional)")]
         [Tooltip("Custom calculation class (e.g., WC3DamageCalculation for FD game)")]
         public FD.Ability.DamageCalculationBase customCalculation;
-        
+
         // SetByCaller
         [Tooltip("GameplayTag for SetByCaller magnitude")]
         public string setByCallerTag = "";
-        
-        // Legacy support
-        [Tooltip("(Deprecated) Simple float magnitude - use scalableMagnitude instead")]
-        public float magnitude;
-        
+
         public GameplayEffectModifier() { }
-        
+
         public GameplayEffectModifier(EGameplayAttributeType attrType, EGameplayModifierOp op, float mag)
         {
             attribute = new AttributeSelector(attrType);
             operation = op;
             calculationType = EModifierCalculationType.ScalableFloat;
             scalableMagnitude = new ScalableFloat(mag);
-            magnitude = mag; // legacy
         }
-        
+
         /// <summary>
         /// Get the attribute name to modify
         /// </summary>
@@ -142,7 +147,7 @@ namespace GAS
             return attribute.GetAttribute();
         }
     }
-    
+
     /// <summary>
     /// Base class for gameplay effects (buffs, debuffs, damage, healing, etc.)
     /// PURE DATA ONLY - All logic extracted to GameplayEffectService and GameplayEffectCalculationService.
@@ -154,22 +159,23 @@ namespace GAS
         public string effectName;
         [TextArea(2, 4)]
         public string description;
-        
+        public Sprite icon;
+
         [Header("Duration")]
         public EGameplayEffectDurationType durationType = EGameplayEffectDurationType.Instant;
         [Tooltip("Duration in seconds (for Duration type)")]
         public float durationMagnitude = 0f;
-        
+
         [Header("Periodic")]
         [Tooltip("Execute effect every X seconds")]
         public bool isPeriodic = false;
         [Tooltip("Period in seconds")]
         public float period = 1f;
-        
+
         [Header("Modifiers")]
         [Tooltip("Attribute modifications this effect applies")]
         public GameplayEffectModifier[] modifiers;
-        
+
         [Header("Gameplay Tags")]
         [Tooltip("Tags granted while effect is active")]
         public GameplayTag[] grantedTags;
@@ -179,13 +185,15 @@ namespace GAS
         public GameplayTag[] applicationBlockedByTags;
         [Tooltip("Tags to remove on application")]
         public GameplayTag[] removeTagsOnApplication;
-        
+
         [Header("Stacking")]
         [Tooltip("Can this effect stack?")]
         public bool allowStacking = false;
         [Tooltip("Maximum stacks")]
         public int maxStacks = 1;
-        [Tooltip("Does stacking refresh duration?")]
+        [Tooltip("Does stacking refresh duration? Only for RefreshEntireStack policy.")]
         public bool refreshDurationOnStack = true;
+        [Tooltip("How duration is handled for stacks")]
+        public EGameplayEffectStackingDurationPolicy stackingDurationPolicy = EGameplayEffectStackingDurationPolicy.RefreshEntireStack;
     }
 }

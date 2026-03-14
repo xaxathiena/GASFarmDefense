@@ -1,5 +1,7 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using GAS;
 
@@ -13,12 +15,17 @@ namespace Abel.TranHuongDao.Core.Abilities
     {
         private readonly IEnemyManager _enemyManager;
 
-        // Stores sweeping coroutine references per ability instance
-        private readonly Dictionary<GameplayAbilitySpec, Coroutine> _activeCoroutines = new Dictionary<GameplayAbilitySpec, Coroutine>();
-        
+        // Stores async task cancellation tokens per ability instance
+        private readonly Dictionary<GameplayAbilitySpec, CancellationTokenSource> _activeSweeps = new Dictionary<GameplayAbilitySpec, CancellationTokenSource>();
+
         // Stores active targets and their effects per ability instance
-        private readonly Dictionary<GameplayAbilitySpec, Dictionary<int, ActiveGameplayEffect>> _activeEffects = 
+        private readonly Dictionary<GameplayAbilitySpec, Dictionary<int, ActiveGameplayEffect>> _activeEffects =
             new Dictionary<GameplayAbilitySpec, Dictionary<int, ActiveGameplayEffect>>();
+
+#if UNITY_EDITOR
+        // Stores active gizmos per ability instance
+        private readonly Dictionary<GameplayAbilitySpec, TD_AoEApplyEffectGizmo> _activeGizmos = new Dictionary<GameplayAbilitySpec, TD_AoEApplyEffectGizmo>();
+#endif
 
         public TD_AoEApplyEffectAbilityBehaviour(IEnemyManager enemyManager)
         {
@@ -29,7 +36,7 @@ namespace Abel.TranHuongDao.Core.Abilities
         {
             var aoeData = data as TD_AoEApplyEffectAbilityData;
             if (aoeData == null || asc?.GetOwner() == null) return false;
-            
+
             // Aura can always activate if owner exists
             return true;
         }
@@ -43,73 +50,78 @@ namespace Abel.TranHuongDao.Core.Abilities
             if (aoeData.castVfxPrefab != null)
             {
                 // Instantiate as child of the owner so it moves with the aura
-                Object.Instantiate(aoeData.castVfxPrefab, asc.GetOwner().position, Quaternion.identity, asc.GetOwner());
+                UnityEngine.Object.Instantiate(aoeData.castVfxPrefab, asc.GetOwner().position, Quaternion.identity, asc.GetOwner());
             }
 
             _activeEffects[spec] = new Dictionary<int, ActiveGameplayEffect>();
 
-            // Start the sweep loop on the Owner's MonoBehaviour (or any globally accessible runner)
-            // Assuming asc.GetOwner() has a MonoBehaviour, otherwise we might need a generic CoroutineRunner.
-            var ownerMono = asc.GetOwner().GetComponent<MonoBehaviour>();
-            if (ownerMono != null)
+#if UNITY_EDITOR
+            // Add Gizmo to visualize the aura area in Editor
+            if (asc.GetOwner() != null)
             {
-                var routine = ownerMono.StartCoroutine(AuraSweepRoutine(aoeData, asc, spec));
-                _activeCoroutines[spec] = routine;
+                var gizmo = asc.GetOwner().gameObject.AddComponent<TD_AoEApplyEffectGizmo>();
+                gizmo.Radius = aoeData.captureRadius;
+                _activeGizmos[spec] = gizmo;
             }
-            else
-            {
-                Debug.LogWarning($"[TD_AoEApplyEffect] Cannot start Aura sweep coroutine because {asc.GetOwner().name} has no MonoBehaviour.");
-            }
+#endif
+
+            // Start the sweep loop via UniTask - completely independent of MonoBehaviour
+            var cts = new CancellationTokenSource();
+            _activeSweeps[spec] = cts;
+            AuraSweepAsync(aoeData, asc, spec, cts.Token).Forget();
         }
 
-        private IEnumerator AuraSweepRoutine(TD_AoEApplyEffectAbilityData aoeData, AbilitySystemComponent asc, GameplayAbilitySpec spec)
+        private async UniTaskVoid AuraSweepAsync(TD_AoEApplyEffectAbilityData aoeData, AbilitySystemComponent asc, GameplayAbilitySpec spec, CancellationToken token)
         {
             var targetEffects = _activeEffects[spec];
             List<int> sweepCache = new List<int>(32);
             List<int> toRemove = new List<int>(32);
 
-            while (spec.IsActive && asc.GetOwner() != null)
+            try
             {
-                Vector3 originPos = asc.GetOwner().position;
-                sweepCache.Clear();
-
-                // Depending on the target type, gather the IDs.
-                // Assuming IEnemyManager provides an Ally manager equivalence or we just sweep enemies for now.
-                // For a fully fleshed out system, you might have IUnitManager that can get both.
-                if (aoeData.targetType == EAuraTargetType.Enemies || aoeData.targetType == EAuraTargetType.Both)
+                while (spec.IsActive && asc.GetOwner() != null && !token.IsCancellationRequested)
                 {
-                    _enemyManager.GetEnemiesInRange(originPos, aoeData.captureRadius, sweepCache);
-                }
-                
-                // Note: If Allies or Both, you would ideally add allies to sweepCache here. 
-                // E.g., _allyManager.GetAlliesInRange(...)
+                    Vector3 originPos = asc.GetOwner().position;
+                    sweepCache.Clear();
 
-                // Check who left the aura
-                toRemove.Clear();
-                foreach (var targetID in targetEffects.Keys)
-                {
-                    if (!sweepCache.Contains(targetID))
+                    // Depending on the target type, gather the IDs.
+                    if (aoeData.targetType == EAuraTargetType.Enemies || aoeData.targetType == EAuraTargetType.Both)
                     {
-                        toRemove.Add(targetID);
+                        _enemyManager.GetEnemiesInRange(originPos, aoeData.captureRadius, sweepCache);
                     }
-                }
 
-                // Remove effects for targets that left
-                foreach (int targetID in toRemove)
-                {
-                    RemoveEffectFromTarget(targetID, targetEffects);
-                }
-
-                // Apply effects for new targets that entered
-                foreach (int targetID in sweepCache)
-                {
-                    if (!targetEffects.ContainsKey(targetID))
+                    // Check who left the aura
+                    toRemove.Clear();
+                    foreach (var targetID in targetEffects.Keys)
                     {
-                        ApplyEffectToTarget(targetID, aoeData, asc, targetEffects);
+                        if (!sweepCache.Contains(targetID))
+                        {
+                            toRemove.Add(targetID);
+                        }
                     }
-                }
 
-                yield return new WaitForSeconds(aoeData.auraUpdateRate);
+                    // Remove effects for targets that left
+                    foreach (int targetID in toRemove)
+                    {
+                        RemoveEffectFromTarget(targetID, targetEffects);
+                    }
+
+                    // Apply effects for new targets that entered
+                    foreach (int targetID in sweepCache)
+                    {
+                        if (!targetEffects.ContainsKey(targetID))
+                        {
+                            ApplyEffectToTarget(targetID, aoeData, asc, targetEffects);
+                        }
+                    }
+
+                    // Await using UniTask without creating GC allocations and independent of MonoBehaviour
+                    await UniTask.Delay(System.TimeSpan.FromSeconds(aoeData.auraUpdateRate), cancellationToken: token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Task was cleanly cancelled when the ability ended
             }
         }
 
@@ -153,19 +165,21 @@ namespace Abel.TranHuongDao.Core.Abilities
 
         private void CleanupAura(AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
-            // Stop coroutine
-            if (_activeCoroutines.TryGetValue(spec, out var routine))
+            // Stop the UniTask cleanly gracefully
+            if (_activeSweeps.TryGetValue(spec, out var cts))
             {
-                if (asc.GetOwner() != null)
-                {
-                    var ownerMono = asc.GetOwner().GetComponent<MonoBehaviour>();
-                    if (ownerMono != null && routine != null)
-                    {
-                        ownerMono.StopCoroutine(routine);
-                    }
-                }
-                _activeCoroutines.Remove(spec);
+                cts.Cancel();
+                cts.Dispose();
+                _activeSweeps.Remove(spec);
             }
+
+#if UNITY_EDITOR
+            if (_activeGizmos.TryGetValue(spec, out var gizmo))
+            {
+                if (gizmo != null) UnityEngine.Object.Destroy(gizmo);
+                _activeGizmos.Remove(spec);
+            }
+#endif
 
             // Remove all leftover active effects
             if (_activeEffects.TryGetValue(spec, out var targetEffects))
@@ -180,4 +194,6 @@ namespace Abel.TranHuongDao.Core.Abilities
             }
         }
     }
+
+
 }

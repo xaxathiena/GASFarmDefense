@@ -18,16 +18,20 @@ namespace Abel.TranHuongDao.Core
         private readonly AbilityBehaviourRegistry _registry;
         private readonly IEnemyManager _enemyManager;
         private readonly IBulletManager _bulletManager;
+        private readonly ITowerManager _towerManager;
         private readonly GameplayAbilityLogic _gameplayAbilityLogic;
 
         public TDAbilitySetup(
             AbilityBehaviourRegistry registry,
             IEnemyManager enemyManager,
-            IBulletManager bulletManager, GameplayAbilityLogic gameplayAbilityLogic)
+            IBulletManager bulletManager,
+            ITowerManager towerManager,
+            GameplayAbilityLogic gameplayAbilityLogic)
         {
             _registry = registry;
             _enemyManager = enemyManager;
             _bulletManager = bulletManager;
+            _towerManager = towerManager;
             _gameplayAbilityLogic = gameplayAbilityLogic;
         }
 
@@ -46,9 +50,12 @@ namespace Abel.TranHuongDao.Core
             _registry.Register<TD_NormalAttackData>(
                 new TD_NormalAttackBehaviour(_enemyManager, _bulletManager));
             _registry.Register<TD_BaseProcData>(
-                new TD_BaseProcBehaviour(_enemyManager, _gameplayAbilityLogic));
+                new TD_BaseProcBehaviour(_enemyManager, _towerManager, _gameplayAbilityLogic));
             _registry.Register<TD_AuraData>(
                 new TD_AuraBehaviour(_enemyManager));
+            _registry.Register<TD_AoEApplyEffectAbilityData>(
+                new TD_AoEApplyEffectAbilityBehaviour(_enemyManager));
+
             // Add new abilities below as the project grows:
             // _registry.Register<TDFrostTowerData>(new TDFrostTowerBehaviour(_enemyManager));
         }

@@ -53,5 +53,12 @@ namespace Abel.TranHuongDao.Core
         /// Returns false if no tower with that ID is currently active.
         /// </summary>
         bool TryGetTower(int instanceID, out Tower tower);
+
+        /// <summary>
+        /// Fill <paramref name="results"/> with the ASCs of all towers whose world
+        /// position is within <paramref name="radius"/> of <paramref name="center"/>.
+        /// At most <paramref name="maxCount"/> entries are added.
+        /// </summary>
+        void GetTowersInRange(Vector3 center, float radius, List<GAS.AbilitySystemComponent> ignoreList, List<GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue);
     }
 }

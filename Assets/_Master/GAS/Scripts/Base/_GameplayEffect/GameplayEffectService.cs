@@ -11,7 +11,7 @@ namespace GAS
     {
         private readonly GameplayEffectCalculationService calculationService;
         private readonly IDebugService debug;
-        
+
         public GameplayEffectService(
             GameplayEffectCalculationService calculationService,
             IDebugService debug)
@@ -19,7 +19,7 @@ namespace GAS
             this.calculationService = calculationService;
             this.debug = debug;
         }
-        
+
         /// <summary>
         /// Check if effect can be applied to target based on tags.
         /// </summary>
@@ -33,7 +33,7 @@ namespace GAS
                     return false;
                 }
             }
-            
+
             // Check blocked tags (if ANY present, block)
             if (effectData.applicationBlockedByTags != null && effectData.applicationBlockedByTags.Length > 0)
             {
@@ -42,10 +42,10 @@ namespace GAS
                     return false;
                 }
             }
-            
+
             return true;
         }
-        
+
         /// <summary>
         /// Apply a modifier with proper aggregation system.
         /// </summary>
@@ -74,17 +74,17 @@ namespace GAS
                 Debug.LogWarning("[GameplayEffectService] Target ASC or AttributeSet is null!");
                 return;
             }
-            
+
             // Get target attribute
             EGameplayAttributeType attributeType = modifier.GetAttributeName();
             GameplayAttribute targetAttribute = targetASC.AttributeSet.GetAttribute(attributeType);
-            
+
             if (targetAttribute == null)
             {
                 Debug.LogWarning($"[GameplayEffectService] Attribute '{attributeType}' not found in target's attribute set!");
                 return;
             }
-            
+
             // Calculate magnitude using service
             float finalMagnitude = calculationService.CalculateMagnitude(
                 modifier,
@@ -93,7 +93,7 @@ namespace GAS
                 level,
                 stackCount,
                 context);
-            
+
             // Apply based on effect type
             if (isInstant)
             {
@@ -103,32 +103,39 @@ namespace GAS
                     case EGameplayModifierOp.Add:
                         targetAttribute.ModifyCurrentValue(finalMagnitude);
                         break;
-                        
+
                     case EGameplayModifierOp.Multiply:
                         targetAttribute.ModifyCurrentValue(targetAttribute.CurrentValue * finalMagnitude);
                         break;
-                        
+
                     case EGameplayModifierOp.Divide:
                         if (finalMagnitude != 0)
                             targetAttribute.ModifyCurrentValue(targetAttribute.CurrentValue / finalMagnitude);
                         break;
-                        
+
                     case EGameplayModifierOp.Override:
                         targetAttribute.SetCurrentValue(finalMagnitude);
                         break;
                 }
-                
+
                 debug.Log($"[GE] Instant {modifier.operation} {finalMagnitude} to {attributeType} → {targetAttribute.CurrentValue}");
             }
             else
             {
                 // Duration/Infinite effects: Use aggregator system (tracked, removable)
                 targetAttribute.AddModifier(activeEffect, modifier.operation, finalMagnitude);
-                
+
+                // CRITICAL FIX: Track the affected attribute in the ActiveGameplayEffect 
+                // so it can be cleaned up later during RemoveGameplayEffect
+                if (activeEffect != null)
+                {
+                    activeEffect.AddAffectedAttribute(targetAttribute);
+                }
+
                 debug.Log($"[GE] Duration {modifier.operation} {finalMagnitude} to {attributeType} (tracked)");
             }
         }
-        
+
         /// <summary>
         /// Apply all modifiers from a GameplayEffect.
         /// </summary>
@@ -145,9 +152,9 @@ namespace GAS
             {
                 return;
             }
-            
+
             bool isInstant = effectData.durationType == EGameplayEffectDurationType.Instant;
-            
+
             foreach (var modifier in effectData.modifiers)
             {
                 ApplyModifierWithAggregation(
@@ -160,6 +167,47 @@ namespace GAS
                     activeEffect,
                     isInstant,
                     context);
+            }
+        }
+        /// <summary>
+        /// Update magnitudes for all modifiers of an active effect (e.g. after stack change)
+        /// </summary>
+        public void RefreshModifiers(ActiveGameplayEffect activeEffect)
+        {
+            if (activeEffect == null || activeEffect.Effect == null || activeEffect.Target == null)
+            {
+                return;
+            }
+
+            var targetASC = activeEffect.Target;
+            var effectData = activeEffect.Effect;
+            float level = activeEffect.Level;
+            float stackCount = activeEffect.StackCount;
+            var context = activeEffect.Context;
+
+            if (effectData.modifiers == null || targetASC.AttributeSet == null)
+            {
+                return;
+            }
+
+            foreach (var modifier in effectData.modifiers)
+            {
+                EGameplayAttributeType attributeType = modifier.GetAttributeName();
+                GameplayAttribute targetAttribute = targetASC.AttributeSet.GetAttribute(attributeType);
+
+                if (targetAttribute == null) continue;
+
+                // Recalculate magnitude with NEW stack count
+                float finalMagnitude = calculationService.CalculateMagnitude(
+                    modifier,
+                    activeEffect.Source,
+                    targetASC,
+                    level,
+                    stackCount,
+                    context);
+
+                // Update existing modifier in the attribute
+                targetAttribute.UpdateModifier(activeEffect, modifier.operation, finalMagnitude);
             }
         }
     }

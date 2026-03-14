@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer.Unity;
 using Abel.TowerDefense.Render;   // GameRenderManager, RenderGroup
-using Abel.TowerDefense.Data;     // UnitRenderData
+using Abel.TowerDefense.Data;
+using FD.Ability;     // UnitRenderData
 
 namespace Abel.TranHuongDao.Core
 {
@@ -58,9 +59,10 @@ namespace Abel.TranHuongDao.Core
 
         // Cached Camera.main — resolved once in Initialize() to avoid per-frame lookup.
         private Camera _mainCamera;
-        // Live data of the currently selected unit — used for per-frame stat refresh.
+        // Cached config of the currently selected unit (static data, safe to cache).
         private UnitConfig _selectedConfig;
-        private UnitAttributeSet _selectedAttributes;
+        // Cached ASC of the currently selected unit — passed to the UI for the effects panel.
+        private GAS.AbilitySystemComponent _selectedASC;
         // ── Constructor ───────────────────────────────────────────────────────────
 
         public TowerSelectionManager(
@@ -97,24 +99,28 @@ namespace Abel.TranHuongDao.Core
         public void Tick()
         {
             // ── Phase 1: per-frame liveness check + stat refresh ──────────────────
-            if (SelectedTower != null || SelectedEnemy != null)
+            if (SelectedTower != null)
             {
-                bool stillAlive;
-                if (SelectedTower != null)
-                    stillAlive = _towerManager.TryGetTower(SelectedTower.InstanceID, out _);
-                else
-                    stillAlive = _enemyManager.TryGetEnemy(SelectedEnemy.InstanceID, out _);
-
-                if (!stillAlive)
+                if (!_towerManager.TryGetTower(SelectedTower.InstanceID, out Tower liveTower))
                 {
-                    // Unit died or was removed — clear selection immediately.
                     Deselect();
                     return;
                 }
-
-                // Unit is still alive — push fresh GAS values to the stat labels.
-                if (_selectedAttributes != null)
-                    _uiView.RefreshStats(_selectedConfig, _selectedAttributes);
+                // Fetch attributes fresh from the live ASC so buffs/debuffs are always current.
+                var attrs = liveTower.ASC?.GetAttributeSet<UnitAttributeSet>();
+                if (attrs != null)
+                    _uiView.RefreshStats(_selectedConfig, attrs, _selectedASC);
+            }
+            else if (SelectedEnemy != null)
+            {
+                if (!_enemyManager.TryGetEnemy(SelectedEnemy.InstanceID, out Enemy liveEnemy))
+                {
+                    Deselect();
+                    return;
+                }
+                var attrs = liveEnemy.ASC?.GetAttributeSet<UnitAttributeSet>();
+                if (attrs != null)
+                    _uiView.RefreshStats(_selectedConfig, attrs, _selectedASC);
             }
 
             // ── Phase 2: click detection ──────────────────────────────────────────
@@ -254,11 +260,11 @@ namespace Abel.TranHuongDao.Core
                 return;
             }
 
-            // Cache for per-frame refresh in Tick().
+            // Cache static config and ASC for per-frame refresh in Tick().
             _selectedConfig = config;
-            _selectedAttributes = attributes;
+            _selectedASC = asc;
 
-            _uiView.ShowUnit(config, attributes);
+            _uiView.ShowUnit(config, attributes, asc);
         }
 
         /// <summary>
@@ -321,7 +327,7 @@ namespace Abel.TranHuongDao.Core
         {
             SelectedTower = null;
             SelectedEnemy = null;
-            _selectedAttributes = null;
+            _selectedASC = null;
             _uiView.Hide();
         }
 
@@ -371,7 +377,6 @@ namespace Abel.TranHuongDao.Core
             // Clear selection — the new tower is not automatically selected.
             SelectedTower = null;
             SelectedEnemy = null;
-            _selectedAttributes = null;
             _uiView.Hide();
         }
 

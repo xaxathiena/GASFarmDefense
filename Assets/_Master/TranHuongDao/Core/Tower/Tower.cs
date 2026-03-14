@@ -58,9 +58,10 @@ namespace Abel.TranHuongDao.Core
         // ── Events ───────────────────────────────────────────────────────────────
         public event Action<Tower> OnDestroyed;
 
-        // ── Attack throttle ──────────────────────────────────────────────────────
-        // TryActivateAbility is guarded by GAS cooldown, but we poll this every frame.
-        // No extra throttle needed; the cooldown defined in TDTowerNormalAttackData drives the rate.
+        // ── Attack ROF Timer ──────────────────────────────────────────────────────
+        // Tracks seconds remaining until the next attack. Managed entirely by Tower;
+        // does NOT use GAS cooldown so the GAS cooldown is free for skills.
+        private float _attackTimer;
 
         // Cached max-health inverse: avoids a division every time HP changes.
         private float maxHealthInverse;
@@ -112,10 +113,25 @@ namespace Abel.TranHuongDao.Core
 
             // Grant the attack ability so the ASC can activate it.
             if (attackAbilityData != null)
-                asc.GiveAbility(attackAbilityData);
+            {
+                var spec = asc.GiveAbility(attackAbilityData);
+                spec.cooldownRateAttr = EGameplayAttributeType.NormalCooldownRate;
+
+                // Auto-activate if policy is OnGranted (e.g. passive/aura)
+                if (attackAbilityData.activationPolicy == EAbilityActivationPolicy.OnGranted)
+                    asc.TryActivateAbility(attackAbilityData);
+            }
+
             // Grant the skill ability (optional — towers without a skill have this null).
             if (skillAbilityData != null)
-                asc.GiveAbility(skillAbilityData);
+            {
+                var spec = asc.GiveAbility(skillAbilityData);
+                spec.cooldownRateAttr = EGameplayAttributeType.SkillCooldownRate;
+
+                // Auto-activate if policy is OnGranted (e.g. passive/aura)
+                if (skillAbilityData.activationPolicy == EAbilityActivationPolicy.OnGranted)
+                    asc.TryActivateAbility(skillAbilityData);
+            }
             // ── Render ─────────────────────────────────────────────────────────
             renderService.RenderUnit(TowerID, InstanceID, Position);
             renderInitialized = true;
@@ -140,7 +156,7 @@ namespace Abel.TranHuongDao.Core
             if (asc.HasAnyTags(GameplayTag.State_Disabled, GameplayTag.State_Silenced))
                 return;
 
-            TryFireAtEnemy();
+            TryFireAtEnemy(dt);
             TryUseSkill();
 
             vfxController?.Tick(dt);
@@ -168,23 +184,42 @@ namespace Abel.TranHuongDao.Core
 
         // ── Private ──────────────────────────────────────────────────────────────
 
-        private void TryFireAtEnemy()
+        private void TryFireAtEnemy(float dt)
         {
             if (attackAbilityData == null) return;
+            if (attackAbilityData.activationPolicy == EAbilityActivationPolicy.OnGranted) return;
+
+            // Tick down the ROF timer.
+            // Scale the decrement by the NormalCooldownRate attribute so attack speed
+            // buffs/debuffs that affect cooldown rate also affect the tower's firing interval.
+            float rate = attributeSet.NormalCooldownRate.CurrentValue;
+            if (rate > 0.0001f)
+            {
+                _attackTimer -= dt / rate;
+            }
+
+            if (_attackTimer > 0f) return;
 
             // TryActivateAbility internally calls IAbilityBehaviour.CanActivate first.
-            // The TowerAttackAbilityBehaviour will query IEnemyManager for closest target.
+            // The behaviour will query IEnemyManager for the closest target.
             bool activated = asc.TryActivateAbility(attackAbilityData);
             if (activated)
             {
+                // Compute next base interval from the live ROF attribute.
+                // Note: The 'rate' multiplier is applied during Tick above.
+                float rof = attributeSet.ROF.CurrentValue;
+                _attackTimer = rof > 0f ? 1.0f / rof : float.MaxValue;
+
                 TriggerProcs(EProcTriggerCondition.OnAttackStart);
-                TriggerProcs(Abilities.EProcTriggerCondition.EveryNthAttack);
+                TriggerProcs(EProcTriggerCondition.EveryNthAttack);
             }
         }
 
         private void TryUseSkill()
         {
             if (skillAbilityData == null) return;
+            if (skillAbilityData.activationPolicy == EAbilityActivationPolicy.OnGranted) return;
+            if (asc.IsAbilityOnCooldown(skillAbilityData)) return;
 
             // GAS cooldown on the skill SO governs the fire rate — no extra timer needed.
             asc.TryActivateAbility(skillAbilityData);
@@ -215,8 +250,7 @@ namespace Abel.TranHuongDao.Core
             {
                 if (ability is TD_BaseProcData procData)
                 {
-                    var behaviour = behaviourRegistry.GetBehaviour(procData) as TD_BaseProcBehaviour;
-                    if (behaviour != null)
+                    if (behaviourRegistry.GetBehaviour(procData) is TD_BaseProcBehaviour behaviour)
                     {
                         behaviour.EvaluateProc(procData, asc, condition, targetAsc);
                     }

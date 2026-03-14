@@ -49,6 +49,18 @@ namespace GAS
         }
 
         /// <summary>
+        /// Update an existing modifier's magnitude
+        /// </summary>
+        public void UpdateModifier(ActiveGameplayEffect sourceEffect, EGameplayModifierOp operation, float newMagnitude)
+        {
+            var mod = modifiers.FirstOrDefault(m => m.SourceEffect == sourceEffect && m.Operation == operation);
+            if (mod != null)
+            {
+                mod.Magnitude = newMagnitude;
+            }
+        }
+
+        /// <summary>
         /// Calculate final value from base value and all modifiers
         /// Execution order: Base → Add → Multiply → Divide → Override (last override wins)
         /// </summary>
@@ -318,6 +330,20 @@ namespace GAS
             aggregator.RemoveModifiersFromEffect(sourceEffect);
             isDirty = true;
 
+            // Recalculate immediately
+            RecalculateCurrentValue();
+        }
+
+        /// <summary>
+        /// Update an existing modifier's magnitude
+        /// </summary>
+        public void UpdateModifier(ActiveGameplayEffect sourceEffect, EGameplayModifierOp operation, float newMagnitude)
+        {
+            if (aggregator == null) return;
+
+            aggregator.UpdateModifier(sourceEffect, operation, newMagnitude);
+            isDirty = true;
+            
             // Recalculate immediately
             RecalculateCurrentValue();
         }

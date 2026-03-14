@@ -15,7 +15,7 @@ namespace GAS
         private readonly IDebugService debug;
         private readonly GameplayEffectService effectService;
 
-        public GameplayAbilityLogic(AbilityBehaviourRegistry behaviourRegistry, 
+        public GameplayAbilityLogic(AbilityBehaviourRegistry behaviourRegistry,
         IDebugService debug, GameplayEffectService effectService)
         {
             _behaviourRegistry = behaviourRegistry;
@@ -126,7 +126,7 @@ namespace GAS
 
         private void ApplyCooldown(GameplayAbilityData ability, AbilitySystemComponent asc, float abilityLevel)
         {
-            float cooldown = ability.cooldownDuration.GetValueAtLevel(abilityLevel, asc);
+            float cooldown = ability.cooldownDuration;
             if (cooldown > 0)
             {
                 asc.StartCooldown(ability, cooldown);

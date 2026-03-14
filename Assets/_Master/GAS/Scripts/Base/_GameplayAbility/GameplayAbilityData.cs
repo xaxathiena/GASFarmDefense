@@ -3,6 +3,22 @@ using UnityEngine;
 namespace GAS
 {
     /// <summary>
+    /// Defines when an ability should be activated.
+    /// </summary>
+    public enum EAbilityActivationPolicy
+    {
+        /// <summary>
+        /// Ability is activated on demand (e.g. by player input or AI logic ticking).
+        /// </summary>
+        OnDemand = 0,
+
+        /// <summary>
+        /// Ability is automatically activated immediately when granted to the ASC. Use for passive abilities or auras.
+        /// </summary>
+        OnGranted = 1
+    }
+
+    /// <summary>
     /// Defines when an ability should end after activation.
     /// </summary>
     public enum EAbilityEndPolicy
@@ -13,7 +29,7 @@ namespace GAS
         /// Cooldown starts immediately.
         /// </summary>
         InstantEnd = 0,
-        
+
         /// <summary>
         /// Ability stays active until manually ended by calling EndAbility().
         /// Use for: Duration buffs, channeling spells, toggle abilities, auras.
@@ -37,9 +53,12 @@ namespace GAS
         public Sprite icon;
 
         [Header("Ability Properties")]
-        public ScalableFloat cooldownDuration = new ScalableFloat();
+        [Tooltip("OnDemand: Triggered manually or by AI logic tick.\nOnGranted: Auto-activated when given to character (for Passives/Aura).")]
+        public EAbilityActivationPolicy activationPolicy = EAbilityActivationPolicy.OnDemand;
+
+        public float cooldownDuration = 0f;
         public ScalableFloat costAmount = new ScalableFloat();
-        
+
         [Tooltip("InstantEnd: Auto-end after fire (normal attack, fireball).\nManualEnd: Stays active until EndAbility() called (buffs, channeling).")]
         public EAbilityEndPolicy endPolicy = EAbilityEndPolicy.InstantEnd;
 

@@ -57,10 +57,10 @@ namespace Abel.TranHuongDao.Core
         public float BaseDamage;
 
         /// <summary>
-        /// Seconds between consecutive attacks.
-        /// Timer pattern: timer -= dt; if (timer &lt;= 0) { Attack(); timer = AttackCooldown; }
+        /// Rate of Fire: number of attacks per second.
+        /// Cooldown is derived as: cooldown = 1.0f / ROF
         /// </summary>
-        public float AttackCooldown;
+        public float ROF;
 
         /// <summary>World-space acquisition radius.</summary>
         public float AttackRange;
@@ -111,7 +111,7 @@ namespace Abel.TranHuongDao.Core
             float      maxHealth,
             float      moveSpeed,
             float      baseDamage,
-            float      attackCooldown,
+            float      rof,
             float      attackRange,
             float      projectileSpeed,
             AttackType attackType,
@@ -125,7 +125,7 @@ namespace Abel.TranHuongDao.Core
             MaxHealth       = maxHealth;
             MoveSpeed       = moveSpeed;
             BaseDamage      = baseDamage;
-            AttackCooldown  = attackCooldown;
+            ROF             = rof;
             AttackRange     = attackRange;
             ProjectileSpeed = projectileSpeed;
             AttackType      = attackType;

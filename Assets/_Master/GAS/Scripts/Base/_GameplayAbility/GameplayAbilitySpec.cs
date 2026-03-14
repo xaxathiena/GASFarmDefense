@@ -11,6 +11,7 @@ namespace GAS
         public GameplayAbilityData Definition => definition;
         public float Level => level;
         public bool IsActive => isActive;
+        public EGameplayAttributeType cooldownRateAttr = EGameplayAttributeType.NormalCooldownRate;
 
         private readonly GameplayAbilityData definition;
         private float level;
