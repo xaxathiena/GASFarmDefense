@@ -26,17 +26,17 @@ namespace Abel.TranHuongDao.Core.Abilities
         public bool CanActivate(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             var multiData = data as TD_MultiAttackData;
-            if (multiData == null || asc?.GetOwner() == null) return false;
+            if (multiData == null || asc?.Avatar == null) return false;
 
-            return _enemyManager.GetClosestEnemyInRange(asc.GetOwner().position, multiData.attackRange) != -1;
+            return _enemyManager.GetClosestEnemyInRange(asc.Position, multiData.attackRange) != -1;
         }
 
         public void OnActivated(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             var multiData = data as TD_MultiAttackData;
-            if (multiData == null || asc?.GetOwner() == null) return;
+            if (multiData == null || asc?.Avatar == null) return;
 
-            Vector3 originPos = asc.GetOwner().position;
+            Vector3 originPos = asc.Position;
 
             _enemyCache.Clear();
             _enemyManager.GetEnemiesInRange(originPos, multiData.attackRange, _enemyCache);
@@ -56,7 +56,7 @@ namespace Abel.TranHuongDao.Core.Abilities
                 spawnNextChainedBullet = (currentPos) =>
                 {
                     if (targetsHit >= multiData.maxTargets) return;
-                    if (asc == null || asc.GetOwner() == null) return; // safety against tower removal
+                    if (asc == null || asc.Avatar == null) return; // safety against tower removal
 
                     // We allocate a local list for the callback because multiple chains 
                     // could be running concurrently, making a shared class-level list unsafe.

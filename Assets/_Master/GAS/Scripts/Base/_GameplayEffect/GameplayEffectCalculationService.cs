@@ -44,9 +44,17 @@ namespace GAS
                     break;
 
                 case EModifierCalculationType.SetByCaller:
-                    // Should be set by caller via GameplayEffectSpec
-                    Debug.LogWarning($"SetByCaller '{modifier.setByCallerTag}' magnitude not yet implemented");
-                    rawMagnitude = 0f;
+                    if (context != null && context.SetByCallerMagnitudes != null &&
+                        !string.IsNullOrEmpty(modifier.setByCallerTag) &&
+                        context.SetByCallerMagnitudes.TryGetValue(modifier.setByCallerTag, out float callerVal))
+                    {
+                        rawMagnitude = callerVal;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"SetByCaller '{modifier.setByCallerTag}' magnitude not found in context!");
+                        rawMagnitude = 0f;
+                    }
                     break;
             }
 

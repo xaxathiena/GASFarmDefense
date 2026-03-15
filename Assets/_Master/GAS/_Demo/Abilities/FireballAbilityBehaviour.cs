@@ -45,35 +45,18 @@ namespace FD.Abilities
             var fireballData = data as FireballAbilityData;
             if (fireballData == null) return;
 
-            var owner = asc.GetData().Owner;
+            var owner = asc.Avatar;
             
             debug.Log($"Fireball activated! Damage: {fireballData.damage}, Speed: {fireballData.projectileSpeed}", Color.cyan);
 
             // Spawn cast effect
             if (fireballData.castEffect != null)
             {
-                Object.Instantiate(fireballData.castEffect, owner.position, Quaternion.identity);
+                Object.Instantiate(fireballData.castEffect, owner.Position, Quaternion.identity);
             }
 
             // Spawn projectile
-            if (fireballData.projectilePrefab != null)
-            {
-                var projectile = Object.Instantiate(
-                    fireballData.projectilePrefab,
-                    owner.position + owner.forward * 1f, // Offset from caster
-                    Quaternion.LookRotation(owner.forward)
-                );
-
-                // Setup projectile logic (you can create a ProjectileComponent)
-                var rb = projectile.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.linearVelocity = owner.forward * fireballData.projectileSpeed;
-                }
-
-                // Destroy projectile after lifetime
-                Object.Destroy(projectile, fireballData.projectileLifetime);
-            }
+            
 
             // For instant abilities (like projectile launch), end immediately
             asc.EndAbility(fireballData);

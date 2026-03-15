@@ -22,8 +22,10 @@ namespace GAS
 
         // Public properties
         public AttributeSet AttributeSet => data.AttributeSet;
-        // Owner
-        public Transform Owner => data.Owner;
+        // Avatar (Spatial Provider)
+        public IGASAvatar Avatar => data.Avatar;
+        public Vector3 Position => Avatar?.Position ?? Vector3.zero;
+
         public int UnitInstanceID { get => data.UnitInstanceID; set => data.UnitInstanceID = value; }
         public string Id => data.Id;
 
@@ -45,15 +47,11 @@ namespace GAS
             logic.UpdateGameplayEffects(data, Time.deltaTime);
         }
 
-        public void InitOwner(Transform owner)
+        public void InitAvatar(IGASAvatar avatar)
         {
-            data.Owner = owner;
+            data.Avatar = avatar;
         }
 
-        public virtual Transform GetOwner()
-        {
-            return data.Owner;
-        }
 
         // Internal accessor for logic layer
         internal AbilitySystemData GetData() => data;
@@ -94,19 +92,19 @@ namespace GAS
         }
 
         /// <summary>
-        /// Try to activate an ability
+        /// Try to activate an ability with optional target context (e.g. hit target).
         /// </summary>
-        public bool TryActivateAbility(GameplayAbilityData ability)
+        public bool TryActivateAbility(GameplayAbilityData ability, AbilitySystemComponent targetContext = null)
         {
-            return logic.TryActivateAbility(data, this, ability);
+            return logic.TryActivateAbility(data, this, ability, targetContext);
         }
 
         /// <summary>
-        /// Try to activate a specific ability spec instance.
+        /// Try to activate a specific ability spec instance with optional target context.
         /// </summary>
-        public bool TryActivateAbility(GameplayAbilitySpec spec)
+        public bool TryActivateAbility(GameplayAbilitySpec spec, AbilitySystemComponent targetContext = null)
         {
-            return logic.TryActivateAbility(data, this, spec);
+            return logic.TryActivateAbility(data, this, spec, targetContext);
         }
 
         /// <summary>
@@ -263,19 +261,19 @@ namespace GAS
         #region Gameplay Effects
 
         /// <summary>
-        /// Apply a gameplay effect to this component
+        /// Apply a gameplay effect to this component with optional dynamic magnitudes.
         /// </summary>
-        public ActiveGameplayEffect ApplyGameplayEffectToSelf(GameplayEffect effect, AbilitySystemComponent source = null, float effectLevel = 1f, GameplayAbilityData sourceAbility = null)
+        public ActiveGameplayEffect ApplyGameplayEffectToSelf(GameplayEffect effect, AbilitySystemComponent source = null, float effectLevel = 1f, GameplayAbilityData sourceAbility = null, Dictionary<string, float> setByCallerMagnitudes = null)
         {
-            return ApplyGameplayEffectToTarget(effect, this, source ?? this, effectLevel, sourceAbility);
+            return ApplyGameplayEffectToTarget(effect, this, source ?? this, effectLevel, sourceAbility, setByCallerMagnitudes);
         }
 
         /// <summary>
-        /// Apply a gameplay effect to another target
+        /// Apply a gameplay effect to another target with optional dynamic magnitudes.
         /// </summary>
-        public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source, float effectLevel = 1f, GameplayAbilityData sourceAbility = null)
+        public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source, float effectLevel = 1f, GameplayAbilityData sourceAbility = null, Dictionary<string, float> setByCallerMagnitudes = null)
         {
-            return logic.ApplyGameplayEffectToTarget(effect, target, source, effectLevel, sourceAbility);
+            return logic.ApplyGameplayEffectToTarget(effect, target, source, effectLevel, sourceAbility, setByCallerMagnitudes);
         }
 
         /// <summary>

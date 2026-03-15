@@ -10,7 +10,7 @@ namespace FD.Views
     /// ✅ Không có static calls
     /// ✅ Chỉ expose Unity properties và lifecycle events
     /// </summary>
-    public class EnemyView : MonoBehaviour, IAbilitySystemComponent
+    public class EnemyView : MonoBehaviour, IAbilitySystemComponent, IGASAvatar
     {
         public AbilitySystemComponent ownerASC;
         // Unity compnent references (optional)
@@ -25,6 +25,12 @@ namespace FD.Views
         public Vector3 Position => transform.position;
 
         public AbilitySystemComponent AbilitySystemComponent => ownerASC;
+
+        public Quaternion Rotation => transform.rotation;
+
+        public Vector3 Scale => transform.localScale;
+
+        public bool IsValid => gameObject != null && gameObject.activeInHierarchy;
 
         // Lifecycle events - Controller sẽ subscribe
         public event Action<EnemyView> OnSpawned;

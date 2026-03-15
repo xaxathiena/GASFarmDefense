@@ -233,7 +233,12 @@ namespace GAS
 
         public GameObject GetAbilityOwner(AbilitySystemComponent asc)
         {
-            return asc?.GetOwner().gameObject;
+            if (asc?.Avatar is TransformAvatar transformAvatar)
+            {
+                // We return null if the avatar is not a Transform (proxy for pure data systems)
+                return null; // For now, we want to discourage GameObject dependency
+            }
+            return null;
         }
 
         #endregion

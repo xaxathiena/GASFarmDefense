@@ -9,11 +9,11 @@ namespace Abel.TranHuongDao.Core
     // ---------------------------------------------------------------------------
     public enum AttackType : byte
     {
-        Normal   = 0,
-        Magic    = 1,
+        Normal = 0,
+        Magic = 1,
         Piercing = 2,
-        Siege    = 3,
-        Chaos    = 4,   // Chaos damage bypasses all resistances.
+        Siege = 3,
+        Chaos = 4,   // Chaos damage bypasses all resistances.
     }
 
     // ---------------------------------------------------------------------------
@@ -24,8 +24,8 @@ namespace Abel.TranHuongDao.Core
     public enum TargetType : byte
     {
         Ground = 1 << 0,   // 1
-        Air    = 1 << 1,   // 2
-        Both   = Ground | Air,
+        Air = 1 << 1,   // 2
+        Both = Ground | Air,
     }
 
     // ---------------------------------------------------------------------------
@@ -107,35 +107,36 @@ namespace Abel.TranHuongDao.Core
         // ── Constructor ─────────────────────────────────────────────────────────
 
         public UnitConfig(
-            string     unitID,
-            float      maxHealth,
-            float      moveSpeed,
-            float      baseDamage,
-            float      rof,
-            float      attackRange,
-            float      projectileSpeed,
+            string unitID,
+            float maxHealth,
+            float moveSpeed,
+            float baseDamage,
+            float rof,
+            float attackRange,
+            float projectileSpeed,
             AttackType attackType,
             TargetType targetType,
-            int        buildCost,
-            int        tier,
-            string     attackAbilityID = "",
-            string     skillAbilityID  = "")
+            int buildCost,
+            int tier,
+            string attackAbilityID = "",
+            string skillAbilityID = "",
+            EUnitLogicType logicType = EUnitLogicType.None)
         {
-            UnitID          = unitID;
-            MaxHealth       = maxHealth;
-            MoveSpeed       = moveSpeed;
-            BaseDamage      = baseDamage;
-            ROF             = rof;
-            AttackRange     = attackRange;
+            UnitID = unitID;
+            MaxHealth = maxHealth;
+            MoveSpeed = moveSpeed;
+            BaseDamage = baseDamage;
+            ROF = rof;
+            AttackRange = attackRange;
             ProjectileSpeed = projectileSpeed;
-            AttackType      = attackType;
-            TargetType      = targetType;
-            BuildCost       = buildCost;
-            Tier            = tier;
+            AttackType = attackType;
+            TargetType = targetType;
+            BuildCost = buildCost;
+            Tier = tier;
             AttackAbilityID = attackAbilityID;
-            SkillAbilityID  = skillAbilityID;
-            _pad0           = 0;
-            _pad1           = 0;
+            SkillAbilityID = skillAbilityID;
+            _pad0 = 0;
+            _pad1 = 0;
         }
     }
 }

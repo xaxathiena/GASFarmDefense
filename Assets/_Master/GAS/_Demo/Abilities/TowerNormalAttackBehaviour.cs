@@ -30,14 +30,14 @@ namespace FD.Abilities
             }
 
             // Check if there are enemies in range
-            var owner = asc.GetData().Owner;
+            var owner = asc.Avatar;
             if (owner == null)
             {
                 return false;
             }
 
             // Get targets from EnemyManager
-            var targets = enemyManager.GetEnemiesInRange(owner.position, attackData.attackRange, LayerMask.GetMask("Enemy"));
+            var targets = enemyManager.GetEnemiesInRange(asc.Position, attackData.attackRange, LayerMask.GetMask("Enemy"));
             if (targets == null || targets.Count == 0)
             {
                 return false;
@@ -52,11 +52,11 @@ namespace FD.Abilities
             var attackData = data as TowerNormalAttackData;
             if (attackData == null) return;
 
-            var owner = asc.GetData().Owner;
+            var owner = asc.Avatar;
             if (owner == null) return;
 
             // Get targets from EnemyManager
-            var targets = enemyManager.GetEnemiesInRange(owner.position, attackData.attackRange, LayerMask.GetMask("Enemy"));
+            var targets = enemyManager.GetEnemiesInRange(asc.Position, attackData.attackRange, LayerMask.GetMask("Enemy"));
             if (targets == null || targets.Count == 0) return;
             
             // Limit to maxTargets
@@ -79,20 +79,20 @@ namespace FD.Abilities
 
         private void FireAtTarget(AbilitySystemComponent asc, Transform target, TowerNormalAttackData attackData, GameplayAbilitySpec spec)
         {
-            var owner = asc.GetOwner();
+            var ownerPos = asc.Position;
             // Spawn muzzle effect
             if (attackData.muzzleEffect != null)
             {
-                Object.Instantiate(attackData.muzzleEffect, owner.position, Quaternion.identity);
+                Object.Instantiate(attackData.muzzleEffect, ownerPos, Quaternion.identity);
             }
 
             // Spawn projectile
             if (attackData.projectilePrefab != null)
             {
-                Vector3 direction = (target.position - owner.position).normalized;
+                Vector3 direction = (target.position - ownerPos).normalized;
                 var projectile = Object.Instantiate(
                     attackData.projectilePrefab,
-                    owner.position + direction * 0.5f, // Offset from tower
+                    ownerPos + direction * 0.5f, // Offset from tower
                     Quaternion.LookRotation(direction)
                 );
 

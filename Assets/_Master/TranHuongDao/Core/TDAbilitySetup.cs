@@ -20,19 +20,25 @@ namespace Abel.TranHuongDao.Core
         private readonly IBulletManager _bulletManager;
         private readonly ITowerManager _towerManager;
         private readonly GameplayAbilityLogic _gameplayAbilityLogic;
+        private readonly MinionManager _minionManager;
+        private readonly FD.Modules.VFX.IVFXManager _vfxManager;
 
         public TDAbilitySetup(
             AbilityBehaviourRegistry registry,
             IEnemyManager enemyManager,
             IBulletManager bulletManager,
             ITowerManager towerManager,
-            GameplayAbilityLogic gameplayAbilityLogic)
+            GameplayAbilityLogic gameplayAbilityLogic,
+            MinionManager minionManager,
+            FD.Modules.VFX.IVFXManager vfxManager)
         {
             _registry = registry;
             _enemyManager = enemyManager;
             _bulletManager = bulletManager;
             _towerManager = towerManager;
             _gameplayAbilityLogic = gameplayAbilityLogic;
+            _minionManager = minionManager;
+            _vfxManager = vfxManager;
         }
 
         public void Start()
@@ -55,6 +61,10 @@ namespace Abel.TranHuongDao.Core
                 new TD_AuraBehaviour(_enemyManager));
             _registry.Register<TD_AoEApplyEffectAbilityData>(
                 new TD_AoEApplyEffectAbilityBehaviour(_enemyManager));
+            _registry.Register<TD_SummonAbilityData>( // Added new registration
+                new TD_SummonAbilityBehaviour(_minionManager)); // Injected _minionManager
+            _registry.Register<TD_InstantAoEAbilityData>(
+                new TD_InstantAoEAbilityBehaviour(_enemyManager, _towerManager, _vfxManager));
 
             // Add new abilities below as the project grows:
             // _registry.Register<TDFrostTowerData>(new TDFrostTowerBehaviour(_enemyManager));

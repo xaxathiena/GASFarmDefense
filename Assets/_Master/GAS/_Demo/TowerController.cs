@@ -69,7 +69,7 @@ namespace FD
             this.towerView = towerView;
             currentCount = ++count;
             this.towerView.ownerASC = this.asc; // Set owner for AbilitySystemComponent access
-            this.asc.InitOwner(this.towerView.transform); // Set owner later if needed
+            this.asc.InitAvatar(this.towerView); // Set owner later if needed
             this.asc.InitializeAttributeSet(attributeSet);
             
             // Initialize profiler

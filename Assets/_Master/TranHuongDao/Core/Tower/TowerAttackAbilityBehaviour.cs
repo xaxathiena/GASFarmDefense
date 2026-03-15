@@ -91,8 +91,7 @@ namespace Abel.TranHuongDao.Core
 
         private static Vector3 GetOwnerPosition(AbilitySystemComponent asc)
         {
-            var owner = asc.GetOwner();
-            return owner != null ? owner.position : Vector3.zero;
+            return asc.Position;
         }
     }
 }

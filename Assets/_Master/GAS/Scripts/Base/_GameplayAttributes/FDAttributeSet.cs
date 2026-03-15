@@ -181,7 +181,7 @@ namespace FD.Ability
         /// </summary>
         private void OnDeath()
         {
-            //Debug.Log($"{ownerASC.GetOwner().name} has died!");
+            //Debug.Log($"{ownerASC.Avatar} has died!");
 
             // Add death tag
             if (ownerASC != null)

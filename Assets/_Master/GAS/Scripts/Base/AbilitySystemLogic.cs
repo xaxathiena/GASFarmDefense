@@ -131,10 +131,7 @@ namespace GAS
                         data.ActiveTagCounts[tagByte] = 1;
                     }
 
-                    if (data.Owner != null)
-                    {
-                        _eventBus.Publish(new GameplayTagChangedEvent(data.Owner.gameObject.GetInstanceID(), tag, newCount));
-                    }
+                   _eventBus.Publish(new GameplayTagChangedEvent(data.UnitInstanceID, tag, newCount));
                 }
             }
         }
@@ -156,10 +153,7 @@ namespace GAS
                         data.ActiveTagCounts.Remove(tagByte);
                     }
 
-                    if (data.Owner != null)
-                    {
-                        _eventBus.Publish(new GameplayTagChangedEvent(data.Owner.gameObject.GetInstanceID(), tag, newCount));
-                    }
+                    _eventBus.Publish(new GameplayTagChangedEvent(data.UnitInstanceID, tag, newCount));
                 }
             }
         }
@@ -251,29 +245,32 @@ namespace GAS
             spec?.SetLevel(level);
         }
 
-        public bool TryActivateAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbilityData ability)
+        public bool TryActivateAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbilityData ability, AbilitySystemComponent targetContext = null)
         {
             var spec = GetAbilitySpec(data, ability);
             if (spec == null)
             {
 #if UNITY_EDITOR
-                //Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {data.Owner.name}");
+                //Debug.LogWarning($"Ability {ability?.abilityName} is not granted to {data.UnitInstanceID}");
 #endif
                 return false;
             }
 
-            return TryActivateAbility(data, asc, spec);
+            return TryActivateAbility(data, asc, spec, targetContext);
         }
 
-        public bool TryActivateAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
+        public bool TryActivateAbility(AbilitySystemData data, AbilitySystemComponent asc, GameplayAbilitySpec spec, AbilitySystemComponent targetContext = null)
         {
             if (spec == null || spec.Definition == null)
             {
 #if UNITY_EDITOR
-                //Debug.LogWarning($"Invalid ability spec on {data.Owner.name}");
+                //Debug.LogWarning($"Invalid ability spec on {data.UnitInstanceID}");
 #endif
                 return false;
             }
+
+            // Set temporary context for this activation
+            spec.TargetContext = targetContext;
 
             var ability = spec.Definition;
 
@@ -355,12 +352,16 @@ namespace GAS
             }
         }
 
+        /// <summary>
+        /// Apply a gameplay effect to a target with optional dynamic magnitudes.
+        /// </summary>
         public ActiveGameplayEffect ApplyGameplayEffectToTarget(
             GameplayEffect effect,
             AbilitySystemComponent target,
             AbilitySystemComponent source,
             float effectLevel = 1f,
-            GameplayAbilityData sourceAbility = null)
+            GameplayAbilityData sourceAbility = null,
+            Dictionary<string, float> setByCallerMagnitudes = null)
         {
             if (effect == null || target == null)
                 return null;
@@ -370,7 +371,7 @@ namespace GAS
             // Check if effect can be applied
             if (!_effectService.CanApplyTo(effect, target))
             {
-                //Debug.LogWarning($"Cannot apply {effect.effectName} to {targetData.Owner.name}");
+                //Debug.LogWarning($"Cannot apply {effect.effectName} to {target.UnitInstanceID}");
                 return null;
             }
 
@@ -387,7 +388,7 @@ namespace GAS
                     }
 
 #if UNITY_EDITOR
-                    //Debug.Log($"Stacked {effect.effectName} on {targetData.Owner.name} (x{existingEffect.StackCount})");
+                    //Debug.Log($"Stacked {effect.effectName} on {target.UnitInstanceID} (x{existingEffect.StackCount})");
 #endif
                     // Always return the existing effect to prevent duplicate instances bypassing maxStacks
                     // Even if AddStack returns false (max stacks reached), we shouldn't create a new instance
@@ -410,7 +411,8 @@ namespace GAS
             {
                 SourceASC = source,
                 TargetASC = target,
-                Level = effectLevel
+                Level = effectLevel,
+                SetByCallerMagnitudes = setByCallerMagnitudes ?? new Dictionary<string, float>()
             };
 
             // Create active effect

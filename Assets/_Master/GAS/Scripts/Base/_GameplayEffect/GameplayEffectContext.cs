@@ -32,6 +32,11 @@ namespace GAS
         /// Stack count for stacking effects
         /// </summary>
         public float StackCount { get; set; } = 1f;
+
+        /// <summary>
+        /// Magnitudes set by caller via tags/strings for dynamic calculations.
+        /// </summary>
+        public System.Collections.Generic.Dictionary<string, float> SetByCallerMagnitudes { get; set; } = new System.Collections.Generic.Dictionary<string, float>();
         
         /// <summary>
         /// Static/thread-local context for current calculation

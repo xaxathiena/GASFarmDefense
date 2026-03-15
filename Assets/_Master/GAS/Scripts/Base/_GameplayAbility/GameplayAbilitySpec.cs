@@ -13,6 +13,12 @@ namespace GAS
         public bool IsActive => isActive;
         public EGameplayAttributeType cooldownRateAttr = EGameplayAttributeType.NormalCooldownRate;
 
+        /// <summary>
+        /// Temporary context for the current activation (e.g. hit target).
+        /// Allows ability to execute at a specific location while being owned by another source.
+        /// </summary>
+        public AbilitySystemComponent TargetContext { get; set; }
+
         private readonly GameplayAbilityData definition;
         private float level;
         private bool isActive;

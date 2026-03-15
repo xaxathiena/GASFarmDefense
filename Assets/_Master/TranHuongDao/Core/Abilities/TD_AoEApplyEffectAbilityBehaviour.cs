@@ -35,7 +35,7 @@ namespace Abel.TranHuongDao.Core.Abilities
         public bool CanActivate(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             var aoeData = data as TD_AoEApplyEffectAbilityData;
-            if (aoeData == null || asc?.GetOwner() == null) return false;
+            if (aoeData == null || asc?.Avatar == null) return false;
 
             // Aura can always activate if owner exists
             return true;
@@ -44,24 +44,29 @@ namespace Abel.TranHuongDao.Core.Abilities
         public void OnActivated(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             var aoeData = data as TD_AoEApplyEffectAbilityData;
-            if (aoeData == null || asc?.GetOwner() == null) return;
+            if (aoeData == null || asc?.Avatar == null) return;
 
             // Optional: Spawn VFX (Aura rings)
             if (aoeData.castVfxPrefab != null)
             {
-                // Instantiate as child of the owner so it moves with the aura
-                UnityEngine.Object.Instantiate(aoeData.castVfxPrefab, asc.GetOwner().position, Quaternion.identity, asc.GetOwner());
+                // Note: Prefab spawning still needs a position. 
+                // Parent rotation/attachment might be tricky without a Transform.
+                UnityEngine.Object.Instantiate(aoeData.castVfxPrefab, asc.Position, Quaternion.identity);
             }
 
             _activeEffects[spec] = new Dictionary<int, ActiveGameplayEffect>();
 
 #if UNITY_EDITOR
-            // Add Gizmo to visualize the aura area in Editor
-            if (asc.GetOwner() != null)
+            // Add Gizmo to visualize the aura area in Editor (if possible)
+            if (asc.Avatar is GAS.TransformAvatar transformAvatar)
             {
-                var gizmo = asc.GetOwner().gameObject.AddComponent<TD_AoEApplyEffectGizmo>();
-                gizmo.Radius = aoeData.captureRadius;
-                _activeGizmos[spec] = gizmo;
+                var gizmo = transformAvatar.Position != Vector3.zero ? new GameObject("AoEGizmo").AddComponent<TD_AoEApplyEffectGizmo>() : null;
+                if (gizmo != null)
+                {
+                    gizmo.transform.SetParent(null); // Or keep it tracked
+                    gizmo.Radius = aoeData.captureRadius;
+                    _activeGizmos[spec] = gizmo;
+                }
             }
 #endif
 
@@ -79,9 +84,13 @@ namespace Abel.TranHuongDao.Core.Abilities
 
             try
             {
-                while (spec.IsActive && asc.GetOwner() != null && !token.IsCancellationRequested)
+                while (spec.IsActive && asc.Avatar != null && asc.Avatar.IsValid && !token.IsCancellationRequested)
                 {
-                    Vector3 originPos = asc.GetOwner().position;
+                    // Resolve Origin: Use TargetContext if provided (e.g. hit location), fallback to current unit.
+                    Vector3 originPos = (spec.TargetContext != null && spec.TargetContext.Avatar != null) 
+                        ? spec.TargetContext.Position 
+                        : asc.Position;
+                    
                     sweepCache.Clear();
 
                     // Depending on the target type, gather the IDs.

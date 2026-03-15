@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GAS;
 using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
@@ -53,6 +54,13 @@ namespace Abel.TranHuongDao.Core
         /// Returns false if no tower with that ID is currently active.
         /// </summary>
         bool TryGetTower(int instanceID, out Tower tower);
+
+        /// <summary>
+        /// Retrieves the <see cref="GAS.AbilitySystemComponent"/> belonging to the tower
+        /// with the given instanceID so abilities can apply <see cref="GAS.GameplayEffect"/>s.
+        /// Returns false if the tower does not exist or has no ASC.
+        /// </summary>
+        bool TryGetTowerASC(int instanceID, out GAS.AbilitySystemComponent asc);
 
         /// <summary>
         /// Fill <paramref name="results"/> with the ASCs of all towers whose world

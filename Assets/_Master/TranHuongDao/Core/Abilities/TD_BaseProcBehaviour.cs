@@ -67,20 +67,19 @@ namespace Abel.TranHuongDao.Core.Abilities
                 }
 
                 // We trigger the ability from the source once.
-                // If the secondary ability needs target payloads, GAS would need that context pass-through,
-                // but currently TryActivateAbility is self-contained.
-                sourceASC.TryActivateAbility(procData.abilityToTrigger);
+                // Pass target context based on executionTarget configuration.
+                AbilitySystemComponent ctx = (procData.executionTarget == EProcContextTarget.Target) ? targetASC : null;
+                sourceASC.TryActivateAbility(procData.abilityToTrigger, ctx);
             }
         }
 
         private List<AbilitySystemComponent> ResolveTargets(TD_BaseProcData procData, AbilitySystemComponent sourceASC, AbilitySystemComponent targetASC)
         {
             var targets = new List<AbilitySystemComponent>();
-            var sourceOwner = sourceASC.GetOwner();
-            var ignoreList = new List<AbilitySystemComponent>() { sourceASC };
-            if (sourceOwner == null) return targets;
+            if (sourceASC.Avatar == null) return targets;
 
-            Vector3 centerPos = sourceOwner.position;
+            Vector3 centerPos = sourceASC.Position;
+            var ignoreList = new List<AbilitySystemComponent>() { sourceASC };
             var attrSet = sourceASC.GetAttributeSet<UnitAttributeSet>();
             float attackRange = attrSet != null ? attrSet.AttackRange.CurrentValue : 5f;
 
@@ -212,11 +211,11 @@ namespace Abel.TranHuongDao.Core.Abilities
             }
 
             // C. Instantiate external Prefab (e.g. Goblin, Nuke VFX)
-            if (procData.prefabToSpawn != null && target.GetOwner() != null)
+            if (procData.prefabToSpawn != null && target.Avatar != null)
             {
                 // For spawning, we instantiate exactly at the target's position.
                 // The prefab should have its own logic for cleanup or subsequent actions.
-                Object.Instantiate(procData.prefabToSpawn, target.GetOwner().position, Quaternion.identity);
+                Object.Instantiate(procData.prefabToSpawn, target.Position, Quaternion.identity);
             }
         }
 

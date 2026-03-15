@@ -32,6 +32,7 @@ namespace Abel.TranHuongDao.Core
 
         // ── Tower registry ────────────────────────────────────────────────────────
         private readonly Dictionary<int, Tower> activeTowers = new Dictionary<int, Tower>(32);
+        private readonly List<Tower> pendingRemoval = new List<Tower>(8);
         private readonly List<int> activeIDBuffer = new List<int>(32);
         private readonly HashSet<Vector3> occupiedCells = new HashSet<Vector3>();
 
@@ -64,13 +65,34 @@ namespace Abel.TranHuongDao.Core
             float dt = Time.deltaTime;
             foreach (var tower in activeTowers.Values)
                 tower.Tick(dt);
+
+            FlushPendingRemovals();
+        }
+
+        private void FlushPendingRemovals()
+        {
+            if (pendingRemoval.Count == 0) return;
+
+            foreach (var tower in pendingRemoval)
+            {
+                tower.OnDestroyed -= HandleTowerDestroyed;
+                tower.Cleanup();
+                activeTowers.Remove(tower.InstanceID);
+                occupiedCells.Remove(tower.Position);
+
+                OnTowerRemoved?.Invoke(tower.InstanceID);
+            }
+
+            pendingRemoval.Clear();
         }
 
         public void Dispose()
         {
-            var towers = new List<Tower>(activeTowers.Values);
-            foreach (var t in towers)
+            var survivors = new List<Tower>(activeTowers.Values);
+            foreach (var t in survivors)
                 DestroyTower(t, notify: false);
+            
+            FlushPendingRemovals();
             activeTowers.Clear();
         }
 
@@ -114,6 +136,17 @@ namespace Abel.TranHuongDao.Core
 
         public bool TryGetTower(int instanceID, out Tower tower)
             => activeTowers.TryGetValue(instanceID, out tower);
+
+        public bool TryGetTowerASC(int instanceID, out GAS.AbilitySystemComponent asc)
+        {
+            if (activeTowers.TryGetValue(instanceID, out var tower))
+            {
+                asc = tower.ASC;
+                return true;
+            }
+            asc = null;
+            return false;
+        }
 
         public void GetTowersInRange(Vector3 center, float radius, List<GAS.AbilitySystemComponent> ignoreList, List<GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue)
         {
@@ -228,7 +261,8 @@ namespace Abel.TranHuongDao.Core
 
         private void HandleTowerDestroyed(Tower tower)
         {
-            DestroyTower(tower, notify: true);
+            if (!pendingRemoval.Contains(tower))
+                pendingRemoval.Add(tower);
         }
     }
 }

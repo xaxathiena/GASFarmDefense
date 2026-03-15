@@ -23,10 +23,10 @@ namespace Abel.TranHuongDao.Core.Abilities
         public bool CanActivate(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
             var attackData = data as TD_NormalAttackData;
-            if (attackData == null || asc?.GetOwner() == null) return false;
+            if (attackData == null || asc?.Avatar == null) return false;
 
             // Only activate if an enemy is in range
-            int closestEnemyID = _enemyManager.GetClosestEnemyInRange(asc.GetOwner().position, attackData.attackRange);
+            int closestEnemyID = _enemyManager.GetClosestEnemyInRange(asc.Position, attackData.attackRange);
             return closestEnemyID != -1;
         }
 
@@ -35,19 +35,17 @@ namespace Abel.TranHuongDao.Core.Abilities
             var attackData = data as TD_NormalAttackData;
             if (attackData == null) return;
 
-            Transform ownerTransform = asc.GetOwner();
-            if (ownerTransform == null) return;
-
-            int targetEnemyID = _enemyManager.GetClosestEnemyInRange(ownerTransform.position, attackData.attackRange);
+            Vector3 ownerPos = asc.Position;
+            int targetEnemyID = _enemyManager.GetClosestEnemyInRange(ownerPos, attackData.attackRange);
             if (targetEnemyID == -1) return;
 
-            // Clean logical separation: request spawn by trailID.
+            // Spawn bullet at owner's position
             _bulletManager.SpawnBullet(
-                trailID: attackData.trailID,
-                trailVfxID: attackData.trailVfxID,
-                hitVfxID: attackData.hitVfxID,
-                targetEnemyInstanceID: targetEnemyID,
-                spawnPosition: ownerTransform.position,
+                attackData.trailID,
+                attackData.trailVfxID,
+                attackData.hitVfxID,
+                targetEnemyID,
+                ownerPos,
                 sourceASC: asc,
                 damageEffect: attackData.hitEffect,
                 damageAmount: attackData.baseDamage,

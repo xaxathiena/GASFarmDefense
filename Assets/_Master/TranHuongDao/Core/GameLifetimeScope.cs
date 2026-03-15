@@ -103,6 +103,16 @@ namespace Abel.TranHuongDao.Core
             builder.RegisterEntryPoint<WaveManager>(Lifetime.Singleton).As<IWaveManager>();
             builder.RegisterEntryPoint<InstanceIDService>(Lifetime.Singleton).As<IInstanceIDService>();
             builder.RegisterEntryPoint<TowerSelectionManager>(Lifetime.Singleton).AsSelf();
+
+            // ── Modular Unit Logic & Minions ──────────────────────────────────────
+            builder.Register<UnitLogicFactory>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<MinionManager>(Lifetime.Singleton).AsSelf();
+
+            // Register all concrete logic types for the factory to resolve
+            builder.Register<StationaryAttackLogic>(Lifetime.Transient);
+            builder.Register<PathFollowerLogic>(Lifetime.Transient);
+            builder.Register<HomingSuicideLogic>(Lifetime.Transient);
+            builder.Register<PetFollowerLogic>(Lifetime.Transient);
         }
     }
 }

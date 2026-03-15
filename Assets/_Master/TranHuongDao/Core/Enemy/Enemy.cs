@@ -15,14 +15,20 @@ namespace Abel.TranHuongDao.Core
     ///   3. Tick(dt)             – called every frame by EnemyManager (ITickable)
     ///   4. OnDeath fires        – EnemyManager cleans up and calls RemoveRender
     /// </summary>
-    public class Enemy
+    public class Enemy : IGASAvatar
     {
         // ── Identity ─────────────────────────────────────────────────────────────
         public int InstanceID { get; private set; }
         public string EnemyID { get; private set; }
 
         // ── Transform ────────────────────────────────────────────────────────────
+        // --- IGASAvatar Implementation ---
         public Vector3 Position { get; private set; }
+        public Vector3 Scale => Vector3.one;
+        public bool IsValid => IsAlive;
+        Quaternion IGASAvatar.Rotation => Quaternion.Euler(0, Rotation, 0);
+
+        // Public properties used by logic and rendering
         public float Rotation { get; private set; }   // degrees, Y-axis
 
         // ── State ────────────────────────────────────────────────────────────────
@@ -99,11 +105,13 @@ namespace Abel.TranHuongDao.Core
             Rotation = 0f;
 
             // ── GAS setup ──────────────────────────────────────────────────────
-            asc.UnitInstanceID = instanceID;
-
             // Seed all GAS attributes from the authored balance config.
             attributeSet.InitializeFromConfig(config);
             asc.InitializeAttributeSet(attributeSet);
+            asc.UnitInstanceID = instanceID;
+            
+            // Link GAS to this Enemy as the spatial avatar
+            asc.InitAvatar(this);
 
             // Cache the reciprocal once so HP changes only cost a multiply, not a divide.
             maxHealthInverse = config.MaxHealth > 0f ? 1f / config.MaxHealth : 1f;

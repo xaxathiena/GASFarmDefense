@@ -9,8 +9,8 @@ namespace GAS
     /// </summary>
     public class AbilitySystemData
     {
-        // Owner
-        public Transform Owner { get; set; }
+        // Avatar (Spatial Provider)
+        public IGASAvatar Avatar { get; set; }
         public string Id { get; set; }
         public int UnitInstanceID { get; set; }
 

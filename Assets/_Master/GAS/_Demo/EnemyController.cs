@@ -72,7 +72,7 @@ namespace FD
             this.enemyView = enemyView;
             currentCount = ++count;
             this.enemyView.ownerASC = this.acs; // Set owner for AbilitySystemComponent access
-            acs.InitOwner(this.enemyView.transform);
+            acs.InitAvatar(enemyView); // Initialize ASC with this controller as the component
             // Initialize ASC with enemy stats if needed
             acs.InitializeAttributeSet(attributeSet);
             

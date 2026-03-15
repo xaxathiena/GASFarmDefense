@@ -3,18 +3,18 @@ using GAS;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
-    public enum EProcTriggerCondition 
-    { 
-        OnAttackStart, 
-        OnHit, 
-        OnKill, 
-        EveryNthAttack 
+    public enum EProcTriggerCondition
+    {
+        OnAttackStart,
+        OnHit,
+        OnKill,
+        EveryNthAttack
     }
 
-    public enum EProcContextTarget 
-    { 
-        Source, 
-        Target 
+    public enum EProcContextTarget
+    {
+        Source,
+        Target
     }
 
     public enum EProcTargetType
@@ -41,27 +41,27 @@ namespace Abel.TranHuongDao.Core.Abilities
     {
         [Header("Trigger Conditions")]
         public EProcTriggerCondition triggerType = EProcTriggerCondition.OnHit;
-        
+
         [Range(0f, 100f), Tooltip("Chance to activate (%).")]
         public float chance = 15f;
-        
+
         [Tooltip("Counter threshold for EveryNthAttack mode.")]
         public int countThreshold = 3;
 
         [Header("Outcome")]
         [Tooltip("If activated, to whom does it apply? Source (Tower) or Target (Enemy)?")]
         public EProcContextTarget executionTarget = EProcContextTarget.Target;
-        
+
         [Tooltip("Gameplay effect to apply immediately upon successful proc.")]
         public GameplayEffect effectToApply;
-        
+
         [Tooltip("Optional sub-ability to trigger upon successful proc.")]
         public GameplayAbilityData abilityToTrigger;
 
         [Header("Targeting Overhaul")]
         [Tooltip("How to select targets when the proc fires.")]
         public EProcTargetSelection targetSelection = EProcTargetSelection.HitTarget;
-        
+
         [Tooltip("What kind of units can be targeted by this proc.")]
         public EProcTargetType targetType = EProcTargetType.Enemy;
 

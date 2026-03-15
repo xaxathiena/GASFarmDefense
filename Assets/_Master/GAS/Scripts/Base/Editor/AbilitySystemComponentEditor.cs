@@ -2,6 +2,8 @@ using UnityEditor;
 using UnityEngine;
 using System.Reflection;
 
+using GAS;
+
 namespace GAS.Editor
 {
     //[CustomEditor(typeof(AbilitySystemComponent))]
@@ -242,13 +244,13 @@ namespace GAS.Editor
             // Source and Target information
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Source:", GUILayout.Width(100));
-            string sourceName = activeEffect.Source != null ? activeEffect.Source.GetOwner().name : "None";
+            string sourceName = activeEffect.Source != null ? (activeEffect.Source.Avatar?.ToString() ?? "Avatar") : "None";
             EditorGUILayout.LabelField(sourceName, EditorStyles.miniLabel);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Target:", GUILayout.Width(100));
-            string targetName = activeEffect.Target != null ? activeEffect.Target.GetOwner().name : "None";
+            string targetName = activeEffect.Target != null ? (activeEffect.Target.Avatar?.ToString() ?? "Avatar") : "None";
             EditorGUILayout.LabelField(targetName, EditorStyles.miniLabel);
             EditorGUILayout.EndHorizontal();
 
