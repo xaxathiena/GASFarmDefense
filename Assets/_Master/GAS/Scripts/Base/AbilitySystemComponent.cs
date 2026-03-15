@@ -22,6 +22,9 @@ namespace GAS
 
         // Public properties
         public AttributeSet AttributeSet => data.AttributeSet;
+        // Owner
+        public Transform Owner => data.Owner;
+        public int UnitInstanceID { get => data.UnitInstanceID; set => data.UnitInstanceID = value; }
         public string Id => data.Id;
 
         public AbilitySystemComponent(IDebugService debug, AbilitySystemLogic logic, GameplayAbilityLogic abilityLogic)
@@ -262,17 +265,17 @@ namespace GAS
         /// <summary>
         /// Apply a gameplay effect to this component
         /// </summary>
-        public ActiveGameplayEffect ApplyGameplayEffectToSelf(GameplayEffect effect, AbilitySystemComponent source = null, float effectLevel = 1f)
+        public ActiveGameplayEffect ApplyGameplayEffectToSelf(GameplayEffect effect, AbilitySystemComponent source = null, float effectLevel = 1f, GameplayAbilityData sourceAbility = null)
         {
-            return ApplyGameplayEffectToTarget(effect, this, source ?? this, effectLevel);
+            return ApplyGameplayEffectToTarget(effect, this, source ?? this, effectLevel, sourceAbility);
         }
 
         /// <summary>
-        /// Apply a gameplay effect to a target
+        /// Apply a gameplay effect to another target
         /// </summary>
-        public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source, float effectLevel = 1f)
+        public ActiveGameplayEffect ApplyGameplayEffectToTarget(GameplayEffect effect, AbilitySystemComponent target, AbilitySystemComponent source, float effectLevel = 1f, GameplayAbilityData sourceAbility = null)
         {
-            return logic.ApplyGameplayEffectToTarget(effect, target, source, effectLevel);
+            return logic.ApplyGameplayEffectToTarget(effect, target, source, effectLevel, sourceAbility);
         }
 
         /// <summary>

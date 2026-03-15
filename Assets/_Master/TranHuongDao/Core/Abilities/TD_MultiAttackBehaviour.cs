@@ -96,6 +96,7 @@ namespace Abel.TranHuongDao.Core.Abilities
                         damageAmount: multiData.baseDamage,
                         bulletSpeed: multiData.bulletSpeed,
                         collisionThreshold: 0.5f,
+                        sourceAbility: multiData,
                         onHit: (hitPos, _) =>
                         {
                             spawnNextChainedBullet(hitPos);
@@ -125,7 +126,8 @@ namespace Abel.TranHuongDao.Core.Abilities
                         damageEffect: multiData.hitEffect,
                         damageAmount: multiData.baseDamage,
                         bulletSpeed: 20f,
-                        collisionThreshold: 0.5f
+                        collisionThreshold: 0.5f,
+                        sourceAbility: multiData
                     );
 
                     targetsFired++;

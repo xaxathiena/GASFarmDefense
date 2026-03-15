@@ -78,7 +78,8 @@ namespace Abel.TranHuongDao.Core
                 damageEffect: attackData.damageEffect,
                 damageAmount: damage,
                 bulletSpeed: projSpeed,
-                collisionThreshold: attackData.collisionThreshold);
+                collisionThreshold: attackData.collisionThreshold,
+                sourceAbility: attackData);
 
             Debug.Log($"[TowerAttack] Bullet fired at enemy {targetID}");
         }

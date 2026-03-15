@@ -38,6 +38,7 @@ namespace Abel.TranHuongDao.Core
             float damageAmount,
             float bulletSpeed,
             float collisionThreshold,
+            GameplayAbilityData sourceAbility = null,
             System.Action<Vector3, int> onHit = null);
     }
 }

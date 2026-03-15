@@ -30,6 +30,7 @@ namespace Abel.TranHuongDao.Core
         // ── Runtime dependencies ─────────────────────────────────────────────────
         private readonly int _targetEnemyID;
         private readonly AbilitySystemComponent _sourceASC;
+        private readonly GameplayAbilityData _sourceAbility;
         private readonly GameplayEffect _damageEffect;
         private readonly float _damageAmount;
         private readonly float _speed;
@@ -56,6 +57,7 @@ namespace Abel.TranHuongDao.Core
             float damageAmount,
             float bulletSpeed,
             float collisionThreshold,
+            GameplayAbilityData sourceAbility,
             IEnemyManager enemyManager,
             IRender2DService renderService,
             FD.Modules.VFX.IVFXManager vfxManager,
@@ -69,6 +71,7 @@ namespace Abel.TranHuongDao.Core
             _targetEnemyID = targetEnemyInstanceID;
             _position = spawnPosition;
             _sourceASC = sourceASC;
+            _sourceAbility = sourceAbility;
             _damageEffect = damageEffect;
             _damageAmount = damageAmount;
             _speed = bulletSpeed;
@@ -144,7 +147,7 @@ namespace Abel.TranHuongDao.Core
             if (_damageEffect != null &&
                 _enemyManager.TryGetEnemyASC(_targetEnemyID, out AbilitySystemComponent targetASC))
             {
-                targetASC.ApplyGameplayEffectToSelf(_damageEffect, _sourceASC);
+                targetASC.ApplyGameplayEffectToSelf(_damageEffect, _sourceASC, 1f, _sourceAbility);
                 Debug.Log($"[Bullet] GE applied to enemy {_targetEnemyID}");
             }
             // ── Fallback: direct damage via UnitAttributeSet ─────────────────────

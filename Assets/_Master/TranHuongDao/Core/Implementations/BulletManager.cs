@@ -48,6 +48,7 @@ namespace Abel.TranHuongDao.Core
             float damageAmount,
             float bulletSpeed,
             float collisionThreshold,
+            GameplayAbilityData sourceAbility = null,
             System.Action<Vector3, int> onHit = null)
         {
             var bullet = new Bullet(
@@ -61,6 +62,7 @@ namespace Abel.TranHuongDao.Core
                 damageAmount,
                 bulletSpeed,
                 collisionThreshold,
+                sourceAbility,
                 _enemyManager,
                 _renderService,
                 _vfxManager,

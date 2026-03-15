@@ -14,60 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectName: 
   description: 
+  icon: {fileID: 0}
   durationType: 1
   durationMagnitude: 2
   isPeriodic: 0
   period: 1
-  modifiers:
-  - attribute:
-      attributeType: 9
-    operation: 1
-    calculationType: 0
-    scalableMagnitude:
-      scalingMode: 0
-      flatValue: 0
-      scalingCurve:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 1
-          value: 0
-          inSlope: 0
-          outSlope: 11.111111
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 10
-          value: 100
-          inSlope: 11.111111
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      csvAsset: {fileID: 0}
-      csvColumn: 
-      previewLevel: 1
-      attributeType: 0
-    backingAttribute:
-      attributeType: 0
-    attributeSource: 0
-    snapshotAttribute: 0
-    coefficient: 1
-    preMultiplyAdditiveValue: 0
-    postMultiplyAdditiveValue: 0
-    customCalculation: {fileID: 0}
-    setByCallerTag: 
-    magnitude: 0
-  grantedTags: 
+  modifiers: []
+  grantedTags: 01
   applicationRequiredTags: 
   applicationBlockedByTags: 
   removeTagsOnApplication: 
   allowStacking: 0
   maxStacks: 1
   refreshDurationOnStack: 1
+  stackingDurationPolicy: 0

@@ -99,6 +99,8 @@ namespace Abel.TranHuongDao.Core
             Rotation = 0f;
 
             // ── GAS setup ──────────────────────────────────────────────────────
+            asc.UnitInstanceID = instanceID;
+
             // Seed all GAS attributes from the authored balance config.
             attributeSet.InitializeFromConfig(config);
             asc.InitializeAttributeSet(attributeSet);
@@ -133,7 +135,10 @@ namespace Abel.TranHuongDao.Core
 
             // Tick the GAS (updates cooldowns, active effects like burning damage)
             asc.Tick();
-
+            if (asc.HasAnyTags(GameplayTag.State_Disabled, GameplayTag.State_Silenced, GameplayTag.State_Stunned))
+            {
+                return;
+            }
             // Move along the path
             MoveAlongPath(dt);
 

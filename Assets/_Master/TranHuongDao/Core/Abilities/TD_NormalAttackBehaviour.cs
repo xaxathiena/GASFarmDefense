@@ -52,7 +52,8 @@ namespace Abel.TranHuongDao.Core.Abilities
                 damageEffect: attackData.hitEffect,
                 damageAmount: attackData.baseDamage,
                 bulletSpeed: attackData.bulletSpeed,
-                collisionThreshold: 0.5f
+                collisionThreshold: 0.5f,
+                sourceAbility: attackData
             );
         }
 

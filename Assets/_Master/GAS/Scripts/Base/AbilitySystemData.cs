@@ -12,6 +12,7 @@ namespace GAS
         // Owner
         public Transform Owner { get; set; }
         public string Id { get; set; }
+        public int UnitInstanceID { get; set; }
 
         // Attributes
         public AttributeSet AttributeSet { get; set; }

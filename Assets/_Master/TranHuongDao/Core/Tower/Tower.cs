@@ -40,6 +40,7 @@ namespace Abel.TranHuongDao.Core
 
         // ── Render ───────────────────────────────────────────────────────────────
         private IRender2DService renderService;
+        private FD.IEventBus _eventBus;
         private bool renderInitialized;
 
         // ── VFX ──────────────────────────────────────────────────────────────────
@@ -144,6 +145,14 @@ namespace Abel.TranHuongDao.Core
                 vfxManager,
                 vfxConfig
             );
+
+            _eventBus = eventBus;
+
+            // ── Unit Identity ──────────────────────────────────────────────────
+            asc.UnitInstanceID = instanceID;
+
+            // ── Hit Notification Subscription ──────────────────────────────────
+            eventBus.Subscribe<GameplayEffectAppliedEvent>(HandleEffectApplied);
         }
 
         /// <summary>Called every frame by TowerManager.Tick().</summary>
@@ -180,6 +189,11 @@ namespace Abel.TranHuongDao.Core
             }
 
             vfxController?.Dispose();
+
+            if (_eventBus != null)
+            {
+                _eventBus.Unsubscribe<GameplayEffectAppliedEvent>(HandleEffectApplied);
+            }
         }
 
         // ── Private ──────────────────────────────────────────────────────────────
@@ -230,6 +244,15 @@ namespace Abel.TranHuongDao.Core
             // Event-driven: called only when HP changes, never every frame.
             if (renderInitialized)
                 renderService.SetHpPercent(TowerID, InstanceID, newValue * maxHealthInverse);
+        }
+
+        private void HandleEffectApplied(GameplayEffectAppliedEvent evt)
+        {
+            // Identity Check: Only trigger if the effect was applied by OUR normal attack ability.
+            if (evt.SourceInstanceID == InstanceID && evt.SourceAbility == attackAbilityData)
+            {
+                OnEnemyHit(evt.TargetASC);
+            }
         }
 
         // ── Procs ────────────────────────────────────────────────────────────────

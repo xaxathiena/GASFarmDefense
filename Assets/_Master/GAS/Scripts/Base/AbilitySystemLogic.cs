@@ -9,6 +9,29 @@ namespace GAS
     /// Stateless service that operates on AbilitySystemData.
     /// Can be registered as Singleton in VContainer.
     /// </summary>
+    public readonly struct GameplayEffectAppliedEvent
+    {
+        public readonly int SourceInstanceID;
+        public readonly int TargetInstanceID;
+        public readonly GameplayEffect Effect;
+        public readonly GameplayAbilityData SourceAbility;
+        public readonly AbilitySystemComponent TargetASC;
+
+        public GameplayEffectAppliedEvent(
+            int sourceInstanceID,
+            int targetInstanceID,
+            GameplayEffect effect,
+            GameplayAbilityData sourceAbility,
+            AbilitySystemComponent targetASC)
+        {
+            SourceInstanceID = sourceInstanceID;
+            TargetInstanceID = targetInstanceID;
+            Effect = effect;
+            SourceAbility = sourceAbility;
+            TargetASC = targetASC;
+        }
+    }
+
     public class AbilitySystemLogic
     {
         private readonly GameplayAbilityLogic _abilityLogic;
@@ -336,7 +359,8 @@ namespace GAS
             GameplayEffect effect,
             AbilitySystemComponent target,
             AbilitySystemComponent source,
-            float effectLevel = 1f)
+            float effectLevel = 1f,
+            GameplayAbilityData sourceAbility = null)
         {
             if (effect == null || target == null)
                 return null;
@@ -361,7 +385,7 @@ namespace GAS
                         // CRITICAL FIX: Refresh attribute modifiers with new stack count
                         _effectService.RefreshModifiers(existingEffect);
                     }
-                    
+
 #if UNITY_EDITOR
                     //Debug.Log($"Stacked {effect.effectName} on {targetData.Owner.name} (x{existingEffect.StackCount})");
 #endif
@@ -410,6 +434,14 @@ namespace GAS
                     RemoveTags(targetData, effect.removeTagsOnApplication);
                 }
 
+                _eventBus.Publish(new GameplayEffectAppliedEvent(
+                    source?.UnitInstanceID ?? -1,
+                    target.UnitInstanceID,
+                    effect,
+                    sourceAbility,
+                    target
+                ));
+
                 return activeEffect; // Does not add to ActiveGameplayEffects
             }
 
@@ -449,6 +481,14 @@ namespace GAS
 
             // Add to active effects
             targetData.ActiveGameplayEffects.Add(activeEffect);
+
+            _eventBus.Publish(new GameplayEffectAppliedEvent(
+                source?.UnitInstanceID ?? -1,
+                target.UnitInstanceID,
+                effect,
+                sourceAbility,
+                target
+            ));
 
             return activeEffect;
         }
