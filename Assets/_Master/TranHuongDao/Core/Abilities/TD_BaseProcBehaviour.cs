@@ -60,6 +60,12 @@ namespace Abel.TranHuongDao.Core.Abilities
             // Trigger secondary ability recursively if configured
             if (procData.abilityToTrigger != null)
             {
+                // Ensure the ability is granted before activation
+                if (sourceASC.GetAbilitySpec(procData.abilityToTrigger) == null)
+                {
+                    sourceASC.GiveAbility(procData.abilityToTrigger);
+                }
+
                 // We trigger the ability from the source once.
                 // If the secondary ability needs target payloads, GAS would need that context pass-through,
                 // but currently TryActivateAbility is self-contained.

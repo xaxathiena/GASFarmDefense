@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ff7eafa15209349a4ced771f94c260, type: 3}
+  m_Name: FirebaseDameEffect
+  m_EditorClassIdentifier: Assembly-CSharp::GAS.GameplayEffect
+  effectName: 
+  description: 
+  icon: {fileID: 0}
+  durationType: 0
+  durationMagnitude: 0
+  isPeriodic: 0
+  period: 1
+  modifiers:
+  - attribute:
+      attributeType: 0
+    operation: 0
+    calculationType: 2
+    scalableMagnitude:
+      scalingMode: 0
+      flatValue: -300
+      scalingCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 1
+          value: 2
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 2
+          value: 3
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 3
+          value: 5
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 4
+          value: 6.3333335
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 5
+          value: 7.8333335
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 6
+          value: 9.333333
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      csvAsset: {fileID: 4900000, guid: 9a93ce25af184294ab192c433d221b10, type: 3}
+      csvColumn: Curve2
+      previewLevel: 1
+      attributeType: 0
+    backingAttribute:
+      attributeType: 0
+    attributeSource: 0
+    snapshotAttribute: 0
+    coefficient: 0
+    preMultiplyAdditiveValue: 0
+    postMultiplyAdditiveValue: 0
+    customCalculation: {fileID: 11400000, guid: 872378afea3509f47a9f2708970ed81a, type: 2}
+    setByCallerTag: 
+  grantedTags: 
+  applicationRequiredTags: 
+  applicationBlockedByTags: 
+  removeTagsOnApplication: 
+  allowStacking: 0
+  maxStacks: 1
+  refreshDurationOnStack: 1
+  stackingDurationPolicy: 0

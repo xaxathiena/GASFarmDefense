@@ -16,37 +16,8 @@ MonoBehaviour:
   abilityName: 
   description: 
   icon: {fileID: 0}
-  cooldownDuration:
-    scalingMode: 0
-    flatValue: 1
-    scalingCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 11.111111
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 10
-        value: 100
-        inSlope: 11.111111
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    csvAsset: {fileID: 0}
-    csvColumn: 
-    previewLevel: 1
-    attributeType: 0
+  activationPolicy: 0
+  cooldownDuration: 0
   costAmount:
     scalingMode: 0
     flatValue: 0
@@ -86,5 +57,6 @@ MonoBehaviour:
   trailVfxID: bullet_vfx_new_6
   hitVfxID: hit_vfx_new_5
   attackRange: 5
+  bulletSpeed: 10
   hitEffect: {fileID: 11400000, guid: bac5b43ec2298445699a71dc0638d249, type: 2}
   baseDamage: 10
