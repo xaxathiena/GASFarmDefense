@@ -27,8 +27,11 @@ namespace Abel.TranHuongDao.Core
         // --- IGASAvatar Implementation ---
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
-        public Vector3 Scale => Vector3.one;
+        public Vector3 Scale => Vector3.one * _scaleFactor;
         public bool IsValid => true;
+
+        private float _scaleFactor = 1f;
+        private string _renderID;
 
         // ── GAS ──────────────────────────────────────────────────────────────────
         private readonly AbilityBehaviourRegistry _behaviourRegistry;
@@ -139,8 +142,13 @@ namespace Abel.TranHuongDao.Core
                 if (skillAbilityData.activationPolicy == EAbilityActivationPolicy.OnGranted)
                     _asc.TryActivateAbility(skillAbilityData);
             }
+            _asc.UnitInstanceID = instanceID;
+
             // ── Render ─────────────────────────────────────────────────────────
-            renderService.RenderUnit(TowerID, InstanceID, Position);
+            _scaleFactor = config.ScaleFactor;
+            _renderID = string.IsNullOrEmpty(config.UnitRenderID) ? towerID : config.UnitRenderID;
+
+            renderService.RenderUnit(_renderID, InstanceID, Position, scale: _scaleFactor);
             renderInitialized = true;
 
             // ── VFX ────────────────────────────────────────────────────────────
@@ -154,7 +162,6 @@ namespace Abel.TranHuongDao.Core
 
             _eventBus = eventBus;
 
-            // ── Unit Identity ──────────────────────────────────────────────────
             _asc.UnitInstanceID = instanceID;
 
             // ── Hit Notification Subscription ──────────────────────────────────
@@ -184,7 +191,7 @@ namespace Abel.TranHuongDao.Core
 
             if (renderInitialized)
             {
-                renderService.RemoveRender(TowerID, InstanceID);
+                renderService.RemoveRender(_renderID, InstanceID);
                 renderInitialized = false;
             }
 
@@ -249,7 +256,7 @@ namespace Abel.TranHuongDao.Core
         {
             // Event-driven: called only when HP changes, never every frame.
             if (renderInitialized)
-                renderService.SetHpPercent(TowerID, InstanceID, newValue * maxHealthInverse);
+                renderService.SetHpPercent(_renderID, InstanceID, newValue * maxHealthInverse);
         }
 
         private void HandleEffectApplied(GameplayEffectAppliedEvent evt)

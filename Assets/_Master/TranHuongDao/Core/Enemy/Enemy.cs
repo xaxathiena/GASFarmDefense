@@ -24,9 +24,12 @@ namespace Abel.TranHuongDao.Core
         // ── Transform ────────────────────────────────────────────────────────────
         // --- IGASAvatar Implementation ---
         public Vector3 Position { get; private set; }
-        public Vector3 Scale => Vector3.one;
+        public Vector3 Scale => Vector3.one * _scaleFactor;
         public bool IsValid => IsAlive;
         Quaternion IGASAvatar.Rotation => Quaternion.Euler(0, Rotation, 0);
+
+        private float _scaleFactor = 1f;
+        private string _renderID;
 
         // Public properties used by logic and rendering
         public float Rotation { get; private set; }   // degrees, Y-axis
@@ -109,7 +112,7 @@ namespace Abel.TranHuongDao.Core
             attributeSet.InitializeFromConfig(config);
             asc.InitializeAttributeSet(attributeSet);
             asc.UnitInstanceID = instanceID;
-            
+
             // Link GAS to this Enemy as the spatial avatar
             asc.InitAvatar(this);
 
@@ -121,7 +124,10 @@ namespace Abel.TranHuongDao.Core
             attributeSet.Health.OnValueChanged += HandleHealthValueChanged;
 
             // ── Render ─────────────────────────────────────────────────────────
-            renderService.RenderUnit(EnemyID, InstanceID, Position, Rotation);
+            _scaleFactor = config.ScaleFactor;
+            _renderID = string.IsNullOrEmpty(config.UnitRenderID) ? enemyID : config.UnitRenderID;
+
+            renderService.RenderUnit(_renderID, InstanceID, Position, Rotation, scale: _scaleFactor);
             renderInitialized = true;
 
             // ── VFX ────────────────────────────────────────────────────────────
@@ -152,7 +158,7 @@ namespace Abel.TranHuongDao.Core
 
             // Push new position to the Render2D pipeline
             if (renderInitialized)
-                renderService.UpdateRender(EnemyID, InstanceID, Position, Rotation);
+                renderService.UpdateRender(_renderID, InstanceID, Position, Rotation, scale: _scaleFactor);
 
             vfxController?.Tick(dt);
         }
@@ -168,7 +174,7 @@ namespace Abel.TranHuongDao.Core
 
             if (renderInitialized)
             {
-                renderService.RemoveRender(EnemyID, InstanceID);
+                renderService.RemoveRender(_renderID, InstanceID);
                 renderInitialized = false;
             }
 
@@ -214,7 +220,7 @@ namespace Abel.TranHuongDao.Core
         {
             // Event-driven: called only when HP changes, never every frame.
             if (renderInitialized)
-                renderService.SetHpPercent(EnemyID, InstanceID, newValue * maxHealthInverse);
+                renderService.SetHpPercent(_renderID, InstanceID, newValue * maxHealthInverse);
         }
 
         private void HandleHealthDepleted()

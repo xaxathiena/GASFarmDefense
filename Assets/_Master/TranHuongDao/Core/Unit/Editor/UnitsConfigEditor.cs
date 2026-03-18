@@ -18,7 +18,7 @@ namespace Abel.TranHuongDao.EditorTools
             UnitsConfig configAsset = (UnitsConfig)target;
 
             GUILayout.Space(20);
-            
+
             // Nút bấm Import to đùng
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Import from CSV", GUILayout.Height(35)))
@@ -47,7 +47,7 @@ namespace Abel.TranHuongDao.EditorTools
                         lineList.Add(sr.ReadLine());
                     lines = lineList.ToArray();
                 }
-                
+
                 // Clear data cũ trước khi chép data mới vào
                 targetAsset.unitEntries.Clear();
 

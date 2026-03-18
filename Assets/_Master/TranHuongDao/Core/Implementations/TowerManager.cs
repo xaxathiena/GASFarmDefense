@@ -91,7 +91,7 @@ namespace Abel.TranHuongDao.Core
             var survivors = new List<Tower>(activeTowers.Values);
             foreach (var t in survivors)
                 DestroyTower(t, notify: false);
-            
+
             FlushPendingRemovals();
             activeTowers.Clear();
         }

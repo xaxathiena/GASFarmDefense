@@ -225,6 +225,7 @@ namespace Abel.TranHuongDao.EditorTools
             {
                 SerializedProperty elem = entriesProp.GetArrayElementAtIndex(index);
                 string unitID = elem.FindPropertyRelative("UnitID").stringValue;
+                string unitRenderID = elem.FindPropertyRelative("UnitRenderID").stringValue;
 
                 // Bẻ xuống dòng mới nếu quá chật
                 if (currentWidth + iconSize + margin > windowWidth - 40)
@@ -235,7 +236,7 @@ namespace Abel.TranHuongDao.EditorTools
                     currentWidth = 0;
                 }
 
-                DrawPortraitCell(unitID, index, iconSize);
+                DrawPortraitCell(unitRenderID, index, iconSize);
                 currentWidth += iconSize + margin;
             }
 
@@ -312,13 +313,13 @@ namespace Abel.TranHuongDao.EditorTools
 
             SerializedProperty elem = entriesProp.GetArrayElementAtIndex(_editingIndex);
             string unitID = elem.FindPropertyRelative("UnitID").stringValue;
-
+            string unitRenderID = elem.FindPropertyRelative("UnitRenderID").stringValue;
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
             // Vẽ thẻ hình đại diện siêu to khổng lồ
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            Texture2D tex = GetOrCreatePortrait(unitID);
+            Texture2D tex = GetOrCreatePortrait(unitRenderID);
             if (tex != null)
             {
                 var boxStyle = new GUIStyle("box");

@@ -72,15 +72,7 @@ namespace Abel.TranHuongDao.Core.Abilities
 
             // ── Apply Effects ─────────────────────────────────────────────────────
             int count = 0;
-            Dictionary<string, float> damagePayload = null;
-
-            if (aoeData.damageEffect != null && !string.IsNullOrEmpty(aoeData.damageSetByCallerTag))
-            {
-                damagePayload = new Dictionary<string, float>
-                {
-                    { aoeData.damageSetByCallerTag, aoeData.damageAmount }
-                };
-            }
+            Dictionary<string, float> damagePayload = new Dictionary<string, float>();
 
             foreach (var target in _targetsCache)
             {

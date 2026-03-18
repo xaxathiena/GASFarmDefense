@@ -18,11 +18,13 @@ namespace Abel.TranHuongDao.Core
         public override void InitializeConfig()
         {
             _lookup = new Dictionary<string, UnitConfig>(unitEntries.Count, System.StringComparer.Ordinal);
+            
             foreach (var entry in unitEntries)
             {
                 if (!string.IsNullOrEmpty(entry.UnitID))
                     _lookup[entry.UnitID] = entry;
             }
+
             Debug.Log($"[UnitsConfig] Indexed {_lookup.Count} unit configs.");
         }
 

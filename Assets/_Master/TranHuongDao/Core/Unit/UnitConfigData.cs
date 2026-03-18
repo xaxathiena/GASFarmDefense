@@ -14,6 +14,8 @@ namespace Abel.TranHuongDao.Core
         Piercing = 2,
         Siege = 3,
         Chaos = 4,   // Chaos damage bypasses all resistances.
+        Hero = 5,
+        Heavy = 6,
     }
 
     // ---------------------------------------------------------------------------
@@ -45,6 +47,19 @@ namespace Abel.TranHuongDao.Core
     public struct UnitConfig
     {
         public string UnitID;
+
+        /// <summary>
+        /// ID used to look up visual profile in UnitRenderDatabase.
+        /// If empty, fall back to UnitID.
+        /// </summary>
+        public string UnitRenderID;
+
+        /// <summary>
+        /// Uniform scale multiplier applied to the rendered unit.
+        /// Useful for boss variants or special units.
+        /// </summary>
+        public float ScaleFactor;
+
         // ── GAS-mapped float stats ───────────────────────────────────────────────
 
         /// <summary>Maximum and initial health of the unit.</summary>
@@ -120,9 +135,12 @@ namespace Abel.TranHuongDao.Core
             int tier,
             string attackAbilityID = "",
             string skillAbilityID = "",
-            EUnitLogicType logicType = EUnitLogicType.None)
+            string unitRenderID = "",
+            float scaleFactor = 1.0f)
         {
             UnitID = unitID;
+            UnitRenderID = string.IsNullOrEmpty(unitRenderID) ? unitID : unitRenderID;
+            ScaleFactor = scaleFactor;
             MaxHealth = maxHealth;
             MoveSpeed = moveSpeed;
             BaseDamage = baseDamage;
