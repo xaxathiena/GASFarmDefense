@@ -190,7 +190,7 @@ namespace Abel.TranHuongDao.Core
             Vector3 target = path[waypointIndex];
             Vector3 direction = (target - Position);
             float distance = direction.magnitude;
-            float step = moveSpeed * dt;
+            float step = attributeSet.MoveSpeed.CurrentValue *dt;
 
             if (step >= distance)
             {

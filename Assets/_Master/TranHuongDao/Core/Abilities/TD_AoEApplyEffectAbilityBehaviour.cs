@@ -58,9 +58,11 @@ namespace Abel.TranHuongDao.Core.Abilities
 
 #if UNITY_EDITOR
             // Add Gizmo to visualize the aura area in Editor (if possible)
-            if (asc.Avatar is GAS.TransformAvatar transformAvatar)
+            if (asc.Avatar is IGASAvatar transformAvatar)
             {
-                var gizmo = transformAvatar.Position != Vector3.zero ? new GameObject("AoEGizmo").AddComponent<TD_AoEApplyEffectGizmo>() : null;
+                
+                var gizmo = new GameObject("AoEGizmo").AddComponent<TD_AoEApplyEffectGizmo>();
+                gizmo.transform.position = transformAvatar.Position;
                 if (gizmo != null)
                 {
                     gizmo.transform.SetParent(null); // Or keep it tracked
