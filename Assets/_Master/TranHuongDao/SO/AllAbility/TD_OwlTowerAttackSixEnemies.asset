@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
-  m_Name: TD_OwlTowerAttackAbility
+  m_Script: {fileID: 11500000, guid: 4c9d71b2b9e68cc4db2e3cfd6dceee6a, type: 3}
+  m_Name: TD_OwlTowerAttackSixEnemies
   m_EditorClassIdentifier: 
-  abilityID: TD_OwlTowerAttackAbility
-  abilityName: TD_OwlTowerAttackAbility
+  abilityID: TD_OwlTowerAttackSixEnemies
+  abilityName: TD_OwlTowerAttackSixEnemies
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -53,14 +53,14 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  triggerType: 1
-  chance: 70
-  countThreshold: 3
-  executionTarget: 1
-  effectToApply: {fileID: 0}
-  abilityToTrigger: {fileID: 11400000, guid: 764e13c9ee962f749a909802e9f34a29, type: 2}
-  targetSelection: 0
-  targetType: 0
-  targetCount: 1
-  flatDamage: 0
-  prefabToSpawn: {fileID: 0}
+  trailID: 
+  trailVfxID: bulelt_vfx_new_7
+  hitVfxID: 
+  attackRange: 5
+  bulletSpeed: 10
+  hitEffect: {fileID: 11400000, guid: bafc90a3df775b2408fd78e2bda16e4b, type: 2}
+  baseDamage: 15
+  isSequential: 1
+  maxTargets: 3
+  maxHitsPerTarget: 1
+  searchRadius: 4
