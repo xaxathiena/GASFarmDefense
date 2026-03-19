@@ -14,6 +14,7 @@ namespace Abel.TranHuongDao.Core.Abilities
     public class TD_AoEApplyEffectAbilityBehaviour : IAbilityBehaviour
     {
         private readonly IEnemyManager _enemyManager;
+        private readonly ITowerManager _towerManager;
 
         // Stores async task cancellation tokens per ability instance
         private readonly Dictionary<GameplayAbilitySpec, CancellationTokenSource> _activeSweeps = new Dictionary<GameplayAbilitySpec, CancellationTokenSource>();
@@ -27,9 +28,10 @@ namespace Abel.TranHuongDao.Core.Abilities
         private readonly Dictionary<GameplayAbilitySpec, TD_AoEApplyEffectGizmo> _activeGizmos = new Dictionary<GameplayAbilitySpec, TD_AoEApplyEffectGizmo>();
 #endif
 
-        public TD_AoEApplyEffectAbilityBehaviour(IEnemyManager enemyManager)
+        public TD_AoEApplyEffectAbilityBehaviour(IEnemyManager enemyManager, ITowerManager towerManager)
         {
             _enemyManager = enemyManager;
+            _towerManager = towerManager;
         }
 
         public bool CanActivate(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
@@ -60,7 +62,7 @@ namespace Abel.TranHuongDao.Core.Abilities
             // Add Gizmo to visualize the aura area in Editor (if possible)
             if (asc.Avatar is IGASAvatar transformAvatar)
             {
-                
+
                 var gizmo = new GameObject("AoEGizmo").AddComponent<TD_AoEApplyEffectGizmo>();
                 gizmo.transform.position = transformAvatar.Position;
                 if (gizmo != null)
@@ -89,10 +91,10 @@ namespace Abel.TranHuongDao.Core.Abilities
                 while (spec.IsActive && asc.Avatar != null && asc.Avatar.IsValid && !token.IsCancellationRequested)
                 {
                     // Resolve Origin: Use TargetContext if provided (e.g. hit location), fallback to current unit.
-                    Vector3 originPos = (spec.TargetContext != null && spec.TargetContext.Avatar != null) 
-                        ? spec.TargetContext.Position 
+                    Vector3 originPos = (spec.TargetContext != null && spec.TargetContext.Avatar != null)
+                        ? spec.TargetContext.Position
                         : asc.Position;
-                    
+
                     sweepCache.Clear();
 
                     // Depending on the target type, gather the IDs.
@@ -100,6 +102,14 @@ namespace Abel.TranHuongDao.Core.Abilities
                     {
                         _enemyManager.GetEnemiesInRange(originPos, aoeData.captureRadius, sweepCache);
                     }
+
+                    if (aoeData.targetType == EAuraTargetType.Allies || aoeData.targetType == EAuraTargetType.Both)
+                    {
+                        _towerManager.GetTowersInRange(originPos, aoeData.captureRadius, sweepCache);
+                    }
+
+                    // Exclude the caster unit
+                    sweepCache.Remove(asc.UnitInstanceID);
 
                     // Check who left the aura
                     toRemove.Clear();
@@ -140,7 +150,8 @@ namespace Abel.TranHuongDao.Core.Abilities
         {
             if (aoeData.effectToApply == null) return;
 
-            if (_enemyManager.TryGetEnemyASC(targetID, out var targetASC))
+            if (_enemyManager.TryGetEnemyASC(targetID, out var targetASC) ||
+                _towerManager.TryGetTowerASC(targetID, out targetASC))
             {
                 // Pass level 1f as simple default
                 var activeEffect = targetASC.ApplyGameplayEffectToSelf(aoeData.effectToApply, asc, 1f);
@@ -156,7 +167,8 @@ namespace Abel.TranHuongDao.Core.Abilities
             if (targetEffects.TryGetValue(targetID, out var activeEffect))
             {
                 // We attempt to get the ASC to remove the effect gracefully
-                if (_enemyManager.TryGetEnemyASC(targetID, out var targetASC))
+                if (_enemyManager.TryGetEnemyASC(targetID, out var targetASC) ||
+                    _towerManager.TryGetTowerASC(targetID, out targetASC))
                 {
                     targetASC.RemoveGameplayEffect(activeEffect);
                 }

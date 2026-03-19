@@ -48,13 +48,9 @@ namespace Abel.TranHuongDao.Core.Abilities
         [Tooltip("Counter threshold for EveryNthAttack mode.")]
         public int countThreshold = 3;
 
-        [Header("Outcome")]
+        [Header("Execution ability")]
         [Tooltip("If activated, to whom does it apply? Source (Tower) or Target (Enemy)?")]
         public EProcContextTarget executionTarget = EProcContextTarget.Target;
-
-        [Tooltip("Gameplay effect to apply immediately upon successful proc.")]
-        public GameplayEffect effectToApply;
-
         [Tooltip("Optional sub-ability to trigger upon successful proc.")]
         public GameplayAbilityData abilityToTrigger;
 
@@ -67,7 +63,8 @@ namespace Abel.TranHuongDao.Core.Abilities
 
         [Tooltip("Maximum number of targets to select (used for Random or Closest).")]
         public int targetCount = 1;
-
+        [Tooltip("Gameplay effect to apply immediately upon successful proc.")]
+        public GameplayEffect effectToApply;
         [Header("Modular Proc Actions")]
 
         [Tooltip("Direct flat damage to deal upon proc (bypasses GameplayEffect complexity for simple nukes/strikes).")]

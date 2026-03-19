@@ -1,4 +1,4 @@
-﻿using VContainer.Unity;
+using VContainer.Unity;
 using GAS;
 using Abel.TranHuongDao.Core.Abilities;
 
@@ -60,7 +60,7 @@ namespace Abel.TranHuongDao.Core
             _registry.Register<TD_AuraData>(
                 new TD_AuraBehaviour(_enemyManager));
             _registry.Register<TD_AoEApplyEffectAbilityData>(
-                new TD_AoEApplyEffectAbilityBehaviour(_enemyManager));
+                new TD_AoEApplyEffectAbilityBehaviour(_enemyManager, _towerManager));
             _registry.Register<TD_SummonAbilityData>( // Added new registration
                 new TD_SummonAbilityBehaviour(_minionManager)); // Injected _minionManager
             _registry.Register<TD_InstantAoEAbilityData>(

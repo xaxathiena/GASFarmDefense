@@ -148,6 +148,18 @@ namespace Abel.TranHuongDao.Core
             return false;
         }
 
+        public void GetTowersInRange(Vector3 center, float radius, List<int> results)
+        {
+            float sqrRadius = radius * radius;
+            foreach (var tower in activeTowers.Values)
+            {
+                if ((tower.Position - center).sqrMagnitude <= sqrRadius)
+                {
+                    results.Add(tower.InstanceID);
+                }
+            }
+        }
+
         public void GetTowersInRange(Vector3 center, float radius, List<GAS.AbilitySystemComponent> ignoreList, List<GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue)
         {
             float sqrRadius = radius * radius;

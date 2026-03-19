@@ -63,6 +63,12 @@ namespace Abel.TranHuongDao.Core
         bool TryGetTowerASC(int instanceID, out GAS.AbilitySystemComponent asc);
 
         /// <summary>
+        /// Fill <paramref name="results"/> with the instance IDs of all towers whose world
+        /// position is within <paramref name="radius"/> of <paramref name="center"/>.
+        /// </summary>
+        void GetTowersInRange(Vector3 center, float radius, List<int> results);
+
+        /// <summary>
         /// Fill <paramref name="results"/> with the ASCs of all towers whose world
         /// position is within <paramref name="radius"/> of <paramref name="center"/>.
         /// At most <paramref name="maxCount"/> entries are added.
