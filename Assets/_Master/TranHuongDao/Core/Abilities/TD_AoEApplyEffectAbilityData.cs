@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using GAS;
 
@@ -23,8 +24,8 @@ namespace Abel.TranHuongDao.Core.Abilities
         [Tooltip("How often (in seconds) the area is swept to apply/remove the effect.")]
         public float auraUpdateRate = 0.5f;
 
-        [Tooltip("The Gameplay Effect to apply (e.g., Slow, Defense Reduce, Attack Reduce, etc.).")]
-        public GameplayEffect effectToApply;
+        [Tooltip("The Gameplay Effects to apply (e.g., Slow, Defense Reduce, Attack Reduce, etc.).")]
+        public List<GameplayEffect> effectsToApply;
 
         [Header("VFX")]
         [Tooltip("Visual effect to instantiate at the caster position when activated.")]

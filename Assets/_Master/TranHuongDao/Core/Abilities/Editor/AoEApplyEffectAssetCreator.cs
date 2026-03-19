@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using GAS;
 using Abel.TranHuongDao.Core.Abilities;
+using System.Collections.Generic;
 
 namespace Abel.TranHuongDao.Editor
 {
@@ -63,7 +64,7 @@ namespace Abel.TranHuongDao.Editor
                 abilityData.auraUpdateRate = 0.5f;
                 // Auras must be ManualEnd so the coroutine keeps running until the ability is explicitly ended or the character deactivated.
                 abilityData.endPolicy = EAbilityEndPolicy.ManualEnd;
-                abilityData.effectToApply = effect;
+                abilityData.effectsToApply = new List<GameplayEffect> { effect };
 
                 AssetDatabase.CreateAsset(abilityData, abilityPath);
             }

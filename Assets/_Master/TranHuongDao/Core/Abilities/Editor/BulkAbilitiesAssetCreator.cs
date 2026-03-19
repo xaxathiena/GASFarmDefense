@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using GAS;
 using Abel.TranHuongDao.Core.Abilities;
+using System.Collections.Generic;
 
 namespace Abel.TranHuongDao.Editor
 {
@@ -133,7 +134,7 @@ namespace Abel.TranHuongDao.Editor
             procData.abilityID = name;
             procData.chance = chance;
             procData.flatDamage = damage;
-            procData.effectToApply = effect;
+            procData.effectsToApply = new List<GameplayEffect> { effect };
             procData.triggerType = EProcTriggerCondition.OnHit;
 
             SaveProcAsset(procData, $"Proc_CC_{name}");
@@ -149,7 +150,7 @@ namespace Abel.TranHuongDao.Editor
             procData.abilityName = name;
             procData.abilityID = name;
             procData.chance = chance;
-            procData.effectToApply = effect;
+            procData.effectsToApply = new List<GameplayEffect> { effect };
             procData.triggerType = EProcTriggerCondition.OnHit;
 
             SaveProcAsset(procData, $"Proc_DoT_{name}");
@@ -164,7 +165,7 @@ namespace Abel.TranHuongDao.Editor
             procData.abilityID = name;
             procData.chance = chance;
             procData.triggerType = trigger;
-            procData.effectToApply = effect;
+            procData.effectsToApply = new List<GameplayEffect> { effect };
             procData.executionTarget = target;
 
             SaveProcAsset(procData, $"Proc_Buff_{name}");

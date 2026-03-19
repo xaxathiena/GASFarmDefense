@@ -20,8 +20,8 @@ namespace Abel.TranHuongDao.Core.Abilities
         private readonly Dictionary<GameplayAbilitySpec, CancellationTokenSource> _activeSweeps = new Dictionary<GameplayAbilitySpec, CancellationTokenSource>();
 
         // Stores active targets and their effects per ability instance
-        private readonly Dictionary<GameplayAbilitySpec, Dictionary<int, ActiveGameplayEffect>> _activeEffects =
-            new Dictionary<GameplayAbilitySpec, Dictionary<int, ActiveGameplayEffect>>();
+        private readonly Dictionary<GameplayAbilitySpec, Dictionary<int, List<ActiveGameplayEffect>>> _activeEffects =
+            new Dictionary<GameplayAbilitySpec, Dictionary<int, List<ActiveGameplayEffect>>>();
 
 #if UNITY_EDITOR
         // Stores active gizmos per ability instance
@@ -56,7 +56,7 @@ namespace Abel.TranHuongDao.Core.Abilities
                 UnityEngine.Object.Instantiate(aoeData.castVfxPrefab, asc.Position, Quaternion.identity);
             }
 
-            _activeEffects[spec] = new Dictionary<int, ActiveGameplayEffect>();
+            _activeEffects[spec] = new Dictionary<int, List<ActiveGameplayEffect>>();
 
 #if UNITY_EDITOR
             // Add Gizmo to visualize the aura area in Editor (if possible)
@@ -146,31 +146,44 @@ namespace Abel.TranHuongDao.Core.Abilities
             }
         }
 
-        private void ApplyEffectToTarget(int targetID, TD_AoEApplyEffectAbilityData aoeData, AbilitySystemComponent asc, Dictionary<int, ActiveGameplayEffect> targetEffects)
+        private void ApplyEffectToTarget(int targetID, TD_AoEApplyEffectAbilityData aoeData, AbilitySystemComponent asc, Dictionary<int, List<ActiveGameplayEffect>> targetEffects)
         {
-            if (aoeData.effectToApply == null) return;
+            if (aoeData.effectsToApply == null || aoeData.effectsToApply.Count == 0) return;
 
             if (_enemyManager.TryGetEnemyASC(targetID, out var targetASC) ||
                 _towerManager.TryGetTowerASC(targetID, out targetASC))
             {
-                // Pass level 1f as simple default
-                var activeEffect = targetASC.ApplyGameplayEffectToSelf(aoeData.effectToApply, asc, 1f);
-                if (activeEffect != null)
+                var appliedList = new List<ActiveGameplayEffect>();
+                foreach (var effect in aoeData.effectsToApply)
                 {
-                    targetEffects[targetID] = activeEffect;
+                    if (effect == null) continue;
+
+                    var activeEffect = targetASC.ApplyGameplayEffectToSelf(effect, asc, 1f);
+                    if (activeEffect != null)
+                    {
+                        appliedList.Add(activeEffect);
+                    }
+                }
+
+                if (appliedList.Count > 0)
+                {
+                    targetEffects[targetID] = appliedList;
                 }
             }
         }
 
-        private void RemoveEffectFromTarget(int targetID, Dictionary<int, ActiveGameplayEffect> targetEffects)
+        private void RemoveEffectFromTarget(int targetID, Dictionary<int, List<ActiveGameplayEffect>> targetEffects)
         {
-            if (targetEffects.TryGetValue(targetID, out var activeEffect))
+            if (targetEffects.TryGetValue(targetID, out var activeEffects))
             {
                 // We attempt to get the ASC to remove the effect gracefully
                 if (_enemyManager.TryGetEnemyASC(targetID, out var targetASC) ||
                     _towerManager.TryGetTowerASC(targetID, out targetASC))
                 {
-                    targetASC.RemoveGameplayEffect(activeEffect);
+                    foreach (var effect in activeEffects)
+                    {
+                        targetASC.RemoveGameplayEffect(effect);
+                    }
                 }
                 targetEffects.Remove(targetID);
             }

@@ -192,12 +192,16 @@ namespace Abel.TranHuongDao.Core.Abilities
 
         private void ApplyProcActions(TD_BaseProcData procData, AbilitySystemComponent source, AbilitySystemComponent target)
         {
-            // A. Apply Gameplay Effect (Buffs, Debuffs, DoTs, CC)
-            // Uses source.ApplyGameplayEffectToTarget so the full AbilitySystemLogic pipeline runs,
-            // including CanApplyTo check and allowStacking / maxStacks enforcement.
-            if (procData.effectToApply != null)
+            // A. Apply Gameplay Effects (Buffs, Debuffs, DoTs, CC)
+            if (procData.effectsToApply != null)
             {
-                source.ApplyGameplayEffectToTarget(procData.effectToApply, target, source);
+                foreach (var effect in procData.effectsToApply)
+                {
+                    if (effect != null)
+                    {
+                        source.ApplyGameplayEffectToTarget(effect, target, source);
+                    }
+                }
             }
 
             // B. Instantly apply Flat Damage directly to the UnitAttributeSet

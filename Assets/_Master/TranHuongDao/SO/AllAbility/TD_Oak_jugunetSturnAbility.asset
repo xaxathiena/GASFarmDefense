@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
-  m_Name: TD_SentinelUpspeedAuraAbility
+  m_Name: TD_Oak_jugunetSturnAbility
   m_EditorClassIdentifier: 
-  abilityID: TD_SentinelUpspeedAuraAbility
-  abilityName: TD_SentinelUpspeedAuraAbility
+  abilityID: 
+  abilityName: 
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -58,9 +58,10 @@ MonoBehaviour:
   countThreshold: 3
   executionTarget: 1
   abilityToTrigger: {fileID: 0}
-  targetSelection: 2
-  targetType: 1
+  targetSelection: 0
+  targetType: 0
   targetCount: 1
-  effectToApply: {fileID: 11400000, guid: ea75d3101c3584f49a3f728505174871, type: 2}
-  flatDamage: 0
+  effectsToApply:
+  - {fileID: 11400000, guid: ddb30281be4c35e4786067e4e5eabbdc, type: 2}
+  flatDamage: 50
   prefabToSpawn: {fileID: 0}

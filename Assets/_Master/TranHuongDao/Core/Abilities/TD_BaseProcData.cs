@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using GAS;
 
@@ -63,8 +64,8 @@ namespace Abel.TranHuongDao.Core.Abilities
 
         [Tooltip("Maximum number of targets to select (used for Random or Closest).")]
         public int targetCount = 1;
-        [Tooltip("Gameplay effect to apply immediately upon successful proc.")]
-        public GameplayEffect effectToApply;
+        [Tooltip("Gameplay effects to apply immediately upon successful proc.")]
+        public List<GameplayEffect> effectsToApply;
         [Header("Modular Proc Actions")]
 
         [Tooltip("Direct flat damage to deal upon proc (bypasses GameplayEffect complexity for simple nukes/strikes).")]
