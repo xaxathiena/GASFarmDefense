@@ -14,15 +14,13 @@ namespace GAS
         ManaRegen,
         Stamina,
         MaxStamina,
-        
-        // Combat Attributes
-        AttackPower,
+
         Defense,
         MoveSpeed,
         Armor,
         CriticalChance,
         CriticalMultiplier,
-        BaseDamage,
+        Damage,
         ROF,              // Rate of Fire: attacks per second
         NormalCooldownRate, // Multiplier for normal ability cooldowns
         SkillCooldownRate,  // Multiplier for skill ability cooldowns

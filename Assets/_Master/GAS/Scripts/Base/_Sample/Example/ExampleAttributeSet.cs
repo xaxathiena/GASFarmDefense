@@ -22,7 +22,7 @@ namespace GAS
         public GameplayAttribute Health { get; private set; }
         public GameplayAttribute Mana { get; private set; }
         public GameplayAttribute Stamina { get; private set; }
-        public GameplayAttribute AttackPower { get; private set; }
+        public GameplayAttribute Damage { get; private set; }
         public GameplayAttribute Defense { get; private set; }
         public GameplayAttribute MoveSpeed { get; private set; }
         
@@ -39,7 +39,7 @@ namespace GAS
             Stamina = new GameplayAttribute();
             
             // Initialize combat attributes
-            AttackPower = new GameplayAttribute();
+            Damage = new GameplayAttribute();
             Defense = new GameplayAttribute();
             MoveSpeed = new GameplayAttribute();
             
@@ -47,7 +47,7 @@ namespace GAS
             RegisterAttribute(EGameplayAttributeType.Health, Health);
             RegisterAttribute(EGameplayAttributeType.Mana, Mana);
             RegisterAttribute(EGameplayAttributeType.Stamina, Stamina);
-            RegisterAttribute(EGameplayAttributeType.AttackPower, AttackPower);
+            RegisterAttribute(EGameplayAttributeType.Damage, Damage);
             RegisterAttribute(EGameplayAttributeType.Defense, Defense);
             RegisterAttribute(EGameplayAttributeType.MoveSpeed, MoveSpeed);
             

@@ -20,13 +20,13 @@ namespace Abel.TranHuongDao.Editor
             CreateAoEDebuffAsset("AoESlow_12", EAuraTargetType.Enemies, EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Multiply, 0.88f, 800f);
 
             // 2. Giảm 20% Sát Thương (Attack Power)
-            CreateAoEDebuffAsset("AoEDamageReduce_20", EAuraTargetType.Enemies, EGameplayAttributeType.AttackPower, EGameplayModifierOp.Multiply, 0.80f, 800f);
+            CreateAoEDebuffAsset("AoEDamageReduce_20", EAuraTargetType.Enemies, EGameplayAttributeType.Damage, EGameplayModifierOp.Multiply, 0.80f, 800f);
 
             // 3. Giảm 50% Giáp (Armor)
             CreateAoEDebuffAsset("AoEArmorReduce_50", EAuraTargetType.Enemies, EGameplayAttributeType.Armor, EGameplayModifierOp.Multiply, 0.50f, 800f);
 
             // 4. Giảm 30% Tốc Đánh (Attack Cooldown -> Multiply by 1.3 to increase delay)
-            CreateAoEDebuffAsset("AoEBaseDamageReduce_30", EAuraTargetType.Enemies, EGameplayAttributeType.BaseDamage, EGameplayModifierOp.Multiply, 0.70f, 800f);
+            CreateAoEDebuffAsset("AoEBaseDamageReduce_30", EAuraTargetType.Enemies, EGameplayAttributeType.Damage, EGameplayModifierOp.Multiply, 0.70f, 800f);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

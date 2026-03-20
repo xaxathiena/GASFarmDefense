@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
   m_Name: TD_StoneAbility
   m_EditorClassIdentifier: 
-  abilityID: TD_ChimeraAbility
-  abilityName: TD_ChimeraAbility
+  abilityID: TD_StoneAbility
+  abilityName: TD_StoneAbility
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
   triggerType: 1
-  chance: 10
+  chance: 3
   countThreshold: 3
   executionTarget: 1
   abilityToTrigger: {fileID: 0}
@@ -62,6 +62,6 @@ MonoBehaviour:
   targetType: 0
   targetCount: 1
   effectsToApply:
-  - {fileID: 11400000, guid: 410499175c837d04dbf4d6c971cb9f19, type: 2}
+  - {fileID: 11400000, guid: 82ae176560630734eb6d0e775fa08c5b, type: 2}
   flatDamage: 0
   prefabToSpawn: {fileID: 0}

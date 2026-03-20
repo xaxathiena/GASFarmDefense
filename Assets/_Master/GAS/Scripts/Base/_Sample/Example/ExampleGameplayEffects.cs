@@ -82,7 +82,7 @@ namespace GAS
             {
                 modifiers = new GameplayEffectModifier[]
                 {
-                    new GameplayEffectModifier(EGameplayAttributeType.AttackPower, EGameplayModifierOp.Add, 10f)
+                    new GameplayEffectModifier(EGameplayAttributeType.Damage, EGameplayModifierOp.Add, 10f)
                 };
             }
         }

@@ -44,7 +44,7 @@ namespace FD.Ability
             RegisterAttribute(EGameplayAttributeType.Armor, Armor);
             RegisterAttribute(EGameplayAttributeType.CriticalChance, CriticalChance);
             RegisterAttribute(EGameplayAttributeType.CriticalMultiplier, CriticalMultiplier);
-            RegisterAttribute(EGameplayAttributeType.BaseDamage, BaseDamage);
+            RegisterAttribute(EGameplayAttributeType.Damage, BaseDamage);
             RegisterAttribute(EGameplayAttributeType.MoveSpeed, MoveSpeed);
 
             // Set default values

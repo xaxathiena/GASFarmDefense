@@ -48,7 +48,7 @@ namespace GAS.Example
                     attribute = new AttributeSelector(EGameplayAttributeType.Health),
                     operation = EGameplayModifierOp.Add,
                     calculationType = EModifierCalculationType.AttributeBased,
-                    backingAttribute = new AttributeSelector(EGameplayAttributeType.AttackPower),
+                    backingAttribute = new AttributeSelector(EGameplayAttributeType.Damage),
                     attributeSource = EAttributeSource.Source,
                     coefficient = 1.5f,
                     postMultiplyAdditiveValue = 20f
@@ -186,7 +186,7 @@ namespace GAS.Example
             {
                 new GameplayEffectModifier
                 {
-                    attribute = new AttributeSelector(EGameplayAttributeType.AttackPower),
+                    attribute = new AttributeSelector(EGameplayAttributeType.Damage),
                     operation = EGameplayModifierOp.Add,
                     calculationType = EModifierCalculationType.ScalableFloat,
                     scalableMagnitude = new ScalableFloat(curve)
@@ -271,10 +271,10 @@ namespace GAS.Example
                     attribute = new AttributeSelector(EGameplayAttributeType.Health),
                     operation = EGameplayModifierOp.Add,
                     calculationType = EModifierCalculationType.AttributeBased,
-                    backingAttribute = new AttributeSelector(EGameplayAttributeType.AttackPower),
+                    backingAttribute = new AttributeSelector(EGameplayAttributeType.Damage),
                     attributeSource = EAttributeSource.Source,
                     preMultiplyAdditiveValue = 50f, // Base 50 damage
-                    coefficient = 1f, // Plus 1x AttackPower
+                    coefficient = 1f, // Plus 1x BaseDamage
                 }
             };
             
