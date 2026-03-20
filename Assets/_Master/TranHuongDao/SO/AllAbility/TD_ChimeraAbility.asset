@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9e99f6ee20584e31b7df8071915ec0d, type: 3}
-  m_Name: TowerNormalAttack
+  m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
+  m_Name: TD_ChimeraAbility
   m_EditorClassIdentifier: 
-  abilityID: TowerNormalAttack
-  abilityName: TowerNormalAttack
+  abilityID: TD_ChimeraAbility
+  abilityName: TD_ChimeraAbility
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -53,11 +53,15 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  damageEffect: {fileID: 0}
-  maxTargets: 2
-  attackRange: 10
-  projectilePrefab: {fileID: 0}
-  projectileSpeed: 15
-  projectileLifetime: 2
-  muzzleEffect: {fileID: 0}
-  hitEffect: {fileID: 0}
+  triggerType: 1
+  chance: 10
+  countThreshold: 3
+  executionTarget: 1
+  abilityToTrigger: {fileID: 0}
+  targetSelection: 0
+  targetType: 0
+  targetCount: 1
+  effectsToApply:
+  - {fileID: 11400000, guid: 410499175c837d04dbf4d6c971cb9f19, type: 2}
+  flatDamage: 0
+  prefabToSpawn: {fileID: 0}
