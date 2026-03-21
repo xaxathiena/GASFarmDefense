@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="../Common.uss" />
+    <ui:VisualElement name="global-background" picking-mode="Ignore" style="flex-grow: 1; background-color: #050505;">
+        <!-- Layers for Parallax -->
+        <ui:VisualElement name="layer-bg" picking-mode="Ignore" style="position: absolute; width: 110%; height: 110%; left: -5%; top: -5%; justify-content: center; align-items: center;">
+            <ui:VisualElement picking-mode="Ignore" style="width: 600px; height: 600px; border-radius: 300px; background-color: rgba(0, 255, 255, 0.05); rotate: 15deg;" />
+        </ui:VisualElement>
+        
+        <ui:VisualElement name="layer-mid" picking-mode="Ignore" style="position: absolute; width: 115%; height: 115%; left: -7.5%; top: -7.5%; justify-content: center; align-items: center;">
+           <ui:VisualElement picking-mode="Ignore" style="width: 400px; height: 800px; background-color: rgba(255, 200, 0, 0.03); rotate: -10deg; translate: 200px 0;" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="layer-front" picking-mode="Ignore" style="position: absolute; width: 120%; height: 120%; left: -10%; top: -10%; justify-content: center; align-items: center;">
+           <ui:VisualElement picking-mode="Ignore" style="width: 300px; height: 300px; background-color: rgba(255, 0, 0, 0.05); rotate: 45deg; translate: -300px 200px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

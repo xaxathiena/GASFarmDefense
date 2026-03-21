@@ -1,0 +1,46 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="../Common.uss" />
+    <ui:VisualElement class="view-root flex-col" style="background-color: transparent;">
+        
+        <ui:VisualElement class="flex-row flex-1">
+            <!-- Left Side / Stats -->
+            <ui:VisualElement name="middle-content" class="flex-1" style="justify-content: flex-end; padding: 40px; overflow: hidden; position: relative;">
+                
+                <!-- Foreground Stats (Bottom Left of Center) -->
+                <ui:VisualElement class="flex-row" style="margin-bottom: 20px;">
+                    <ui:VisualElement style="margin-right: 60px;">
+                        <ui:Label text="CURRENT SERVER" class="text-gray" style="font-size: 10px;" />
+                        <ui:Label text="VALHALLA_04" class="text-white" style="font-size: 16px; -unity-font-style: bold;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="margin-right: 60px;">
+                        <ui:Label text="ACTIVE PLAYERS" class="text-gray" style="font-size: 10px;" />
+                        <ui:Label text="4,812 ONLINE" class="text-green" style="font-size: 16px; -unity-font-style: bold;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement>
+                        <ui:Label text="LATENCY" class="text-gray" style="font-size: 10px;" />
+                        <ui:Label text="24 MS" class="text-white" style="font-size: 16px; -unity-font-style: bold;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Right Panel -->
+            <ui:VisualElement name="right-panel" class="slide-visible" style="width: 350px; padding: 40px; justify-content: flex-end;">
+                
+                <ui:Button name="btn-play" class="primary-btn" text="PLAY GAME&#10;START CAMPAIGN" style="margin-bottom: 10px; height: 80px;" />
+                <ui:Button name="btn-join" class="secondary-btn" text="JOIN LOBBY&#10;MULTIPLAYER" style="margin-bottom: 40px; height: 80px;" />
+                
+                <ui:VisualElement style="background-color: #5bb4b8; height: 100px; border-radius: 4px; flex-direction: row; padding: 10px;">
+                    <ui:VisualElement style="width: 80px; height: 80px; background-color: #222;" />
+                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 10px; justify-content: center;">
+                        <ui:Label text="Mythic Archivist" class="text-gold" style="-unity-font-style: bold;" />
+                        <ui:Label text="RANK: ELDER" class="text-gray" style="font-size: 10px;" />
+                        <ui:VisualElement style="height: 4px; background-color: #222; margin-top: 10px;">
+                            <ui:VisualElement style="width: 80%; height: 100%; background-color: #f2cb5d;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

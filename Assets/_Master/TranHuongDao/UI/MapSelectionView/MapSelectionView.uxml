@@ -1,0 +1,90 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="../Common.uss" />
+    <ui:VisualElement class="view-root flex-col" style="background-color: transparent; padding-top: 60px;">
+        
+        <ui:VisualElement class="flex-row flex-1" style="background-color: transparent;">
+            <!-- Center Content: Map List -->
+            <ui:VisualElement name="map-list" class="slide-top-hidden flex-1" style="padding: 40px;">
+                <ui:Label text="SELECT MAP" class="header-text text-white" style="font-size: 32px; margin-bottom: 5px;" />
+                <ui:Label text="CHOOSE DEPLOYMENT ZONE" class="text-gray" style="font-size: 12px; margin-bottom: 30px;" />
+
+                <!-- Map Item 1 -->
+                <ui:VisualElement name="map-frozen" class="map-item">
+                    <ui:VisualElement name="map-frozen-color" style="width: 200px; height: 100%; background-color: #5bb4b8;" />
+                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
+                        <ui:Label text="FROZEN WASTES" class="text-white" style="font-size: 24px; -unity-font-style: bold;" />
+                        <ui:VisualElement class="flex-row" style="margin-top: 5px;">
+                            <ui:Label text="LOW VISIBILITY" class="text-green" style="font-size: 12px; margin-right: 20px;" />
+                            <ui:Label text="REGION: NORTH-REACH" class="text-gray" style="font-size: 12px;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Map Item 2 (Active) -->
+                <ui:VisualElement name="map-iron" class="map-item selected">
+                    <ui:VisualElement name="map-iron-color" style="width: 200px; height: 100%; background-color: #7b7e52;" />
+                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
+                        <ui:Label text="IRON FORTRESS" class="text-gold" style="font-size: 24px; -unity-font-style: bold;" />
+                        <ui:VisualElement class="flex-row" style="margin-top: 5px;">
+                            <ui:Label text="HEAT EXHAUSTION" class="text-gray" style="color: #ff5555; font-size: 12px; margin-right: 20px;" />
+                            <ui:Label text="REGION: CORE-DEPTHS" class="text-gray" style="font-size: 12px;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Map Item 3 -->
+                <ui:VisualElement name="map-emerald" class="map-item">
+                    <ui:VisualElement name="map-emerald-color" style="width: 200px; height: 100%; background-color: #1a4a35;" />
+                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
+                        <ui:Label text="EMERALD SANCTUM" class="text-white" style="font-size: 24px; -unity-font-style: bold;" />
+                        <ui:VisualElement class="flex-row" style="margin-top: 5px;">
+                            <ui:Label text="MAGIC STORMS" class="text-green" style="font-size: 12px; margin-right: 20px;" />
+                            <ui:Label text="REGION: LIFE-WOMB" class="text-gray" style="font-size: 12px;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <!-- Right Panel: Warcraft 3 Style Map Review -->
+            <ui:VisualElement name="map-review" class="slide-right-hidden flex-col" style="width: 400px; background-color: #181818; border-left-width: 1px; border-left-color: #333; padding: 30px;">
+                
+                <!-- Minimap Preview -->
+                <ui:VisualElement name="map-review-preview" style="height: 250px; background-color: #111; border-width: 2px; border-color: #c0914a; align-items: center; justify-content: center; margin-bottom: 20px;">
+                   <ui:Label text="[ MINIMAP PREVIEW ]" class="text-gray" />
+                </ui:VisualElement>
+
+                <!-- Map Info Header -->
+                <ui:Label name="map-review-title" text="IRON FORTRESS" class="text-gold" style="font-size: 28px; -unity-font-style: bold; margin-bottom: 15px;" />
+                
+                <ui:VisualElement class="flex-row" style="margin-bottom: 2px;">
+                    <ui:Label text="Suggested Players:" class="text-gray" style="width: 130px;" />
+                    <ui:Label text="2-4" class="text-white" />
+                </ui:VisualElement>
+                <ui:VisualElement class="flex-row" style="margin-bottom: 2px;">
+                    <ui:Label text="Size:" class="text-gray" style="width: 130px;" />
+                    <ui:Label text="Large" class="text-white" />
+                </ui:VisualElement>
+                <ui:VisualElement class="flex-row" style="margin-bottom: 20px;">
+                    <ui:Label text="Tileset:" class="text-gray" style="width: 130px;" />
+                    <ui:Label text="Volcanic" class="text-white" />
+                </ui:VisualElement>
+
+                <!-- Map Description Base -->
+                <ui:VisualElement class="flex-1" style="background-color: #111; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-width: 1px; border-color: #222;">
+                    <ui:Label name="map-review-description" text="Located in the deepest reaches of the Core-Depths. Extreme heat causes periodic lava flows. High volatility requires careful placement of cooling towers." class="text-white" style="white-space: normal; font-size: 14px; line-height: 20px;" />
+                </ui:VisualElement>
+
+                <!-- Bottom Button Area -->
+                <ui:VisualElement style="justify-content: flex-end;">
+                    <ui:Button name="btn-start" class="primary-btn" text="START BATTLE" style="margin-bottom: 10px; height: 60px; font-size: 20px; letter-spacing: 2px;" />
+                    <ui:VisualElement class="flex-row space-between">
+                        <ui:Button name="btn-back" text="BACK" class="secondary-btn" style="flex-1; margin-right: 5px; padding: 10px; height: 40px; font-size: 12px; letter-spacing: 1px;" />
+                        <ui:Button text="OPTIONS" class="secondary-btn" style="flex-1; margin-left: 5px; padding: 10px; height: 40px; font-size: 12px; letter-spacing: 1px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
