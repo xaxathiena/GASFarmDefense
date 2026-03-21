@@ -24,6 +24,11 @@ namespace GASFarmDefense.UIToolkit.Editor
             var mainMenu = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MainMenuView/MainMenuView.uxml");
             var mapSel = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MapSelectionView/MapSelectionView.uxml");
             var loading = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/LoadingScreenView/LoadingScreenView.uxml");
+            var randomFarmTD = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MapsView/RandomFarmTD/RandomFarmTDView.uxml");
+            var shop = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MapsView/RandomFarmTD/ShopPopup.uxml");
+            var market = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MapsView/RandomFarmTD/MarketPopup.uxml");
+            var farm = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MapsView/RandomFarmTD/FarmPopup.uxml");
+            var guide = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/_Master/TranHuongDao/UI/MapsView/RandomFarmTD/GuidePopup.uxml");
             
             var serializedObject = new SerializedObject(manager);
             serializedObject.FindProperty("_backgroundUxml").objectReferenceValue = background;
@@ -31,6 +36,11 @@ namespace GASFarmDefense.UIToolkit.Editor
             serializedObject.FindProperty("_mainMenuUxml").objectReferenceValue = mainMenu;
             serializedObject.FindProperty("_mapSelectionUxml").objectReferenceValue = mapSel;
             serializedObject.FindProperty("_loadingScreenUxml").objectReferenceValue = loading;
+            serializedObject.FindProperty("_randomFarmTDUxml").objectReferenceValue = randomFarmTD;
+            serializedObject.FindProperty("_shopPopupUxml").objectReferenceValue = shop;
+            serializedObject.FindProperty("_marketPopupUxml").objectReferenceValue = market;
+            serializedObject.FindProperty("_farmPopupUxml").objectReferenceValue = farm;
+            serializedObject.FindProperty("_guidePopupUxml").objectReferenceValue = guide;
             serializedObject.ApplyModifiedProperties();
             
             // Create a temporary panel settings if there isn't one globally (standard procedure helps visuals)

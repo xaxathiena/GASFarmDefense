@@ -1,0 +1,101 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="../../Common.uss" />
+    <Style src="RandomFarmTD.uss" />
+    <ui:VisualElement class="hud-root">
+        
+        <!-- Top Resource Bar - Expanded -->
+        <ui:VisualElement class="res-bar">
+            <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon bg-primary" />
+                <ui:Label text="1,250" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon bg-secondary" />
+                <ui:Label text="250" class="res-text" />
+            </ui:VisualElement>
+             <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon" style="background-color: #ffaa00;" />
+                <ui:Label text="15" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon" style="background-color: #ff7700;" />
+                <ui:Label text="8" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon bg-tertiary" />
+                <ui:Label text="12" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon" style="background-color: #7700ff;" />
+                <ui:Label text="5" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="res-item">
+                <ui:VisualElement class="res-icon" style="background-color: #8b4513;" />
+                <ui:Label text="30" class="res-text" />
+            </ui:VisualElement>
+
+            <ui:VisualElement style="flex-grow: 1;" />
+            
+            <ui:Label text="Base HP 110" class="res-text text-red" style="margin-right: 20px;" />
+            <ui:Label text="Wave 12" class="res-text text-gold" />
+        </ui:VisualElement>
+
+        <!-- Center: Game Map Placeholder -->
+        <ui:VisualElement style="flex: 1; align-items: center; justify-content: center;">
+             <ui:Label text="[ ISOMETRIC GAME MAP DISPLAY ]" class="text-gray" style="font-size: 24px; opacity: 0.3;" />
+        </ui:VisualElement>
+
+        <!-- Bottom Left: Card Deck -->
+        <ui:VisualElement name="card-container" class="card-container">
+            <ui:VisualElement class="card-item">
+               <ui:Label text="1" class="card-lvl" />
+               <ui:VisualElement class="card-image-box" />
+               <ui:Label text="ARCHER TOWER" class="card-name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="card-item">
+               <ui:Label text="1" class="card-lvl" />
+               <ui:VisualElement class="card-image-box" />
+               <ui:Label text="CANNON TOWER" class="card-name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="card-item">
+               <ui:Label text="1" class="card-lvl" />
+               <ui:VisualElement class="card-image-box" />
+               <ui:Label text="MAGE TOWER" class="card-name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="card-item gold">
+               <ui:Label text="5" class="card-lvl text-gold" />
+               <ui:VisualElement class="card-image-box" style="background-color: #222;" />
+               <ui:Label text="REINFORCED AXE" class="card-name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="card-item">
+               <ui:Label text="Item" class="card-lvl" />
+               <ui:VisualElement class="card-image-box" />
+               <ui:Label text="WOOD SHIELD" class="card-name" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Right Middle: Menu -->
+        <ui:VisualElement class="side-menu">
+            <ui:Button name="btn-shop" class="menu-btn">
+                <ui:VisualElement class="menu-btn-icon bg-primary" />
+                <ui:Label text="SHOP" class="menu-btn-text" />
+            </ui:Button>
+            <ui:Button name="btn-market" class="menu-btn">
+                <ui:VisualElement class="menu-btn-icon bg-tertiary" />
+                <ui:Label text="MARKET" class="menu-btn-text" />
+            </ui:Button>
+             <ui:Button name="btn-farm" class="menu-btn">
+                <ui:VisualElement class="menu-btn-icon" style="background-color: #ffaa00;" />
+                <ui:Label text="FARM" class="menu-btn-text" />
+            </ui:Button>
+             <ui:Button name="btn-guide" class="menu-btn">
+                <ui:VisualElement class="menu-btn-icon" style="background-color: #777;" />
+                <ui:Label text="INTEL" class="menu-btn-text" />
+            </ui:Button>
+            <ui:Button name="btn-menu" class="menu-btn" style="margin-top: 20px; border-color: #888; height: 32px;">
+                <ui:Label text="Menu" style="font-size: 10px; color: #888;" />
+            </ui:Button>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

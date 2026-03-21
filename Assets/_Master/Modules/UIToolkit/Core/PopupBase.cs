@@ -26,5 +26,12 @@ namespace GASFarmDefense.UIToolkit.Core
             RootElement.style.display = DisplayStyle.None;
             InvokeAfterHide();
         }
+
+        public virtual void Close()
+        {
+            OnCloseRequested?.Invoke();
+        }
+
+        public event System.Action OnCloseRequested;
     }
 }

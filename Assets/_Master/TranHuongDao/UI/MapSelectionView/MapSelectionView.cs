@@ -88,13 +88,32 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         private void OnStartClicked()
         {
-            Debug.Log("Start Battle Clicked. Switching to LoadingScreenView...");
-            GameUIManager.Instance.ViewManager.SwitchView<LoadingScreenView>().Forget();
+            Debug.Log("Start Battle Clicked. Transitioning to Map Game...");
+            
+            // Hide global persistent elements for the game
+            GameUIManager.Instance.SetGlobalUIActive(false);
+
+            // Transition flow: Map Selection -> Loading -> Random Farm TD
+            SwitchToGameFlow().Forget();
+        }
+
+        private async UniTaskVoid SwitchToGameFlow()
+        {
+            // Show loading
+            await GameUIManager.Instance.ViewManager.SwitchView<LoadingScreenView>();
+            
+            // Simulate loading data
+            await UniTask.Delay(1500);
+
+            // Switch to the actual game HUD
+            GameUIManager.Instance.ViewManager.SwitchView<RandomFarmTDView>().Forget();
+            Debug.Log("Loading Complete. Game HUD is now showing.");
         }
 
         private void OnBackClicked()
         {
-            Debug.Log("Back Clicked. Switching to MainMenuView...");
+            Debug.Log("Back Clicked. Returning to Main Menu...");
+            GameUIManager.Instance.SetGlobalUIActive(true);
             GameUIManager.Instance.ViewManager.SwitchView<MainMenuView>().Forget();
         }
 

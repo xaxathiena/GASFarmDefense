@@ -20,6 +20,11 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         [SerializeField] private VisualTreeAsset _mainMenuUxml;
         [SerializeField] private VisualTreeAsset _mapSelectionUxml;
         [SerializeField] private VisualTreeAsset _loadingScreenUxml;
+        [SerializeField] private VisualTreeAsset _randomFarmTDUxml;
+        [SerializeField] private VisualTreeAsset _shopPopupUxml;
+        [SerializeField] private VisualTreeAsset _marketPopupUxml;
+        [SerializeField] private VisualTreeAsset _farmPopupUxml;
+        [SerializeField] private VisualTreeAsset _guidePopupUxml;
 
         protected override void Awake()
         {
@@ -84,6 +89,29 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 loadingView.UIAnimation = new UIFadeAnimation();
                 ViewManager.RegisterView(loadingView);
             }
+            // 4. Instantiate and Register RandomFarmTDView
+            var gameHUD = new RandomFarmTDView();
+            if (_randomFarmTDUxml != null)
+            {
+                gameHUD.Initialize(_randomFarmTDUxml);
+                gameHUD.UIAnimation = new UIFadeAnimation();
+                ViewManager.RegisterView(gameHUD);
+            }
+
+            // Popups
+            RegisterPopup<ShopPopup>(_shopPopupUxml);
+            RegisterPopup<MarketPopup>(_marketPopupUxml);
+            RegisterPopup<FarmPopup>(_farmPopupUxml);
+            RegisterPopup<GuidePopup>(_guidePopupUxml);
+        }
+
+        private void RegisterPopup<T>(VisualTreeAsset uxml) where T : PopupBase, new()
+        {
+            if (uxml == null) return;
+            var popup = new T();
+            popup.Initialize(uxml);
+            popup.UIAnimation = new UIFadeAnimation();
+            PopupManager.RegisterPopup(popup);
         }
 
         private void Start()

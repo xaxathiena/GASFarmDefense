@@ -41,8 +41,6 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 prog += 0.05f;
                 SetProgress(UnityEngine.Mathf.Clamp01(prog));
             }
-            // Switch back to Main Menu or game scene
-            GameUIManager.Instance.ViewManager.SwitchView<MainMenuView>().Forget();
         }
     }
 }

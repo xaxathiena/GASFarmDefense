@@ -1,0 +1,50 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="../../Common.uss" />
+    <Style src="RandomFarmPopups.uss" />
+    <ui:VisualElement class="popup-overlay">
+        <ui:VisualElement class="popup-window">
+            
+            <ui:VisualElement class="popup-header">
+                <ui:Label text="• FARMER\'S MARKET" class="text-gold" style="font-size: 24px; -unity-font-style: bold;" />
+                <ui:Button name="btn-close" text="✕" class="popup-close-btn" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="flex-row bg-neutral-light" style="flex: 1; padding: 12px; border-width: 1px; border-color: #444; margin-bottom: 15px; border-radius: 4px;">
+                <!-- Left Sidebar: Inventory -->
+                <ui:VisualElement style="width: 160px; border-right-width: 1px; border-color: #333; padding-right: 15px;">
+                    <ui:Label text="STORAGE" class="text-gray" style="font-size: 10px; margin-bottom: 10px;" />
+                    <ui:VisualElement class="bg-neutral-light" style="height: 32px; margin-bottom: 4px; padding: 4px; border-radius: 2px;">
+                        <ui:Label text="Carrot x 15" class="text-white" style="font-size: 11px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="bg-neutral-light" style="height: 32px; margin-bottom: 4px; padding: 4px; border-radius: 2px;">
+                        <ui:Label text="Pumpkin x 8" class="text-white" style="font-size: 11px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="bg-neutral-light" style="height: 32px; margin-bottom: 4px; padding: 4px; border-radius: 2px;">
+                        <ui:Label text="Grape x 5" class="text-white" style="font-size: 11px;" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement style="flex: 1;" />
+                    <ui:Button text="SELL ALL" class="secondary-btn" style="height: 24px; font-size: 9px;" />
+                </ui:VisualElement>
+
+                <!-- Right Side: Market Trends -->
+                <ui:VisualElement style="flex: 1; padding-left: 15px;">
+                    <ui:Label text="PRICE TRENDS" class="text-gold" style="font-size: 12px; margin-bottom: 10px;" />
+                    
+                    <ui:VisualElement style="flex: 1; background-color: #0d0d0d; border-width: 1px; border-color: #333; border-radius: 4px; align-items: center; justify-content: center;">
+                         <ui:Label text="[ GRAPH ]" class="text-green" style="font-size: 18px; opacity: 0.3;" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-top: 15px; align-items: flex-end;">
+                        <ui:VisualElement>
+                            <ui:Label text="Current Balance" class="text-gray" style="font-size: 9px;" />
+                            <ui:Label text="1,250 G" class="text-gold" style="font-size: 18px; -unity-font-style: bold;" />
+                        </ui:VisualElement>
+                        <ui:Button text="TRADE" class="primary-btn" style="width: 100px; height: 32px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

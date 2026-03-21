@@ -70,6 +70,13 @@ namespace GASFarmDefense.UIToolkit.Core
             RegisterCoreUI();
         }
 
+        public virtual void SetGlobalUIActive(bool active)
+        {
+            var style = active ? DisplayStyle.Flex : DisplayStyle.None;
+            if (BackgroundContainer != null) BackgroundContainer.style.display = style;
+            if (TopBarContainer != null) TopBarContainer.style.display = style;
+        }
+
         /// <summary>
         /// Override this method to register specific views and popups for the game.
         /// </summary>

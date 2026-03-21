@@ -21,6 +21,8 @@ namespace GASFarmDefense.UIToolkit.Core
             var type = typeof(T);
             _popupContainer.Add(popup.RootElement);
             _popupDict[type] = popup;
+            
+            popup.OnCloseRequested += () => HideTopPopup().Forget();
         }
 
         public async UniTask ShowPopup<T>() where T : PopupBase
