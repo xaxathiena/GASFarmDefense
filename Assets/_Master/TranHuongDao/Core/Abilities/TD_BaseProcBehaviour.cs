@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using GAS;
+using FD.Modules.VFX;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
@@ -14,15 +15,17 @@ namespace Abel.TranHuongDao.Core.Abilities
     {
         private readonly IEnemyManager _enemyManager;
         private readonly ITowerManager _towerManager;
+        private readonly IVFXManager _vfxManager;
         private readonly GameplayAbilityLogic _logic;
         private readonly Dictionary<string, int> _attackCounts = new Dictionary<string, int>();
 
         [Inject]
-        public TD_BaseProcBehaviour(IEnemyManager enemyManager, ITowerManager towerManager, GameplayAbilityLogic logic)
+        public TD_BaseProcBehaviour(IEnemyManager enemyManager, ITowerManager towerManager, GameplayAbilityLogic logic, IVFXManager vfxManager)
         {
             _enemyManager = enemyManager;
             _towerManager = towerManager;
             _logic = logic;
+            _vfxManager = vfxManager;
         }
 
         public bool CanActivate(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
@@ -215,11 +218,10 @@ namespace Abel.TranHuongDao.Core.Abilities
             }
 
             // C. Instantiate external Prefab (e.g. Goblin, Nuke VFX)
-            if (procData.prefabToSpawn != null && target.Avatar != null)
+            if (!string.IsNullOrEmpty(procData.hitVfxID) && target.Avatar != null)
             {
-                // For spawning, we instantiate exactly at the target's position.
-                // The prefab should have its own logic for cleanup or subsequent actions.
-                Object.Instantiate(procData.prefabToSpawn, target.Position, Quaternion.identity);
+                // Play VFX at target position using VFXManager
+                _vfxManager.PlayEffectAt(procData.hitVfxID, target.Position);
             }
         }
 

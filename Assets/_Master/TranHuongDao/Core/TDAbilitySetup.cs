@@ -56,7 +56,7 @@ namespace Abel.TranHuongDao.Core
             _registry.Register<TD_NormalAttackData>(
                 new TD_NormalAttackBehaviour(_enemyManager, _bulletManager));
             _registry.Register<TD_BaseProcData>(
-                new TD_BaseProcBehaviour(_enemyManager, _towerManager, _gameplayAbilityLogic));
+                new TD_BaseProcBehaviour(_enemyManager, _towerManager, _gameplayAbilityLogic, _vfxManager));
             _registry.Register<TD_AuraData>(
                 new TD_AuraBehaviour(_enemyManager));
             _registry.Register<TD_AoEApplyEffectAbilityData>(

@@ -71,7 +71,8 @@ namespace Abel.TranHuongDao.Core.Abilities
         [Tooltip("Direct flat damage to deal upon proc (bypasses GameplayEffect complexity for simple nukes/strikes).")]
         public float flatDamage = 0f;
 
-        [Tooltip("Prefab to instantiate upon proc (e.g. Goblin, Nuke VFX, Fireball).")]
-        public GameObject prefabToSpawn;
+        [Header("VFX Options (Effekseer)")]
+        [Tooltip("ID of the Effekseer VFX to play on hit (optional).")]
+        public string hitVfxID = "";
     }
 }
