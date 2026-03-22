@@ -155,11 +155,7 @@ MonoBehaviour:
   _mainMenuUxml: {fileID: 9197481963319205126, guid: 2e3ada35431974a418342aae57feb903, type: 3}
   _mapSelectionUxml: {fileID: 9197481963319205126, guid: ad20869563b93e540aa6f4b58c49f7d7, type: 3}
   _loadingScreenUxml: {fileID: 9197481963319205126, guid: 65a8e7bdee9d4024f81360902f83c22c, type: 3}
-  _randomFarmTDUxml: {fileID: 9197481963319205126, guid: 057aabd7db65f4d4082ed167022ca26c, type: 3}
-  _shopPopupUxml: {fileID: 9197481963319205126, guid: 960483c648cd91d47aab8fac741a2a60, type: 3}
-  _marketPopupUxml: {fileID: 9197481963319205126, guid: 425d53a33a87cc347b948d3a4e86a0ed, type: 3}
-  _farmPopupUxml: {fileID: 9197481963319205126, guid: 7888587da15fc58439da6268ebad653b, type: 3}
-  _guidePopupUxml: {fileID: 9197481963319205126, guid: 8cd7198fb599e2649982aa3ef99a0d5b, type: 3}
+  _settingsPopupUxml: {fileID: 9197481963319205126, guid: 567a1787b6b06804f8605079ab971f46, type: 3}
 --- !u!114 &463198156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,9 +282,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1756540014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1756540016}
+  - component: {fileID: 1756540015}
+  m_Layer: 0
+  m_Name: ProjectLifetimeScope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1756540015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756540014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c51f52ca6e57839449e3c215215e0815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
+  gameUIManager: {fileID: 463198155}
+--- !u!4 &1756540016
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756540014}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 801429535}
   - {fileID: 463198157}
+  - {fileID: 1756540016}

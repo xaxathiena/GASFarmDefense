@@ -1,11 +1,11 @@
+using Abel.TowerDefense; // UnitDebugger
+using Abel.TowerDefense.Config;    // UnitRenderDatabase
+using Abel.TowerDefense.DebugTools;
+using Abel.TowerDefense.Render;    // GameRenderManager
+using GAS;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using GAS;
-using Abel.TowerDefense.Render;    // GameRenderManager
-using Abel.TowerDefense.Config;    // UnitRenderDatabase
-using Abel.TowerDefense.DebugTools;
-using Abel.TowerDefense; // UnitDebugger
 
 // Recompile trigger: Feb 22 2026
 
@@ -14,7 +14,7 @@ namespace Abel.TranHuongDao.Core
     /// <summary>
     /// Root VContainer scope for the TranHuongDao Tower Defense scene.
     /// </summary>
-    public class GameLifetimeScope : GameLifetimeScopeTDBase
+    public class FarmRandomTDLifetimeScope : MapGameLifetimeScopeBase
     {
 
 
@@ -47,7 +47,6 @@ namespace Abel.TranHuongDao.Core
             // DebugService implements IStartable + IDisposable; RegisterEntryPoint
             // wires those interfaces into VContainer's PlayerLoop automatically.
             builder.RegisterEntryPoint<DebugService>(Lifetime.Singleton).As<IDebugService>();
-            builder.RegisterEntryPoint<ConfigService>(Lifetime.Singleton).As<IConfigService>();
             // ── GAS – Singleton services (stateless logic, shared across all ASCs) ─
             builder.Register<GameplayEffectCalculationService>(Lifetime.Singleton);
             builder.Register<GameplayEffectService>(Lifetime.Singleton);

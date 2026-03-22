@@ -1,0 +1,38 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi:schemaLocation="UnityEngine.UIElements ../../../../UIElementsSchema/UnityEngine.UIElements.xsd" editor-extension-mode="False">
+    <ui:Style src="project://database/Assets/_Master/UI/SettingsPopup/SettingsPopup.uss?fileID=7433441132597879392&amp;guid=8e9e160e109848d4fb9a6e11893c836c&amp;type=3#SettingsPopup" />
+    <ui:VisualElement name="settings-popup-root" class="popup-overlay">
+        <ui:VisualElement name="settings-container" class="popup-container glass">
+            
+            <!-- Header -->
+            <ui:VisualElement name="header" class="header">
+                <ui:Label name="title" text="SETTINGS" class="title-text" />
+                <ui:Button name="btn-close" text="X" class="btn-close" />
+            </ui:VisualElement>
+
+            <!-- Body Area -->
+            <ui:VisualElement name="body" class="body">
+                
+                <!-- Audio Section -->
+                <ui:VisualElement class="section">
+                    <ui:Label text="AUDIO" class="section-label" />
+                    
+                    <ui:VisualElement class="slider-row">
+                        <ui:Label text="Music" class="label-text" />
+                        <ui:Slider name="slider-music" value="75" low-value="0" high-value="100" class="premium-slider" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement class="slider-row">
+                        <ui:Label text="SFX" class="label-text" />
+                        <ui:Slider name="slider-sfx" value="85" low-value="0" high-value="100" class="premium-slider" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Footer Section -->
+                <ui:VisualElement class="section footer">
+                    <ui:Button name="btn-back-home" text="BACK TO HOME" class="btn-premium btn-danger" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

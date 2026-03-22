@@ -1,8 +1,12 @@
-using UnityEngine;
-using UnityEngine.UIElements;
+using System;
+using System.Collections.Generic;
+using Abel.TranHuongDao.Core;
 using Cysharp.Threading.Tasks;
 using GASFarmDefense.UIToolkit.Core;
 using GASFarmDefense.UIToolkit.Core.Animations;
+using UnityEngine;
+using UnityEngine.UIElements;
+using VContainer;
 
 namespace GASFarmDefense.UIToolkit.TranHuongDao
 {
@@ -20,15 +24,16 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         [SerializeField] private VisualTreeAsset _mainMenuUxml;
         [SerializeField] private VisualTreeAsset _mapSelectionUxml;
         [SerializeField] private VisualTreeAsset _loadingScreenUxml;
-        [SerializeField] private VisualTreeAsset _randomFarmTDUxml;
-        [SerializeField] private VisualTreeAsset _shopPopupUxml;
-        [SerializeField] private VisualTreeAsset _marketPopupUxml;
-        [SerializeField] private VisualTreeAsset _farmPopupUxml;
-        [SerializeField] private VisualTreeAsset _guidePopupUxml;
+        [SerializeField] private VisualTreeAsset _settingsPopupUxml;
 
         protected override void Awake()
         {
-            if (Instance == null) Instance = this;
+            if (Instance == null)
+            {
+                Instance = this;
+                transform.SetParent(null);
+                DontDestroyOnLoad(gameObject);
+            }
             else { Destroy(gameObject); return; }
 
             base.Awake(); // Sets up Root, Containers, Managers
@@ -39,7 +44,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 var bg = _backgroundUxml.Instantiate();
                 bg.style.flexGrow = 1;
                 BackgroundContainer.Add(bg);
-                
+
                 // Track layers for parallax
                 _layerBg = bg.Q<VisualElement>("layer-bg");
                 _layerMid = bg.Q<VisualElement>("layer-mid");
@@ -56,54 +61,56 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 topBar.pickingMode = PickingMode.Ignore; // Don't block background clicks
                 TopBarContainer.Add(topBar);
             }
+            ViewManager.SwitchView<MainMenuView>().Forget();
         }
 
+        private IObjectResolver _resolver;
+
+        [Inject]
+        public void Construct(IObjectResolver resolver)
+        {
+            _resolver = resolver;
+        }
+
+
         /// <summary>
-        /// Registers all the specific views for this game.
+        /// Registers all the specific global views for the project.
         /// </summary>
         protected override void RegisterCoreUI()
         {
-            // 1. Instantiate and Register MainMenuView
-            var mainMenuView = new MainMenuView();
-            if (_mainMenuUxml != null)
-            {
-                mainMenuView.Initialize(_mainMenuUxml);
-                mainMenuView.UIAnimation = new UIFadeAnimation(); 
-                ViewManager.RegisterView(mainMenuView);
-            }
+            if (_resolver == null || ViewManager == null) return;
 
-            // 2. Instantiate and Register MapSelectionView
-            var mapSelView = new MapSelectionView();
-            if (_mapSelectionUxml != null)
-            {
-                mapSelView.Initialize(_mapSelectionUxml);
-                mapSelView.UIAnimation = new UIFadeAnimation();
-                ViewManager.RegisterView(mapSelView);
-            }
+            // 1. Global Views
+            RegisterGlobalView<MainMenuView>(_mainMenuUxml);
+            RegisterGlobalView<MapSelectionView>(_mapSelectionUxml);
+            RegisterGlobalView<LoadingScreenView>(_loadingScreenUxml);
 
-            // 3. Instantiate and Register LoadingScreenView
-            var loadingView = new LoadingScreenView();
-            if (_loadingScreenUxml != null)
-            {
-                loadingView.Initialize(_loadingScreenUxml);
-                loadingView.UIAnimation = new UIFadeAnimation();
-                ViewManager.RegisterView(loadingView);
-            }
-            // 4. Instantiate and Register RandomFarmTDView
-            var gameHUD = new RandomFarmTDView();
-            if (_randomFarmTDUxml != null)
-            {
-                gameHUD.Initialize(_randomFarmTDUxml);
-                gameHUD.UIAnimation = new UIFadeAnimation();
-                ViewManager.RegisterView(gameHUD);
-            }
-
-            // Popups
-            RegisterPopup<ShopPopup>(_shopPopupUxml);
-            RegisterPopup<MarketPopup>(_marketPopupUxml);
-            RegisterPopup<FarmPopup>(_farmPopupUxml);
-            RegisterPopup<GuidePopup>(_guidePopupUxml);
+            // 2. Default Popups
+            RegisterDefaultPopups();
         }
+
+        private void RegisterGlobalView<T>(VisualTreeAsset uxml) where T : ViewBase, new()
+        {
+            if (uxml == null) return;
+            var view = new T();
+            _resolver.Inject(view);
+            view.Initialize(uxml);
+            view.UIAnimation = new UIFadeAnimation();
+            ViewManager.RegisterView(view);
+        }
+
+        private void RegisterDefaultPopups()
+        {
+            if (_settingsPopupUxml != null && _resolver != null && PopupManager != null)
+            {
+                var settings = new FDSettingsPopup();
+                _resolver.Inject(settings);
+                settings.Initialize(_settingsPopupUxml);
+                settings.UIAnimation = new UIFadeAnimation();
+                PopupManager.RegisterPopup("Settings", settings);
+            }
+        }
+
 
         private void RegisterPopup<T>(VisualTreeAsset uxml) where T : PopupBase, new()
         {

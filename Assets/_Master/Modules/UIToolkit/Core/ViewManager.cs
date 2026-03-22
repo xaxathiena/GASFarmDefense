@@ -44,5 +44,47 @@ namespace GASFarmDefense.UIToolkit.Core
                 UnityEngine.Debug.LogError($"[ViewManager] View of type {type.Name} is not registered!");
             }
         }
+
+        public async UniTask HideCurrentView()
+        {
+            if (_currentView != null)
+            {
+                await _currentView.Hide();
+                _currentView = null;
+            }
+        }
+
+        public T GetView<T>() where T : ViewBase
+        {
+            if (_viewDict.TryGetValue(typeof(T), out ViewBase view))
+            {
+                return (T)view;
+            }
+            return null;
+        }
+
+        public void UnregisterView<T>() where T : ViewBase
+        {
+            var type = typeof(T);
+            if (_viewDict.TryGetValue(type, out ViewBase view))
+            {
+                _viewContainer.Remove(view.RootElement);
+                _viewDict.Remove(type);
+                if (_currentView == view) _currentView = null;
+            }
+        }
+
+        public void ClearViews(IEnumerable<Type> types)
+        {
+            foreach (var type in types)
+            {
+                if (_viewDict.TryGetValue(type, out ViewBase view))
+                {
+                    _viewContainer.Remove(view.RootElement);
+                    _viewDict.Remove(type);
+                    if (_currentView == view) _currentView = null;
+                }
+            }
+        }
     }
 }

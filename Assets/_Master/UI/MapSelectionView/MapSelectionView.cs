@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Abel.TranHuongDao.Core;
 using Cysharp.Threading.Tasks;
 using GASFarmDefense.UIToolkit.Core;
 using UnityEngine;
@@ -21,14 +22,29 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private Label _lblReviewTitle;
         private Label _lblReviewDescription;
         private VisualElement _reviewPreview;
-        
-        private List<VisualElement> _mapItems = new List<VisualElement>();
-        private Dictionary<string, MapData> _mapDataDict = new Dictionary<string, MapData>();
+        private VisualElement _mapListContainer;
+
+        private VisualTreeAsset _mapItemTemplate;
+
+        private List<MapSelectionItem> _mapItems = new List<MapSelectionItem>();
+        private List<FD_MapConfigSO> _mapConfigs = new List<FD_MapConfigSO>();
+        private FD_MapConfigSO _selectedMap;
+
+        [VContainer.Inject] private SceneLoaderService _sceneLoader;
+        [VContainer.Inject] private IConfigService _configService;
 
         protected override void OnSetup()
         {
             base.OnSetup();
 
+            // 1. Load Maps from Config
+            var mapsConfig = _configService.GetConfig<FD_MapsConfigSO>();
+            if (mapsConfig != null)
+            {
+                _mapConfigs = mapsConfig.Maps;
+            }
+
+            // 2. Bind static elements
             _btnStart = RootElement.Q<Button>("btn-start");
             if (_btnStart != null) _btnStart.clicked += OnStartClicked;
 
@@ -39,75 +55,78 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _lblReviewDescription = RootElement.Q<Label>("map-review-description");
             _reviewPreview = RootElement.Q<VisualElement>("map-review-preview");
 
-            // Setup Data
-            _mapDataDict["map-frozen"] = new MapData { 
-                Name = "FROZEN WASTES", 
-                Region = "NORTH-REACH", 
-                Description = "A desolate tundra where the cold itself is an enemy. Low visibility makes long-range defense difficult.",
-                PreviewColor = new Color(0.35f, 0.7f, 0.72f) // #5bb4b8
-            };
-            _mapDataDict["map-iron"] = new MapData { 
-                Name = "IRON FORTRESS", 
-                Region = "CORE-DEPTHS", 
-                Description = "Located in the deepest reaches of the Core-Depths. Extreme heat causes periodic lava flows. High volatility requires careful placement of cooling towers.",
-                PreviewColor = new Color(0.48f, 0.49f, 0.32f) // #7b7e52
-            };
-            _mapDataDict["map-emerald"] = new MapData { 
-                Name = "EMERALD SANCTUM", 
-                Region = "LIFE-WOMB", 
-                Description = "A vibrant forest pulsating with raw mana. Magic storms occasionally overload tower systems, requiring manual resets.",
-                PreviewColor = new Color(0.1f, 0.29f, 0.21f) // #1a4a35
-            };
+            _mapListContainer = RootElement.Q<VisualElement>("map-list");
 
-            // Register Map Items
-            var items = RootElement.Query<VisualElement>(className: "map-item").ToList();
-            foreach (var item in items)
+            // 3. Load Templates from Resources (Convention-based)
+            _mapItemTemplate = Resources.Load<VisualTreeAsset>("UI/Templates/MapSelectionItem");
+            if (_mapItemTemplate == null)
             {
-                _mapItems.Add(item);
-                item.RegisterCallback<ClickEvent>(evt => OnMapItemClicked(item));
+                Debug.LogError("[MapSelectionView] Failed to load MapSelectionItem template from Resources/UI/Templates/MapSelectionItem");
+            }
+
+            // 4. Dynamic Map Items
+            RefreshMapList();
+        }
+
+        private void RefreshMapList()
+        {
+            if (_mapListContainer == null || _mapItemTemplate == null) return;
+
+            // Clear existing (though we cleaned UXML, good to be safe)
+            // But we need to keep the header labels! 
+            // Better: find a sub-container or only remove items with .map-item class
+            var existingItems = _mapListContainer.Query<VisualElement>(className: "map-item").ToList();
+            foreach (var item in existingItems) item.RemoveFromHierarchy();
+
+
+            _mapItems.Clear();
+
+            for (int i = 0; i < _mapConfigs.Count; i++)
+            {
+                var config = _mapConfigs[i];
+                var item = _mapItemTemplate.Instantiate();
+                var itemRoot = item.Q<VisualElement>(className: "map-item");
+
+
+                if (itemRoot != null)
+                {
+                    var mapItem = new MapSelectionItem(itemRoot);
+                    mapItem.Setup(config);
+                    _mapListContainer.Add(itemRoot);
+                    _mapItems.Add(mapItem);
+
+                    mapItem.OnClicked += (mi) => OnMapItemClicked(mi);
+
+                    // Auto-select first map
+                    if (i == 0) OnMapItemClicked(mapItem);
+                }
             }
         }
 
-        private void OnMapItemClicked(VisualElement clickedItem)
+
+        private void OnMapItemClicked(MapSelectionItem clickedItem)
         {
             // Update UI Selection state
             foreach (var item in _mapItems)
             {
-                item.RemoveFromClassList("selected");
+                item.SetSelected(false);
             }
-            clickedItem.AddToClassList("selected");
+            clickedItem.SetSelected(true);
+
+            _selectedMap = clickedItem.Config;
 
             // Update Review Panel
-            if (_mapDataDict.TryGetValue(clickedItem.name, out var data))
-            {
-                if (_lblReviewTitle != null) _lblReviewTitle.text = data.Name;
-                if (_lblReviewDescription != null) _lblReviewDescription.text = data.Description;
-                if (_reviewPreview != null) _reviewPreview.style.backgroundColor = data.PreviewColor;
-            }
+            if (_lblReviewTitle != null) _lblReviewTitle.text = _selectedMap.DisplayName;
+            if (_lblReviewDescription != null) _lblReviewDescription.text = _selectedMap.Description;
+            if (_reviewPreview != null) _reviewPreview.style.backgroundColor = _selectedMap.PreviewColor;
         }
 
         private void OnStartClicked()
         {
-            Debug.Log("Start Battle Clicked. Transitioning to Map Game...");
-            
-            // Hide global persistent elements for the game
-            GameUIManager.Instance.SetGlobalUIActive(false);
+            if (_selectedMap == null) return;
 
-            // Transition flow: Map Selection -> Loading -> Random Farm TD
-            SwitchToGameFlow().Forget();
-        }
-
-        private async UniTaskVoid SwitchToGameFlow()
-        {
-            // Show loading
-            await GameUIManager.Instance.ViewManager.SwitchView<LoadingScreenView>();
-            
-            // Simulate loading data
-            await UniTask.Delay(1500);
-
-            // Switch to the actual game HUD
-            GameUIManager.Instance.ViewManager.SwitchView<RandomFarmTDView>().Forget();
-            Debug.Log("Loading Complete. Game HUD is now showing.");
+            Debug.Log($"Starting Battle for {_selectedMap.DisplayName}...");
+            _sceneLoader.LoadMap(_selectedMap).Forget();
         }
 
         private void OnBackClicked()
@@ -121,7 +140,8 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         {
             var mapList = RootElement.Q<VisualElement>("map-list");
             var mapReview = RootElement.Q<VisualElement>("map-review");
-            
+
+
             if (mapList != null)
             {
                 mapList.RemoveFromClassList("slide-visible");

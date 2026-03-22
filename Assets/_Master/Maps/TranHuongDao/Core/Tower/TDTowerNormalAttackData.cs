@@ -1,5 +1,5 @@
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -8,7 +8,7 @@ namespace Abel.TranHuongDao.Core
     /// Create one in the Project window via Abel → Tower Normal Attack.
     ///
     /// The behaviour class <see cref="TowerAttackAbilityBehaviour"/> resolves at runtime
-    /// by name — register that class in <see cref="GameLifetimeScope"/>.
+    /// by name — register that class in <see cref="FarmRandomTDLifetimeScope"/>.
     /// </summary>
     [CreateAssetMenu(fileName = "TD_TowerNormalAttack",
                      menuName = "Abel/TranHuongDao/Tower Normal Attack")]

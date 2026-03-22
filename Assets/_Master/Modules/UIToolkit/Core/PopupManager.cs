@@ -8,6 +8,7 @@ namespace GASFarmDefense.UIToolkit.Core
     public class PopupManager
     {
         private Dictionary<Type, PopupBase> _popupDict = new Dictionary<Type, PopupBase>();
+        private Dictionary<string, PopupBase> _idPopupDict = new Dictionary<string, PopupBase>();
         private Stack<PopupBase> _activePopups = new Stack<PopupBase>();
         private VisualElement _popupContainer;
 
@@ -19,17 +20,33 @@ namespace GASFarmDefense.UIToolkit.Core
         public void RegisterPopup<T>(T popup) where T : PopupBase
         {
             var type = typeof(T);
-            _popupContainer.Add(popup.RootElement);
+            RegisterPopupInternal(type.Name, popup);
             _popupDict[type] = popup;
-            
+        }
+
+        public void RegisterPopup(string id, PopupBase popup)
+        {
+            RegisterPopupInternal(id, popup);
+        }
+
+        private void RegisterPopupInternal(string id, PopupBase popup)
+        {
+            if (!_popupContainer.Contains(popup.RootElement))
+            {
+                _popupContainer.Add(popup.RootElement);
+            }
+            _idPopupDict[id] = popup;
             popup.OnCloseRequested += () => HideTopPopup().Forget();
         }
 
         public async UniTask ShowPopup<T>() where T : PopupBase
         {
-            var type = typeof(T);
+            await ShowPopup(typeof(T).Name);
+        }
 
-            if (_popupDict.TryGetValue(type, out PopupBase popup))
+        public async UniTask ShowPopup(string id)
+        {
+            if (_idPopupDict.TryGetValue(id, out PopupBase popup))
             {
                 // Bring to front in the visual tree (render on top of others)
                 popup.RootElement.BringToFront();
@@ -42,8 +59,30 @@ namespace GASFarmDefense.UIToolkit.Core
             }
             else
             {
-                UnityEngine.Debug.LogError($"[PopupManager] Popup of type {type.Name} is not registered!");
+                UnityEngine.Debug.LogError($"[PopupManager] Popup with ID '{id}' is not registered!");
             }
+        }
+
+        public void UnregisterPopup(string id)
+        {
+            if (_idPopupDict.TryGetValue(id, out PopupBase popup))
+            {
+                _popupContainer.Remove(popup.RootElement);
+                _idPopupDict.Remove(id);
+
+                // Also remove from type dict if it matches
+                var keysToRemove = new List<Type>();
+                foreach (var pair in _popupDict)
+                {
+                    if (pair.Value == popup) keysToRemove.Add(pair.Key);
+                }
+                foreach (var key in keysToRemove) _popupDict.Remove(key);
+            }
+        }
+
+        public void ClearPopups(IEnumerable<string> ids)
+        {
+            foreach (var id in ids) UnregisterPopup(id);
         }
 
         public async UniTask HideTopPopup()

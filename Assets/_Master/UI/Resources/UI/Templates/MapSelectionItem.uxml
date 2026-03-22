@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement class="map-item">
+        <ui:VisualElement name="map-item-color" style="width: 200px; height: 100%;" />
+        <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
+            <ui:Label name="map-item-title" text="MAP NAME" class="text-white" style="font-size: 24px; -unity-font-style: bold;" />
+            <ui:VisualElement class="flex-row" style="margin-top: 5px;">
+                <ui:Label name="map-item-status" text="STATUS" class="text-green" style="font-size: 12px; margin-right: 20px;" />
+                <ui:Label name="map-item-region" text="REGION: UNKNOWN" class="text-gray" style="font-size: 12px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -8,41 +8,7 @@
                 <ui:Label text="SELECT MAP" class="header-text text-white" style="font-size: 32px; margin-bottom: 5px;" />
                 <ui:Label text="CHOOSE DEPLOYMENT ZONE" class="text-gray" style="font-size: 12px; margin-bottom: 30px;" />
 
-                <!-- Map Item 1 -->
-                <ui:VisualElement name="map-frozen" class="map-item">
-                    <ui:VisualElement name="map-frozen-color" style="width: 200px; height: 100%; background-color: #5bb4b8;" />
-                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
-                        <ui:Label text="FROZEN WASTES" class="text-white" style="font-size: 24px; -unity-font-style: bold;" />
-                        <ui:VisualElement class="flex-row" style="margin-top: 5px;">
-                            <ui:Label text="LOW VISIBILITY" class="text-green" style="font-size: 12px; margin-right: 20px;" />
-                            <ui:Label text="REGION: NORTH-REACH" class="text-gray" style="font-size: 12px;" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-
-                <!-- Map Item 2 (Active) -->
-                <ui:VisualElement name="map-iron" class="map-item selected">
-                    <ui:VisualElement name="map-iron-color" style="width: 200px; height: 100%; background-color: #7b7e52;" />
-                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
-                        <ui:Label text="IRON FORTRESS" class="text-gold" style="font-size: 24px; -unity-font-style: bold;" />
-                        <ui:VisualElement class="flex-row" style="margin-top: 5px;">
-                            <ui:Label text="HEAT EXHAUSTION" class="text-gray" style="color: #ff5555; font-size: 12px; margin-right: 20px;" />
-                            <ui:Label text="REGION: CORE-DEPTHS" class="text-gray" style="font-size: 12px;" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-
-                <!-- Map Item 3 -->
-                <ui:VisualElement name="map-emerald" class="map-item">
-                    <ui:VisualElement name="map-emerald-color" style="width: 200px; height: 100%; background-color: #1a4a35;" />
-                    <ui:VisualElement class="flex-col flex-1" style="margin-left: 20px; justify-content: center;">
-                        <ui:Label text="EMERALD SANCTUM" class="text-white" style="font-size: 24px; -unity-font-style: bold;" />
-                        <ui:VisualElement class="flex-row" style="margin-top: 5px;">
-                            <ui:Label text="MAGIC STORMS" class="text-green" style="font-size: 12px; margin-right: 20px;" />
-                            <ui:Label text="REGION: LIFE-WOMB" class="text-gray" style="font-size: 12px;" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
+                <!-- Dynamic items will be added here -->
 
             </ui:VisualElement>
 

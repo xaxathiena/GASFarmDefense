@@ -1,0 +1,134 @@
+/* SettingsPopup.uss */
+
+.popup-overlay {
+    flex-grow: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-container.glass {
+    width: 600px;
+    background-color: rgba(30, 30, 45, 0.8);
+    border-radius: 20px;
+    border-width: 1.5px;
+    border-color: rgba(255, 255, 255, 0.15);
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom-width: 1px;
+    border-color: rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
+}
+
+.title-text {
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: #FFFFFF;
+    letter-spacing: 2px;
+}
+
+.btn-close {
+    background-color: rgba(255, 45, 85, 0.2);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgba(255, 45, 85, 0.3);
+    color: #FF2D55;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    transition: 0.2s background-color, 0.2s scale;
+}
+
+.btn-close:hover {
+    background-color: rgba(255, 45, 85, 0.4);
+    scale: 1.1;
+}
+
+.body {
+    flex-direction: column;
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.section-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+    -unity-font-style: bold;
+}
+
+.slider-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.label-text {
+    width: 100px;
+    color: #E0E0E0;
+    font-size: 18px;
+}
+
+.premium-slider {
+    flex-grow: 1;
+    height: 32px;
+}
+
+/* Base Slider Styles (Approximate standard naming) */
+.premium-slider #unity-dragger {
+    background-color: #007AFF;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-width: 0;
+}
+
+.premium-slider #unity-tracker {
+    background-color: rgba(255, 255, 255, 0.1);
+    height: 6px;
+    border-radius: 3px;
+    border-width: 0;
+    margin-top: -3px;
+}
+
+.footer {
+    padding-top: 12px;
+    border-top-width: 1px;
+    border-color: rgba(255, 255, 255, 0.1);
+    align-items: center;
+}
+
+.btn-premium {
+    height: 48px;
+    width: 240px;
+    background-color: #007AFF;
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 18px;
+    -unity-font-style: bold;
+    border-width: 0;
+    transition: 0.2s background-color, 0.3s translate;
+}
+
+.btn-premium:hover {
+    background-color: #0056b3;
+    translate: 0 -2px;
+}
+
+.btn-danger {
+    background-color: rgba(255, 45, 85, 0.7);
+}
+
+.btn-danger:hover {
+    background-color: #FF2D55;
+}

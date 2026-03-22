@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="../../../../UI/Common.uss" />
     <Style src="RandomFarmTD.uss" />
-    <ui:VisualElement class="hud-root">
+    <ui:VisualElement class="hud-root" picking-mode="Ignore">
         
         <!-- Top Resource Bar - Expanded -->
         <ui:VisualElement class="res-bar">
@@ -40,10 +40,8 @@
             <ui:Label text="Wave 12" class="res-text text-gold" />
         </ui:VisualElement>
 
-        <!-- Center: Game Map Placeholder -->
-        <ui:VisualElement style="flex: 1; align-items: center; justify-content: center;">
-             <ui:Label text="[ ISOMETRIC GAME MAP DISPLAY ]" class="text-gray" style="font-size: 24px; opacity: 0.3;" />
-        </ui:VisualElement>
+        <!-- Center: Game Map Space -->
+        <ui:VisualElement picking-mode="Ignore" style="flex: 1;" />
 
         <!-- Bottom Left: Card Deck -->
         <ui:VisualElement name="card-container" class="card-container">
