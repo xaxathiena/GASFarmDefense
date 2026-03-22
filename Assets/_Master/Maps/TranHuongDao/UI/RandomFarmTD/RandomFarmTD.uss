@@ -135,10 +135,30 @@
 
 /* Special Highlighting - Gold Card */
 .card-item.gold {
-    border-color: var(--color-primary);
+    border-color: #d4af37;
     background-color: rgba(212, 175, 55, 0.1);
 }
 
 .card-item.gold .card-name {
-    color: var(--color-primary);
+    color: #d4af37;
+}
+
+/* Drag states */
+.card-item.dragging {
+    border-color: #ffd700; /* Yellow border when dragging */
+    border-width: 2px;
+    scale: 1.1;
+    opacity: 0.8;
+}
+
+.card-item.valid {
+    border-color: #00ff00; /* Green border when over valid spot */
+    border-width: 3px;
+    background-color: rgba(0, 255, 0, 0.1);
+}
+
+.card-item.invalid {
+    border-color: #ff0000; /* Red border when over invalid spot */
+    border-width: 2px;
+    background-color: rgba(255, 0, 0, 0.1);
 }

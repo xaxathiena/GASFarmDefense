@@ -97,13 +97,6 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         public void Tick()
         {
-            // Allow pressing B as a shortcut to start dragging (for testing without UI).
-            if (!_isDragging && Input.GetKeyDown(KeyCode.B))
-            {
-                StartDragging();
-                return;
-            }
-
             if (!_isDragging) return;
 
             // --- Cancel drag on right-click or Escape ----------------------------
@@ -113,16 +106,11 @@ namespace Abel.TranHuongDao.Core
                 return;
             }
 
-            // --- Raycast mouse ray against the mathematical Y=0 plane ------------
+            // --- Raycast mouse ray against plane --------------------------------
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            // Plane.Raycast returns the distance along the ray to the intersection.
             if (!_groundPlane.Raycast(ray, out float distance)) return;
 
             Vector3 worldPos = ray.GetPoint(distance);
-
-            // --- Snap to grid centre ---------------------------------------------
-            // Convert to grid indices, then back to world to get the cell centre.
             Vector2Int gridPos = _map.WorldToGridPosition(worldPos);
             Vector3 snappedPos = _map.GridToWorldPosition(gridPos.x, gridPos.y);
 
@@ -130,15 +118,28 @@ namespace Abel.TranHuongDao.Core
             previewSprite.transform.position = snappedPos;
 
             // --- Recolor based on build legality ---------------------------------
-            previewSprite.color = _map.CanBuildAt(snappedPos) ? ColorValid : ColorInvalid;
+            bool canBuild = _map.CanBuildAt(snappedPos);
+            previewSprite.color = canBuild ? ColorValid : ColorInvalid;
 
-            // --- Drop on mouse button release ------------------------------------
-            // Using GetMouseButtonUp instead of GetMouseButtonDown to match the
-            // natural "drag then release" feel of a card-based UI.
-            if (Input.GetMouseButtonUp(0))
-            {
-                TryDropTower(gridPos, snappedPos);
-            }
+            // --- Drop on mouse button release (handled by Click from Card usually, but keeping here for fallback) ---
+        }
+
+        public bool IsValidPlacement(Vector2 screenPos, out Vector2Int gridPos, out Vector3 snappedPos)
+        {
+            gridPos = Vector2Int.zero;
+            snappedPos = Vector3.zero;
+
+            // UI Toolkit uses top-left origin, but Camera.ScreenPointToRay expects bottom-left (screen pixels).
+            Vector2 correctedPos = new Vector2(screenPos.x, Screen.height - screenPos.y);
+            Ray ray = Camera.main.ScreenPointToRay(correctedPos);
+            
+            if (!_groundPlane.Raycast(ray, out float distance)) return false;
+
+            Vector3 worldPos = ray.GetPoint(distance);
+            gridPos = _map.WorldToGridPosition(worldPos);
+            snappedPos = _map.GridToWorldPosition(gridPos.x, gridPos.y);
+
+            return _map.CanBuildAt(snappedPos);
         }
 
         // ── Public API ────────────────────────────────────────────────────────
@@ -154,28 +155,21 @@ namespace Abel.TranHuongDao.Core
 
         // ── Private helpers ───────────────────────────────────────────────────
 
-        /// <summary>
-        /// Executes the full drop sequence when the player releases the mouse button:
-        /// validate → mark cell → get random ID → spawn tower → end drag.
-        /// </summary>
-        private void TryDropTower(Vector2Int gridPos, Vector3 snappedWorldPos)
+        public void TryDropTower(Vector2Int gridPos, Vector3 snappedWorldPos, string towerID = "")
         {
             if (_map.CanBuildAt(snappedWorldPos))
             {
-                // Step 1: Mark the cell as occupied so nothing else can build here.
                 _map.SetCellState(gridPos, GridCellType.TowerOccupied);
 
-                // Step 2: Pick a random tower type from the config data.
-                string randomID = _config.GetTowerIDWithTier(1, _unitsConfig);
-                if (string.IsNullOrEmpty(randomID))
+                string finalID = string.IsNullOrEmpty(towerID) ? _config.GetTowerIDWithTier(1, _unitsConfig) : towerID;
+                if (string.IsNullOrEmpty(finalID))
                 {
-                    Debug.LogError($"[TowerDragDropManager] No tower ID found for tier 1 in config!");
+                    Debug.LogError($"[TowerDragDropManager] No tower ID found!");
                     return;
                 }
-                // Step 3: Delegate actual unit creation to the spawner (DOD layer).
-                _spawner.SpawnTower(randomID, snappedWorldPos);
+                _spawner.SpawnTower(finalID, snappedWorldPos);
 
-                Debug.Log($"[TowerDragDropManager] Placed '{randomID}' at grid {gridPos} (world {snappedWorldPos})");
+                Debug.Log($"[TowerDragDropManager] Placed '{finalID}' at grid {gridPos} (world {snappedWorldPos})");
             }
             else
             {
@@ -187,14 +181,14 @@ namespace Abel.TranHuongDao.Core
         }
 
         /// <summary>Ends the drag session and hides the preview icon.</summary>
-        private void StopDragging()
+        public void StopDragging()
         {
             _isDragging = false;
             SetPreviewVisible(false);
         }
 
         /// <summary>Cancels a drag without attempting placement.</summary>
-        private void CancelDragging()
+        public void CancelDragging()
         {
             Debug.Log("[TowerDragDropManager] Drag cancelled.");
             StopDragging();

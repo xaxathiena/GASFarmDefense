@@ -4,6 +4,7 @@ using GASFarmDefense.Modules.Addressables;
 using UnityEngine;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace GASFarmDefense.UIToolkit.TranHuongDao
 {
@@ -24,18 +25,20 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _currentMap = map;
 
             // 1. Show Loading Screen
-            await _uiManager.ViewManager.SwitchView<LoadingScreenView>();
+            var loadingScreen = await _uiManager.ViewManager.SwitchView<LoadingScreenView>();
             _uiManager.SetGlobalUIActive(false);
+            if (loadingScreen != null) loadingScreen.RootElement.BringToFront();
 
             // 2. Load Scene via Addressables
             SceneInstance sceneInstance = await _addressableService.LoadSceneAsync(map.MapScene);
 
-            // The MapUISetupProvider will start automatically and show the Map HUD in the same ViewContainer.
-            // To prevent the new Map HUD from rendering on top of the Loading Screen, we bring the Loading Screen to the front.
-            var loadingScreen = _uiManager.ViewManager.GetView<LoadingScreenView>();
+            // Re-check loading screen after scene load to ensure it stays on top of new Map HUD
+            loadingScreen = _uiManager.ViewManager.GetView<LoadingScreenView>();
             if (loadingScreen != null)
             {
                 loadingScreen.RootElement.BringToFront();
+                // Ensure it's visible and blocking
+                loadingScreen.RootElement.style.display = DisplayStyle.Flex;
             }
 
             // 3. Keep Loading Screen visible for a short bit

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GASFarmDefense.UIToolkit.Core;
 using UnityEngine;
@@ -31,6 +32,47 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
             _btnMenu = RootElement.Q<Button>("btn-menu");
             if (_btnMenu != null) _btnMenu.clicked += OnMenuClicked;
+
+            SetupCardItems();
+        }
+
+        [VContainer.Inject] private Abel.TranHuongDao.Core.TowerDragDropManager _towerDragManager;
+
+        [SerializeField] private VisualTreeAsset _cardTemplate;
+        private List<TDCardItemUI> _cards = new List<TDCardItemUI>();
+
+        private void SetupCardItems()
+        {
+            _cardTemplate = Resources.Load<VisualTreeAsset>("UI/Templates/TDCardItemUI");
+            var cardContainer = RootElement.Q<VisualElement>("card-container");
+            if (cardContainer == null) return;
+            if (_cardTemplate == null) return;
+
+            cardContainer.Clear();
+            _cards.Clear();
+
+            // Example: Generate 5 cards dynamically
+            var cardData = new[]
+            {
+                new { name = "", lvl = "1", gold = false },
+                new { name = "", lvl = "1", gold = false },
+                new { name = "", lvl = "1", gold = false },
+                new { name = "", lvl = "5", gold = true },
+                new { name = "", lvl = "Item", gold = false }
+            };
+
+            foreach (var data in cardData)
+            {
+                var cardUI = new TDCardItemUI(_cardTemplate, _towerDragManager);
+                cardUI.SetData(data.name, data.lvl, data.gold);
+
+
+                cardUI.OnCardPlayed += (c, pos) => Debug.Log($"Card Played at {pos}");
+                cardUI.OnCardClicked += (c) => Debug.Log("Card Clicked");
+
+                cardContainer.Add(cardUI.Root);
+                _cards.Add(cardUI);
+            }
         }
 
         private void OnShopClicked()

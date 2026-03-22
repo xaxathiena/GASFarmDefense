@@ -23,7 +23,7 @@ namespace GASFarmDefense.UIToolkit.Core
             _viewDict[type] = view;
         }
 
-        public async UniTask SwitchView<T>() where T : ViewBase
+        public async UniTask<T> SwitchView<T>() where T : ViewBase
         {
             var type = typeof(T);
 
@@ -38,10 +38,12 @@ namespace GASFarmDefense.UIToolkit.Core
             {
                 _currentView = nextView;
                 await _currentView.Show();
+                return (T)_currentView;
             }
             else
             {
                 UnityEngine.Debug.LogError($"[ViewManager] View of type {type.Name} is not registered!");
+                return null;
             }
         }
 
