@@ -56,6 +56,22 @@ namespace GASFarmDefense.UIToolkit.Core
             }
         }
 
+        public async UniTask HideView<T>() where T : ViewBase
+        {
+            var type = typeof(T);
+            if (_viewDict.TryGetValue(type, out ViewBase view))
+            {
+                if (_currentView == view)
+                {
+                    await HideCurrentView();
+                }
+                else
+                {
+                    await view.Hide();
+                }
+            }
+        }
+
         public T GetView<T>() where T : ViewBase
         {
             if (_viewDict.TryGetValue(typeof(T), out ViewBase view))

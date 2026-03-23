@@ -2481,27 +2481,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameLifetimeScope
   parentReference:
-    TypeName: 
+    TypeName: GASFarmDefense.UIToolkit.TranHuongDao.ProjectLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
   gameDatabase: {fileID: 11400000, guid: 075250bc06b88f14ab634d7483ff73ca, type: 2}
   gameManager: {fileID: 2002587549}
   unitDebugger: {fileID: 2002587548}
   showUnitDebugger: 0
-  _hudUxml: {fileID: 9197481963319205126, guid: 057aabd7db65f4d4082ed167022ca26c, type: 3}
+  _hudUxml: {fileID: 9197481963319205126, guid: a3d3fb6113b2a7b4781f4fc7f90aa6f7, type: 3}
   _mapPopups:
-  - PopupId: shop
-    Uxml: {fileID: 9197481963319205126, guid: 960483c648cd91d47aab8fac741a2a60, type: 3}
-    PopupClassName: 
-  - PopupId: market
-    Uxml: {fileID: 9197481963319205126, guid: 425d53a33a87cc347b948d3a4e86a0ed, type: 3}
-    PopupClassName: 
-  - PopupId: guide
-    Uxml: {fileID: 9197481963319205126, guid: 8cd7198fb599e2649982aa3ef99a0d5b, type: 3}
-    PopupClassName: 
-  - PopupId: farm
-    Uxml: {fileID: 9197481963319205126, guid: 7888587da15fc58439da6268ebad653b, type: 3}
-    PopupClassName: 
+  - Uxml: {fileID: 9197481963319205126, guid: 4bb2524fa9c1b3948bde7fd1a07ea934, type: 3}
+    PopupClassName: ShopPopup
+  - Uxml: {fileID: 9197481963319205126, guid: d10fb9a596f7a5f46bddd25451a0c117, type: 3}
+    PopupClassName: MarketPopup
+  - Uxml: {fileID: 9197481963319205126, guid: 4eda3e6e5bc618845beb74b50dbbacd6, type: 3}
+    PopupClassName: GuidePopup
+  - Uxml: {fileID: 9197481963319205126, guid: 5c46b175222c0b94b87726ffe685ce9b, type: 3}
+    PopupClassName: FarmPopup
   towerBuilderConfigSO: {fileID: 11400000, guid: c68605544dab9c3439ab377c3cec3463, type: 2}
   mapLayoutManager: {fileID: 2061553634}
   towerDragDropManager: {fileID: 1194910451}

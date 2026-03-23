@@ -1,10 +1,10 @@
+using System.Collections.Generic;
+using Abel.TranHuongDao.Core;
+using GASFarmDefense.UIToolkit.Core;
+using GASFarmDefense.UIToolkit.TranHuongDao;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using System.Collections.Generic;
-using GASFarmDefense.UIToolkit.Core;
-using Abel.TranHuongDao.Core;
-using GASFarmDefense.UIToolkit.TranHuongDao;
 
 namespace Abel.TowerDefense
 {
@@ -23,18 +23,17 @@ namespace Abel.TowerDefense
             base.Configure(builder); // GameLifetimeScopeTDBase registrations
 
             // ── Essential Independent Services ────────────────────────────────────
-            builder.Register<ViewManager>(Lifetime.Singleton);
-            builder.Register<PopupManager>(Lifetime.Singleton);
-            builder.Register<SceneLoaderService>(Lifetime.Singleton);
-            
+            // Note: ProjectLifetimeScope (Root) provides global ViewManager, PopupManager, and SceneLoaderService.
+
             // Note: ProjectLifetimeScope also registers this, but we allow override for independence
+
             builder.RegisterEntryPoint<Abel.TranHuongDao.Core.ConfigService>(Lifetime.Singleton)
                    .As<Abel.TranHuongDao.Core.IConfigService>();
 
             // ── UI Setup Entry Point ──────────────────────────────────────────────
             builder.RegisterEntryPoint<MapUISetupProvider>(Lifetime.Singleton)
                    .WithParameter("hudUxml", _hudUxml)
-               .WithParameter("mapPopups", _mapPopups);
+                   .WithParameter("mapPopups", _mapPopups);
         }
     }
 }

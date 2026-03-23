@@ -7,6 +7,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
     public class MainMenuView : ViewBase
     {
         private Button _btnPlay;
+        [VContainer.Inject] private ViewManager _viewManager;
 
         protected override void OnSetup()
         {
@@ -19,12 +20,10 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             }
         }
 
-
-
         private void OnPlayClicked()
         {
             UnityEngine.Debug.Log("Play Game Clicked. Switching to MapSelectionView...");
-            GameUIManager.Instance.ViewManager.SwitchView<MapSelectionView>().Forget();
+            _viewManager.SwitchView<MapSelectionView>().Forget();
         }
 
         public override async UniTask Hide()

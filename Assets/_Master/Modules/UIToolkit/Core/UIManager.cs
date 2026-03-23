@@ -12,8 +12,8 @@ namespace GASFarmDefense.UIToolkit.Core
     {
         [SerializeField] protected UIDocument _uiDocument;
 
-        public ViewManager ViewManager { get; private set; }
-        public PopupManager PopupManager { get; private set; }
+        [VContainer.Inject] public ViewManager ViewManager { get; set; }
+        [VContainer.Inject] public PopupManager PopupManager { get; set; }
         public VisualElement BackgroundContainer { get; private set; }
         public VisualElement TopBarContainer { get; private set; }
 
@@ -61,10 +61,11 @@ namespace GASFarmDefense.UIToolkit.Core
             popupContainer.pickingMode = PickingMode.Ignore;
             root.Add(popupContainer);
 
-            ViewManager = new ViewManager();
+            // Use injected managers or create new ones if not provided
+            ViewManager ??= new ViewManager();
             ViewManager.Init(viewContainer);
 
-            PopupManager = new PopupManager();
+            PopupManager ??= new PopupManager();
             PopupManager.Init(popupContainer);
 
             RegisterCoreUI();

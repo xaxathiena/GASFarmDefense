@@ -27,6 +27,8 @@ namespace GASFarmDefense.UIToolkit.Core
         public void RegisterPopup(string id, PopupBase popup)
         {
             RegisterPopupInternal(id, popup);
+            var type = popup.GetType();
+            _popupDict[type] = popup;
         }
 
         private void RegisterPopupInternal(string id, PopupBase popup)

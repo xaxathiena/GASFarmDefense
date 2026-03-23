@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Style src="RandomFarmStylesShared.uss" />
+    <ui:Style src="RandomFarmPopups.uss" />
+    
+    <ui:VisualElement name="overlay" class="popup-overlay">
+        <ui:VisualElement name="window" class="game-panel" style="width: 550px; height: 500px; padding: 0;">
+            <!-- Header -->
+            <ui:VisualElement name="header" class="popup-header" style="padding: 0 16px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement class="dot-gold" />
+                    <ui:Label text="GAME GUIDE" class="gold-text popup-title" />
+                </ui:VisualElement>
+                <ui:Button name="btn-close" class="game-button" style="width: 32px; height: 32px; font-size: 18px;" text="×" />
+            </ui:VisualElement>
+
+            <!-- Tabs -->
+            <ui:VisualElement class="game-panel" style="flex-direction: row; background-color: rgba(0,0,0,0.4); border-radius: 8px; margin: 12px; padding: 2px;">
+                <ui:Button name="tab-how-to-play" class="guide-tab-btn active" text="HOW TO PLAY" />
+                <ui:Button name="tab-shop-info" class="guide-tab-btn" text="SHOP INFO" />
+                <ui:Button name="tab-tower-tiers" class="guide-tab-btn" text="TOWER TIERS" />
+            </ui:VisualElement>
+
+            <!-- Tab Content -->
+            <ui:VisualElement name="tab-content" style="flex: 1; padding: 16px;">
+                 <ui:ScrollView name="scroll-how-to-play" style="display: flex;">
+                    <ui:VisualElement class="game-panel" style="margin-bottom: 16px; background-color: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.05);">
+                        <ui:Label text="GAMEPLAY BASICS" class="gold-text" style="font-size: 12px; margin-bottom: 8px;" />
+                        <ui:Label text="• Plant seeds in the Farm to grow crops." style="font-size: 10px; margin-bottom: 4px; opacity: 0.8;" />
+                        <ui:Label text="• Harvest crops and sell them in the Market for Gold." style="font-size: 10px; margin-bottom: 4px; opacity: 0.8;" />
+                        <ui:Label text="• Use Gold to buy Tower Packs in the Shop." style="font-size: 10px; margin-bottom: 4px; opacity: 0.8;" />
+                        <ui:Label text="• Defend your farm from waves of enemies." style="font-size: 10px; opacity: 0.8;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="game-panel" style="background-color: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.05);">
+                        <ui:Label text="STRATEGY TIP" class="gold-text" style="font-size: 12px; margin-bottom: 8px;" />
+                        <ui:Label text="Combine different tower types to cover each other's weaknesses. Use Weapons to boost damage and Buffs to gain tactical advantages." style="font-size: 10px; white-space: normal; line-height: 14px; opacity: 0.8;" />
+                    </ui:VisualElement>
+                 </ui:ScrollView>
+
+                 <ui:VisualElement name="content-shop-info" style="display: none; flex: 1; flex-direction: row;">
+                    <ui:ScrollView style="flex: 1; margin-right: 12px;">
+                        <ui:VisualElement name="item-list-grid" style="flex-direction: row; flex-wrap: wrap;">
+                            <!-- Dynamically generated items -->
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                    <ui:VisualElement name="detail-panel" class="game-panel" style="width: 220px; background-color: rgba(0,0,0,0.6); border-color: rgba(212,175,55,0.4);">
+                        <ui:Label text="SELECT AN ITEM" style="font-size: 10px; opacity: 0.5; -unity-text-align: middle-center; flex: 1;" />
+                    </ui:VisualElement>
+                 </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

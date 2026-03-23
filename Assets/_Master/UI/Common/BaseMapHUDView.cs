@@ -11,6 +11,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private Button _btnBackHome;
 
         [Inject] private SceneLoaderService _sceneLoader;
+        [Inject] private PopupManager _popupManager;
 
         protected override void OnSetup()
         {
@@ -25,7 +26,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         private void OnSettingsClicked()
         {
-            GameUIManager.Instance.PopupManager.ShowPopup("Settings").Forget();
+            _popupManager.ShowPopup<FDSettingsPopup>().Forget();
         }
 
         private void OnBackHomeClicked()

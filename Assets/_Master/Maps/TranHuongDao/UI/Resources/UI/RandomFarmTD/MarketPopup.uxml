@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Style src="RandomFarmStylesShared.uss" />
+    <ui:Style src="RandomFarmPopups.uss" />
+    
+    <ui:VisualElement name="overlay" class="popup-overlay">
+        <ui:VisualElement name="window" class="game-panel" style="width: 500px; height: auto; max-height: 800px; padding: 0;">
+            <!-- Header -->
+            <ui:VisualElement name="header" class="popup-header" style="padding: 0 16px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement class="dot-gold" />
+                    <ui:Label text="MARKET" class="gold-text popup-title" />
+                </ui:VisualElement>
+                <ui:Button name="btn-close" class="game-button" style="width: 32px; height: 32px; font-size: 18px; border-radius: 4px;" text="×" />
+            </ui:VisualElement>
+
+            <ui:ScrollView style="padding: 16px;">
+                <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 8px; border-bottom-width: 1px; border-color: rgba(255,255,255,0.1); padding-bottom: 4px;">
+                   <ui:Label text="COMMODITY" style="font-size: 10px; opacity: 0.5;" />
+                   <ui:Label text="PRICE" style="font-size: 10px; opacity: 0.5; margin-left: 100px;" />
+                   <ui:Label text="TREND" style="font-size: 10px; opacity: 0.5;" />
+                   <ui:Label text="ACTION" style="font-size: 10px; opacity: 0.5; width: 60px; -unity-text-align: middle-right;" />
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="market-list">
+                    <!-- Row Carrot -->
+                    <ui:VisualElement name="row-carrot" class="market-item-row">
+                        <ui:VisualElement class="icon-box icon-carrot" />
+                        <ui:Label text="CARROT" style="font-size: 12px; font-weight: bold; width: 80px;" />
+                        <ui:Label name="lbl-price-carrot" text="$120" class="gold-text" style="width: 80px; margin-left: 44px;" />
+                        <ui:Label name="lbl-trend-carrot" text="+20" class="trend-up" style="flex-grow: 1; font-size: 10px;" />
+                        <ui:Button name="btn-sell-carrot" class="game-button" style="width: 60px; font-size: 10px;" text="SELL ALL" />
+                    </ui:VisualElement>
+                    <!-- Row Pumpkin -->
+                    <ui:VisualElement name="row-pumpkin" class="market-item-row">
+                        <ui:VisualElement class="icon-box icon-pumpkin" />
+                        <ui:Label text="PUMPKIN" style="font-size: 12px; font-weight: bold; width: 80px;" />
+                        <ui:Label name="lbl-price-pumpkin" text="$130" class="gold-text" style="width: 80px; margin-left: 44px;" />
+                        <ui:Label name="lbl-trend-pumpkin" text="+30" class="trend-up" style="flex-grow: 1; font-size: 10px;" />
+                        <ui:Button name="btn-sell-pumpkin" class="game-button" style="width: 60px; font-size: 10px;" text="SELL ALL" />
+                    </ui:VisualElement>
+                    <!-- Row Grape -->
+                    <ui:VisualElement name="row-grape" class="market-item-row">
+                        <ui:VisualElement class="icon-box icon-grape" />
+                        <ui:Label text="GRAPE" style="font-size: 12px; font-weight: bold; width: 80px;" />
+                        <ui:Label name="lbl-price-grape" text="$100" class="gold-text" style="width: 80px; margin-left: 44px;" />
+                        <ui:Label name="lbl-trend-grape" text="-10" class="trend-down" style="flex-grow: 1; font-size: 10px;" />
+                        <ui:Button name="btn-sell-grape" class="game-button" style="width: 60px; font-size: 10px;" text="SELL ALL" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:Label text="MARKET TREND GRAPH" class="gold-text" style="font-size: 12px; margin-top: 24px; margin-bottom: 8px; border-bottom-width: 1px; border-color: rgba(255,255,255,0.1);" />
+                <ui:VisualElement name="chart-box" style="height: 140px; background-color: rgba(0,0,0,0.5); border-radius: 8px; border-width: 1px; border-color: rgba(255,255,255,0.05); padding: 12px;">
+                    <ui:VisualElement style="flex: 1; border-left-width: 1px; border-bottom-width: 1px; border-color: #333; margin-left: 20px; margin-bottom: 10px;" />
+                    <ui:Label text="Live market data updated every 30s" style="font-size: 8px; opacity: 0.3; -unity-text-align: middle-center;" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

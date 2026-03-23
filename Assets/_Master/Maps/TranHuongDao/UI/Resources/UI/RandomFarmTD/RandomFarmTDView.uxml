@@ -1,0 +1,72 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Style src="RandomFarmStylesShared.uss" />
+    <ui:Style src="RandomFarmTD.uss" />
+    
+    <ui:VisualElement class="hud-root" picking-mode="Ignore">
+        <!-- Top Bar -->
+        <ui:VisualElement class="res-bar">
+            <ui:VisualElement name="stat-gold" class="stat-item">
+                <ui:VisualElement class="icon-box icon-gold" />
+                <ui:Label name="lbl-gold" text="125" class="gold-text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="stat-carrot" class="stat-item">
+                <ui:VisualElement class="icon-box icon-carrot" />
+                <ui:Label name="lbl-carrot" text="15" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="stat-pumpkin" class="stat-item">
+                <ui:VisualElement class="icon-box icon-pumpkin" />
+                <ui:Label name="lbl-pumpkin" text="8" class="res-text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="stat-grape" class="stat-item">
+                <ui:VisualElement class="icon-box icon-grape" />
+                <ui:Label name="lbl-grape" text="3" class="res-text" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement style="flex-grow: 1;" />
+            
+            <ui:VisualElement style="flex-direction: column; align-items: center; margin-right: 20px;">
+                <ui:Label text="RANDOM FARM" class="gold-text" style="font-size: 16px; -unity-font-style: bold-italic;" />
+                <ui:Label text="EST. 2026" style="font-size: 8px; opacity: 0.5;" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement style="flex-grow: 1;" />
+
+            <ui:VisualElement class="stat-item stat-hp">
+                <ui:Label name="lbl-hp" text="110" class="res-text text-heart" />
+                <ui:Label text="BASE HP" style="font-size: 8px; margin-left: 4px; opacity: 0.6;" />
+            </ui:VisualElement>
+            <ui:VisualElement class="game-panel wave-panel">
+                <ui:Label name="lbl-wave" text="WAVE 13" style="font-size: 11px; font-weight: bold;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Right Menu -->
+        <ui:VisualElement class="side-menu">
+            <ui:Button name="btn-shop" class="menu-btn game-button">
+                <ui:VisualElement class="menu-btn-icon icon-gold" />
+                <ui:Label text="SHOP" class="menu-btn-text" />
+            </ui:Button>
+            <ui:Button name="btn-market" class="menu-btn game-button">
+                <ui:VisualElement class="menu-btn-icon icon-grape" />
+                <ui:Label text="MARKET" class="menu-btn-text" />
+            </ui:Button>
+            <ui:Button name="btn-farm" class="menu-btn game-button">
+                <ui:VisualElement class="menu-btn-icon icon-carrot" />
+                <ui:Label text="FARM" class="menu-btn-text" />
+            </ui:Button>
+            <ui:Button name="btn-guide" class="menu-btn game-button">
+                <ui:VisualElement class="menu-btn-icon" style="background-color: #666;" />
+                <ui:Label text="INTEL" class="menu-btn-text" />
+            </ui:Button>
+            
+            <ui:VisualElement style="height: 40px;" />
+            
+            <ui:Button name="btn-menu" class="menu-btn game-button" style="height: 48px; border-color: #444;">
+                <ui:Label text="MENU" style="font-size: 10px; opacity: 0.6;" />
+            </ui:Button>
+        </ui:VisualElement>
+
+        <!-- Card Deck -->
+        <ui:VisualElement name="card-container" class="card-container" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -9,6 +9,8 @@ using GASFarmDefense.UIToolkit.Core.Animations;
 using Abel.TranHuongDao.Core;
 using GASFarmDefense.UIToolkit.TranHuongDao;
 using Cysharp.Threading.Tasks;
+using System.Linq;
+using System.Reflection;
 
 namespace GASFarmDefense.UIToolkit.Core
 {
@@ -102,32 +104,46 @@ namespace GASFarmDefense.UIToolkit.Core
                     _resolver.Inject(popupInstance);
                     popupInstance.Initialize(config.Uxml);
                     popupInstance.UIAnimation = new UIFadeAnimation();
-                    _popupManager.RegisterPopup(config.PopupId, popupInstance);
+                    _popupManager.RegisterPopup(popupInstance.GetType().Name, popupInstance);
                 }
             }
         }
 
         private PopupBase CreatePopupInstance(MapPopupConfig config)
         {
-            // Use specific logic based on PopupId or ClassName
-            switch (config.PopupId)
+            if (string.IsNullOrEmpty(config.PopupClassName)) return null;
+
+            Type type = ResolveType(config.PopupClassName);
+
+            if (type != null && typeof(PopupBase).IsAssignableFrom(type))
             {
-                case "Settings": return new FDSettingsPopup();
-                case "Shop": return new ShopPopup();
-                case "Market": return new MarketPopup();
-                case "Farm": return new FarmPopup();
-                case "Guide": return new GuidePopup();
-                default:
-                    if (!string.IsNullOrEmpty(config.PopupClassName))
-                    {
-                        Type type = Type.GetType(config.PopupClassName);
-                        if (type != null && typeof(PopupBase).IsAssignableFrom(type))
-                        {
-                            return (PopupBase)Activator.CreateInstance(type);
-                        }
-                    }
-                    return new GuidePopup(); // Fallback
+                return (PopupBase)Activator.CreateInstance(type);
             }
+
+            Debug.LogWarning($"[MapUISetupProvider] Could not find popup class type: {config.PopupClassName}");
+            return null;
+        }
+
+        private Type ResolveType(string typeName)
+        {
+            // 1. Try direct resolution (works if assembly-qualified or already fully qualified)
+            var type = Type.GetType(typeName);
+            if (type != null) return type;
+
+            // 2. Search through all loaded assemblies (flexible approach)
+            // Cache lookup can be added if performance is an issue, but for setup once it's fine.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                // Try finding by full name (if provided as Namespace.Class)
+                type = assembly.GetType(typeName);
+                if (type != null) return type;
+
+                // Try finding by class name only (ignores namespace)
+                type = assembly.GetTypes().FirstOrDefault(t => t.Name == typeName);
+                if (type != null) return type;
+            }
+
+            return null;
         }
     }
 }

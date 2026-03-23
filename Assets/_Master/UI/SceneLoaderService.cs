@@ -45,30 +45,33 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             await UniTask.Delay(500); // Small buffer for visual comfort
 
             // 4. Hide the global Loading Screen
-            await _uiManager.ViewManager.HideCurrentView();
+            await _uiManager.ViewManager.HideView<LoadingScreenView>();
 
             Debug.Log($"[SceneLoader] Map {map.DisplayName} loaded successfully.");
         }
 
-        public async UniTask ReturnToHome(string homeSceneName = "MainScene")
+        public async UniTask ReturnToHome(string emptySceneName = "EmptyScene")
         {
             // 1. Show Loading Screen
             await _uiManager.ViewManager.SwitchView<LoadingScreenView>();
 
-            // 2. Cleanup Map UI
-            // Map UI is now handled by scene scope lifetime
-            // _uiManager.CleanupMapUI();
+            // 2. Load Empty Scene (Single mode unloads the map)
+            AsyncOperation loadOp = SceneManager.LoadSceneAsync(emptySceneName, LoadSceneMode.Single);
+            if (loadOp == null)
+            {
+                Debug.LogError($"[SceneLoader] Scene '{emptySceneName}' could not be loaded. Please ensure it is added to the Build Settings.");
+                // Fallback attempt to restore UI even if scene load fails (though highly unlikely to work if map is still there)
+            }
+            else
+            {
+                await loadOp.ToUniTask();
+            }
 
-            // 3. Load Home Scene
-
-            AsyncOperation loadOp = SceneManager.LoadSceneAsync(homeSceneName, LoadSceneMode.Single);
-            await loadOp.ToUniTask();
-
-            // 4. Restore Global UI
+            // 3. Restore Global UI
             _uiManager.SetGlobalUIActive(true);
             await _uiManager.ViewManager.SwitchView<MainMenuView>();
 
-            Debug.Log("[SceneLoader] Returned to Home.");
+            Debug.Log("[SceneLoader] Returned to Home via Empty Scene.");
         }
     }
 }

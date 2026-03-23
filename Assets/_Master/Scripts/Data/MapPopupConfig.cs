@@ -6,8 +6,7 @@ namespace Abel.TranHuongDao.Core
     [Serializable]
     public class MapPopupConfig
     {
-        public string PopupId;
         public VisualTreeAsset Uxml;
-        public string PopupClassName; // Optional: Full class name if different from default
+        public string PopupClassName; // Name of the class inheriting from PopupBase
     }
 }

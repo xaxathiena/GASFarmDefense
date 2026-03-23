@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Style src="RandomFarmStylesShared.uss" />
+    <ui:Style src="RandomFarmPopups.uss" />
+    
+    <ui:VisualElement name="overlay" class="popup-overlay">
+        <ui:VisualElement name="window" class="game-panel" style="width: 500px; height: auto; max-height: 800px; padding: 0;">
+            <!-- Header -->
+            <ui:VisualElement name="header" class="popup-header" style="padding: 0 16px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement class="dot-gold" />
+                    <ui:Label text="SHOP" class="gold-text popup-title" />
+                </ui:VisualElement>
+                <ui:Button name="btn-close" class="game-button" style="width: 32px; height: 32px; font-size: 18px; border-radius: 4px;" text="×" />
+            </ui:VisualElement>
+
+            <ui:ScrollView style="padding: 16px;">
+                <!-- Tower Pack Section -->
+                <ui:VisualElement name="tower-packs" style="flex-direction: row; justify-content: space-between; margin-bottom: 24px;">
+                    <ui:VisualElement class="game-panel" style="flex: 1; margin-right: 8px; background-color: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.05); align-items: center; padding: 12px;">
+                        <ui:VisualElement name="img-pack-1" style="width: 64px; height: 64px; background-color: #2a2a2a; border-radius: 8px; border-width: 1px; border-color: rgba(255,255,255,0.1); margin-bottom: 8px;" />
+                        <ui:Label text="TIER 1 TOWER PACK" style="font-size: 11px; font-weight: bold; text-align: center; margin-bottom: 8px;" />
+                        <ui:Button name="btn-buy-pack-1" class="game-button" style="width: 100%;" text="10 GOLD" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="game-panel" style="flex: 1; margin-left: 8px; background-color: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.05); align-items: center; padding: 12px;">
+                        <ui:VisualElement name="img-pack-5" class="icon-tier-5" style="width: 64px; height: 64px; border-radius: 8px; border-width: 1px; margin-bottom: 8px;" />
+                        <ui:Label text="TIER 5 TOWER PACK" style="font-size: 11px; font-weight: bold; text-align: center; margin-bottom: 8px;" />
+                        <ui:Button name="btn-buy-pack-5" class="game-button" style="width: 100%;" text="100 GOLD" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Weapons Section -->
+                <ui:VisualElement name="weapons-section" style="margin-bottom: 20px;">
+                    <ui:VisualElement class="border-wood" style="flex-direction: row; justify-content: space-between; align-items: center; border-bottom-width: 1px; margin-bottom: 12px; padding-bottom: 4px;">
+                        <ui:Label text="WEAPONS" class="gold-text" style="font-size: 14px; letter-spacing: 1px;" />
+                        <ui:Button name="btn-reroll-weapons" class="game-button" style="padding: 2px 10px; font-size: 10px;" text="REROLL (5G)" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="weapon-grid" style="flex-direction: row; flex-wrap: wrap; justify-content: flex-start;">
+                        <ui:VisualElement class="shop-item-icon" />
+                        <ui:VisualElement class="shop-item-icon" />
+                        <ui:VisualElement class="shop-item-icon" />
+                        <ui:VisualElement class="shop-item-icon" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Buffs Section -->
+                <ui:VisualElement name="buffs-section" style="margin-bottom: 20px;">
+                    <ui:VisualElement class="border-wood" style="flex-direction: row; justify-content: space-between; align-items: center; border-bottom-width: 1px; margin-bottom: 12px; padding-bottom: 4px;">
+                        <ui:Label text="TACTICAL BUFFS" class="gold-text" style="font-size: 14px; letter-spacing: 1px;" />
+                        <ui:Button name="btn-reroll-buffs" class="game-button" style="padding: 2px 10px; font-size: 10px;" text="REROLL (5G)" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="buff-grid" style="flex-direction: row; flex-wrap: wrap; justify-content: flex-start;">
+                        <ui:VisualElement class="shop-item-icon" />
+                        <ui:VisualElement class="shop-item-icon" />
+                        <ui:VisualElement class="shop-item-icon" />
+                        <ui:VisualElement class="shop-item-icon" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

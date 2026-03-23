@@ -112,6 +112,9 @@ namespace Abel.TranHuongDao.Core
             builder.Register<PathFollowerLogic>(Lifetime.Transient);
             builder.Register<HomingSuicideLogic>(Lifetime.Transient);
             builder.Register<PetFollowerLogic>(Lifetime.Transient);
+
+            // ── Economy & Farming ──────────────────────────────────────────────────
+            builder.RegisterEntryPoint<TDEconomyService>(Lifetime.Singleton).AsSelf();
         }
     }
 }

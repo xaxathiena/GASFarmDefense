@@ -32,6 +32,8 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         [VContainer.Inject] private SceneLoaderService _sceneLoader;
         [VContainer.Inject] private IConfigService _configService;
+        [VContainer.Inject] private ViewManager _viewManager;
+        [VContainer.Inject] private GASFarmDefense.UIToolkit.Core.UIManager _uiManager;
 
         protected override void OnSetup()
         {
@@ -132,8 +134,8 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private void OnBackClicked()
         {
             Debug.Log("Back Clicked. Returning to Main Menu...");
-            GameUIManager.Instance.SetGlobalUIActive(true);
-            GameUIManager.Instance.ViewManager.SwitchView<MainMenuView>().Forget();
+            _uiManager.SetGlobalUIActive(true);
+            _viewManager.SwitchView<MainMenuView>().Forget();
         }
 
         public override async UniTask Hide()

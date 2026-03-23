@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Style src="RandomFarmStylesShared.uss" />
+    <ui:Style src="RandomFarmPopups.uss" />
+    
+    <ui:VisualElement name="overlay" class="popup-overlay">
+        <ui:VisualElement name="window" class="game-panel" style="width: 500px; height: auto; max-height: 800px; padding: 0;">
+            <!-- Header -->
+            <ui:VisualElement name="header" class="popup-header" style="padding: 0 16px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement class="dot-gold" />
+                    <ui:Label text="FARM" class="gold-text popup-title" />
+                </ui:VisualElement>
+                <ui:Button name="btn-close" class="game-button" style="width: 32px; height: 32px; font-size: 18px; border-radius: 4px;" text="×" />
+            </ui:VisualElement>
+
+            <ui:ScrollView style="padding: 16px;">
+                <ui:VisualElement class="game-panel" style="background-color: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); flex-direction: row; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 24px;">
+                    <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement class="icon-box" style="background-color: #a0522d; border-radius: 50%;" />
+                        <ui:Label text="TOTAL SEEDS:" class="gold-text" style="font-size: 14px;" />
+                    </ui:VisualElement>
+                    <ui:Label name="lbl-seeds" text="50" class="gold-text" style="font-size: 24px;" />
+                </ui:VisualElement>
+
+                <ui:VisualElement style="flex-direction: row; justify-content: space-around; flex-wrap: wrap;">
+                    <!-- Carrot Slot -->
+                    <ui:Button name="btn-plant-carrot" class="farm-slot">
+                        <ui:Label text="CARROT" style="font-size: 10px; font-weight: bold; margin-bottom: 8px;" />
+                        <ui:VisualElement class="icon-box icon-carrot" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        <ui:Label name="lbl-growing-carrot" text="Growing: 2" style="font-size: 9px; opacity: 0.6; margin-top: 8px;" />
+                    </ui:Button>
+                    <!-- Pumpkin Slot -->
+                    <ui:Button name="btn-plant-pumpkin" class="farm-slot">
+                        <ui:Label text="PUMPKIN" style="font-size: 10px; font-weight: bold; margin-bottom: 8px;" />
+                        <ui:VisualElement class="icon-box icon-pumpkin" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        <ui:Label name="lbl-growing-pumpkin" text="Growing: 1" style="font-size: 9px; opacity: 0.6; margin-top: 8px;" />
+                    </ui:Button>
+                    <!-- Grape Slot -->
+                    <ui:Button name="btn-plant-grape" class="farm-slot">
+                        <ui:Label text="GRAPE" style="font-size: 10px; font-weight: bold; margin-bottom: 8px;" />
+                        <ui:VisualElement class="icon-box icon-grape" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        <ui:Label name="lbl-growing-grape" text="Growing: 0" style="font-size: 9px; opacity: 0.6; margin-top: 8px;" />
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <ui:Label text="NÔNG SẢN HIỆN CÓ" class="gold-text" style="font-size: 12px; margin-top: 24px; margin-bottom: 8px; border-bottom-width: 1px; border-color: rgba(255,255,255,0.1);" />
+                <ui:VisualElement name="inventory-summary" style="background-color: rgba(0,0,0,0.5); border-radius: 8px; padding: 12px;">
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+                        <ui:Label text="CARROTS:" style="font-size: 11px; opacity: 0.7;" />
+                        <ui:Label name="lbl-inv-carrot" text="15" class="gold-text" style="font-size: 11px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+                        <ui:Label text="PUMPKINS:" style="font-size: 11px; opacity: 0.7;" />
+                        <ui:Label name="lbl-inv-pumpkin" text="8" class="gold-text" style="font-size: 11px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                        <ui:Label text="GRAPES:" style="font-size: 11px; opacity: 0.7;" />
+                        <ui:Label name="lbl-inv-grape" text="3" class="gold-text" style="font-size: 11px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

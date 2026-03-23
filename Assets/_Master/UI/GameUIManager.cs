@@ -16,8 +16,6 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
     /// </summary>
     public class GameUIManager : UIManager
     {
-        public static GameUIManager Instance { get; private set; }
-
         [Header("UXML Assets")]
         [SerializeField] private VisualTreeAsset _backgroundUxml;
         [SerializeField] private VisualTreeAsset _topBarUxml;
@@ -28,15 +26,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         protected override void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
-            }
-            else { Destroy(gameObject); return; }
-
-            base.Awake(); // Sets up Root, Containers, Managers
+            base.Awake(); // Sets up Root, Containers, Managers using injected dependencies
 
             // 0. Setup Global Background
             if (_backgroundUxml != null && BackgroundContainer != null)

@@ -14,9 +14,32 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private Button _btnGuide;
         private Button _btnMenu;
 
+        private Label _lblGold;
+        private Label _lblCarrot;
+        private Label _lblPumpkin;
+        private Label _lblGrape;
+
+        [VContainer.Inject] private Abel.TranHuongDao.Core.TDEconomyService _economyService;
+        [VContainer.Inject] private Abel.TranHuongDao.Core.TowerDragDropManager _towerDragManager;
+        [VContainer.Inject] private ViewManager _viewManager;
+        [VContainer.Inject] private PopupManager _popupManager;
+        [VContainer.Inject] private GASFarmDefense.UIToolkit.Core.UIManager _uiManager;
+        [VContainer.Inject] private SceneLoaderService _sceneLoader;
+
         protected override void OnSetup()
         {
             base.OnSetup();
+
+            _lblGold = RootElement.Q<Label>("lbl-gold");
+            _lblCarrot = RootElement.Q<Label>("lbl-carrot");
+            _lblPumpkin = RootElement.Q<Label>("lbl-pumpkin");
+            _lblGrape = RootElement.Q<Label>("lbl-grape");
+
+            if (_economyService != null)
+            {
+                _economyService.OnDataChanged += RefreshResources;
+                RefreshResources();
+            }
 
             _btnShop = RootElement.Q<Button>("btn-shop");
             if (_btnShop != null) _btnShop.clicked += OnShopClicked;
@@ -36,7 +59,14 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             SetupCardItems();
         }
 
-        [VContainer.Inject] private Abel.TranHuongDao.Core.TowerDragDropManager _towerDragManager;
+        private void RefreshResources()
+        {
+            if (_economyService == null) return;
+            if (_lblGold != null) _lblGold.text = _economyService.Gold.ToString();
+            if (_lblCarrot != null) _lblCarrot.text = _economyService.Inventory["Carrot"].ToString();
+            if (_lblPumpkin != null) _lblPumpkin.text = _economyService.Inventory["Pumpkin"].ToString();
+            if (_lblGrape != null) _lblGrape.text = _economyService.Inventory["Grape"].ToString();
+        }
 
         [SerializeField] private VisualTreeAsset _cardTemplate;
         private List<TDCardItemUI> _cards = new List<TDCardItemUI>();
@@ -78,32 +108,31 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private void OnShopClicked()
         {
             Debug.Log("Open Shop Popup");
-            GameUIManager.Instance.PopupManager.ShowPopup<ShopPopup>().Forget();
+            _popupManager.ShowPopup<ShopPopup>().Forget();
         }
 
         private void OnMarketClicked()
         {
             Debug.Log("Open Market Popup");
-            GameUIManager.Instance.PopupManager.ShowPopup<MarketPopup>().Forget();
+            _popupManager.ShowPopup<MarketPopup>().Forget();
         }
 
         private void OnFarmClicked()
         {
             Debug.Log("Open Farm Popup");
-            GameUIManager.Instance.PopupManager.ShowPopup<FarmPopup>().Forget();
+            _popupManager.ShowPopup<FarmPopup>().Forget();
         }
 
         private void OnGuideClicked()
         {
             Debug.Log("Open Guide Popup");
-            GameUIManager.Instance.PopupManager.ShowPopup<GuidePopup>().Forget();
+            _popupManager.ShowPopup<GuidePopup>().Forget();
         }
 
         private void OnMenuClicked()
         {
-            Debug.Log("Return to Main Menu (Demo)");
-            GameUIManager.Instance.SetGlobalUIActive(true);
-            GameUIManager.Instance.ViewManager.SwitchView<MainMenuView>().Forget();
+            Debug.Log("Return to Main Menu... Unloading Map.");
+            _sceneLoader.ReturnToHome().Forget();
         }
     }
 }
