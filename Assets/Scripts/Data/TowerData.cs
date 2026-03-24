@@ -8,7 +8,7 @@ namespace FD.Data
     /// Pure data class cho Tower configuration
     /// Immutable, serializable, testable
     /// </summary>
-    [CreateAssetMenu(fileName = "TowerData", menuName = "FD/Tower Data", order = 1)]
+    [CreateAssetMenu(fileName = "TowerData", menuName = "Map/RandomFarmTD/Tower Data", order = 1)]
     public class TowerData : ScriptableObject
     {
         public int helloWorld;

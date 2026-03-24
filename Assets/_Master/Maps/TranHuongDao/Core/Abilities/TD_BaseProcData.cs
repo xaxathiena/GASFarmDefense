@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
@@ -37,7 +37,7 @@ namespace Abel.TranHuongDao.Core.Abilities
     /// <summary>
     /// Master Class for probabilities and conditioned effects (RNG Procs).
     /// </summary>
-    [CreateAssetMenu(menuName = "TD/Abilities/Proc Ability Data", fileName = "TD_BaseProcData")]
+    [CreateAssetMenu(menuName = "GAS/Abilities/Proc Ability Data", fileName = "TD_BaseProcData")]
     public class TD_BaseProcData : GameplayAbilityData
     {
         [Header("Trigger Conditions")]

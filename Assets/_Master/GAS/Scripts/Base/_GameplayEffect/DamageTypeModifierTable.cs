@@ -7,7 +7,7 @@ namespace FD.Ability
     /// Bảng khắc hệ cho hệ thống damage Warcraft 3.
     /// Định nghĩa damage modifier dựa trên Attack Type vs Armor Type.
     /// </summary>
-    [CreateAssetMenu(fileName = "DamageTypeTable", menuName = "FD/Damage Calculation/Damage Type Modifier Table")]
+    [CreateAssetMenu(fileName = "DamageTypeTable", menuName = "Map/RandomFarmTD/Damage Calculation/Damage Type Modifier Table")]
     public class DamageTypeModifierTable : ScriptableObject
     {
         [System.Serializable]

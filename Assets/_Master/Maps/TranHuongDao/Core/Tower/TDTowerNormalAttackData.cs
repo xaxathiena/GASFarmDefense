@@ -11,7 +11,7 @@ namespace Abel.TranHuongDao.Core
     /// by name — register that class in <see cref="FarmRandomTDLifetimeScope"/>.
     /// </summary>
     [CreateAssetMenu(fileName = "TD_TowerNormalAttack",
-                     menuName = "Abel/TranHuongDao/Tower Normal Attack")]
+                     menuName = "GAS/Abilities/Tower Normal Attack")]
     public class TDTowerNormalAttackData : GameplayAbilityData
     {
         // attackRange, damageAmount, and bulletSpeed have been removed.

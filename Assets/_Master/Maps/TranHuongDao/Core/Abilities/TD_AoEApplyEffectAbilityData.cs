@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
@@ -11,7 +11,7 @@ namespace Abel.TranHuongDao.Core.Abilities
         Both
     }
 
-    [CreateAssetMenu(fileName = "TD_AoESlowAbilityData", menuName = "GAS/Abilities/TD/AoE Apply Effect")]
+    [CreateAssetMenu(fileName = "TD_AoESlowAbilityData", menuName = "GAS/Abilities/AoE Apply Effect")]
     public class TD_AoEApplyEffectAbilityData : GameplayAbilityData
     {
         [Header("AoE Apply Effect Settings")]

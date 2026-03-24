@@ -22,7 +22,7 @@ namespace Abel.TranHuongDao.Core
     /// Global ScriptableObject database handling waves configuration for multiple maps.
     /// Derives from BaseConfigSO to natively integrate with ConfigService.
     /// </summary>
-    [CreateAssetMenu(fileName = "WavesConfig", menuName = "Abel/TranHuongDao/WavesConfig")]
+    [CreateAssetMenu(fileName = "WavesConfig", menuName = "Map/RandomFarmTD/WavesConfig")]
     public class WavesConfig : BaseConfigSO
     {
         /// <summary>List defining waves per map.</summary>

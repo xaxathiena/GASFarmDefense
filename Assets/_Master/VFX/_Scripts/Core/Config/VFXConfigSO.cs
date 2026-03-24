@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FD.Modules.VFX
 {
-    [CreateAssetMenu(fileName = "VFXConfig", menuName = "FD/Config/VFXConfig")]
+    [CreateAssetMenu(fileName = "VFXConfig", menuName = "Map/RandomFarmTD/Config/VFXConfig")]
     public class VFXConfigSO : Abel.TranHuongDao.Core.BaseConfigSO
     {
         public List<VFXConfigData> VFXList = new List<VFXConfigData>();

@@ -18,7 +18,7 @@ namespace Abel.TranHuongDao.Core
     /// Configuration for a specific map layout, including grid dimensions,
     /// obstacles, and multiple viable paths for enemies to traverse.
     /// </summary>
-    [CreateAssetMenu(fileName = "MapConfig", menuName = "Abel/TranHuongDao/MapConfig")]
+    [CreateAssetMenu(fileName = "MapConfig", menuName = "Map/RandomFarmTD/MapConfig")]
     public class MapConfigSO : BaseConfigSO
     {
         [Header("Map Identification")]

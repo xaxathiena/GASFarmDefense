@@ -9,7 +9,7 @@ namespace FD.Ability
     /// This class is kept for asset compatibility only.
     /// </summary>
     [System.Obsolete("Use GameplayAbilityData + IAbilityBehaviour pattern")]
-    [CreateAssetMenu(fileName = "FDGameplayAbility", menuName = "FD/Abilities/FD Gameplay Ability (Deprecated)")]
+    [CreateAssetMenu(fileName = "FDGameplayAbility", menuName = "Map/RandomFarmTD/Abilities/FD Gameplay Ability (Deprecated)")]
     public class FDGameplayAbility : GameplayAbilityData
     {
         [Header("FD Damage Configuration")]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Abel.TranHuongDao.Core
 {
-    [CreateAssetMenu(fileName = "UnitsConfig", menuName = "Abel/TranHuongDao/Units Config Database")]
+    [CreateAssetMenu(fileName = "UnitsConfig", menuName = "Map/RandomFarmTD/Units Config Database")]
     public class UnitsConfig : BaseConfigSO
     {
         [Header("Runtime Database")]

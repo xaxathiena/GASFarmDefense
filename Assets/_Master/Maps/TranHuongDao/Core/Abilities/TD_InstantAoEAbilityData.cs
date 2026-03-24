@@ -3,7 +3,7 @@ using GAS;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
-    [CreateAssetMenu(fileName = "TD_InstantAoEAbilityData", menuName = "GAS/Abilities/TD/Instant AoE")]
+    [CreateAssetMenu(fileName = "TD_InstantAoEAbilityData", menuName = "GAS/Abilities/Instant AoE")]
     public class TD_InstantAoEAbilityData : GameplayAbilityData
     {
         [Header("AoE Settings")]

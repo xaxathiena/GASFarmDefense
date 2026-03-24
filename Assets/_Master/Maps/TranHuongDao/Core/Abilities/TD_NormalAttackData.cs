@@ -1,5 +1,5 @@
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
@@ -7,7 +7,7 @@ namespace Abel.TranHuongDao.Core.Abilities
     /// Pure data container for Normal Attack capability.
     /// Inherits from GAS.GameplayAbilityData to support ASC registration.
     /// </summary>
-    [CreateAssetMenu(menuName = "TD/Abilities/Normal Attack Data", fileName = "TD_NormalAttackData")]
+    [CreateAssetMenu(menuName = "GAS/Abilities/Normal Attack Data", fileName = "TD_NormalAttackData")]
     public class TD_NormalAttackData : GameplayAbilityData
     {
         [Header("Normal Attack Configuration")]

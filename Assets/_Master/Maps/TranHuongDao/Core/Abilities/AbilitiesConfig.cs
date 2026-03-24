@@ -11,7 +11,7 @@ namespace Abel.TranHuongDao.Core
     ///
     /// The key used for lookup is the ability ID (ability.abilityID), which matches UnitConfig.AttackAbilityID / SkillAbilityID.
     /// </summary>
-    [CreateAssetMenu(fileName = "AbilitiesConfig", menuName = "Abel/TranHuongDao/Abilities Config Database")]
+    [CreateAssetMenu(fileName = "AbilitiesConfig", menuName = "Map/RandomFarmTD/Abilities Config Database")]
     public class AbilitiesConfig : BaseConfigSO
     {
         [Header("Ability Registry")]

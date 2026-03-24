@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -10,29 +10,29 @@ namespace Abel.TranHuongDao.Core
     {
         [Tooltip("The tag that triggers this VFX")]
         public GameplayTag tag;
-        
+
         [Tooltip("The VFX ID registered in VFXManager")]
         public string vfxID;
-        
+
         [Tooltip("Offset relative to the unit's position")]
         public Vector3 offset;
-        
+
         [Tooltip("Higher priority VFX might overlay lower ones if needed")]
         public int priority;
     }
 
-    [CreateAssetMenu(fileName = "TagVFXConfig", menuName = "GASFD/Config/Tag VFX Config")]
+    [CreateAssetMenu(fileName = "TagVFXConfig", menuName = "Map/RandomFarmTD/Tag VFX Config")]
     public class TagVFXConfig : BaseConfigSO
     {
         [SerializeField] private List<TagVFXData> vfxMappings = new List<TagVFXData>();
-        
+
         // Fast O(1) lookup dictionary
         private Dictionary<GameplayTag, TagVFXData> _vfxDict;
 
         public override void InitializeConfig()
         {
             base.InitializeConfig();
-            
+
             _vfxDict = new Dictionary<GameplayTag, TagVFXData>();
             foreach (var mapping in vfxMappings)
             {

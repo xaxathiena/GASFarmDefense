@@ -8,7 +8,7 @@ namespace FD.Data
     /// ScriptableObject wrapper cho TowerData
     /// Dùng để design towers trong Inspector
     /// </summary>
-    [CreateAssetMenu(fileName = "TowerConfig", menuName = "FD/Tower Config")]
+    [CreateAssetMenu(fileName = "TowerConfig", menuName = "Map/RandomFarmTD/Tower Config")]
     public class TowerConfigSO : ScriptableObject
     {
         [Header("Identification")]

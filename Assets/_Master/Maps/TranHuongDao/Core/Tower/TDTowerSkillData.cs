@@ -13,7 +13,7 @@ namespace Abel.TranHuongDao.Core
     /// cooldownDuration (inherited from GameplayAbilityData) controls how often the skill fires.
     /// </summary>
     [CreateAssetMenu(fileName = "TD_TowerSkill",
-                     menuName  = "Abel/TranHuongDao/Tower Skill")]
+                     menuName  = "GAS/Abilities/Tower Skill")]
     public class TDTowerSkillData : GameplayAbilityData
     {
         [Header("Skill Effect")]

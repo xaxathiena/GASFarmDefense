@@ -1,16 +1,16 @@
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
     /// <summary>
     /// Data for an ability that summons a minion.
     /// </summary>
-    [CreateAssetMenu(menuName = "TD/Abilities/Summon Ability Data", fileName = "TD_SummonAbilityData")]
+    [CreateAssetMenu(menuName = "GAS/Abilities/Summon Ability Data", fileName = "TD_SummonAbilityData")]
     public class TD_SummonAbilityData : GameplayAbilityData
     {
         [Header("Summon Configuration")]
-        [Tooltip("The ID of the unit to summon (from UnitsConfig).")]
+        [Tooltip("The ID of the unit to summon.")]
         public string unitID;
 
         [Tooltip("Optional logic override. If None, uses the unit's default LogicType.")]

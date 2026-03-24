@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Abel.TranHuongDao.Core
 {
-    [CreateAssetMenu(fileName = "MapConfig", menuName = "GASFD/Map Config")]
+    [CreateAssetMenu(fileName = "MapConfig", menuName = "Map/RandomFarmTD/Map Config")]
     public class FD_MapConfigSO : BaseConfigSO
     {
         public string MapId;

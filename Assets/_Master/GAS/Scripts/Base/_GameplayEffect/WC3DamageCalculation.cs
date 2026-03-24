@@ -11,7 +11,7 @@ namespace FD.Ability
     /// 2. Apply Type Modifier (Attack Type vs Armor Type)
     /// 3. Apply Armor Reduction
     /// </summary>
-    [CreateAssetMenu(fileName = "WC3DamageCalculation", menuName = "FD/Damage Calculation/WC3 Damage Calculation")]
+    [CreateAssetMenu(fileName = "WC3DamageCalculation", menuName = "Map/RandomFarmTD/Damage Calculation/WC3 Damage Calculation")]
     public class WC3DamageCalculation : DamageCalculationBase
     {
         [Header("Configuration")]

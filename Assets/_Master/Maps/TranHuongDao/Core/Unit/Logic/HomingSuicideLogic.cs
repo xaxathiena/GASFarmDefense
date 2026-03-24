@@ -1,5 +1,5 @@
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -39,12 +39,12 @@ namespace Abel.TranHuongDao.Core
                 else
                 {
                     // 3. Explode!
-                    Explode(minion, targetID);
+                    Explode(minion);
                 }
             }
         }
 
-        private void Explode(Minion minion, int targetID)
+        private void Explode(Minion minion)
         {
             // Trigger explosion ability if any
             if (minion.AttackAbility != null)
@@ -54,12 +54,7 @@ namespace Abel.TranHuongDao.Core
                     minion.ASC.GiveAbility(minion.AttackAbility);
                 }
 
-                bool success = minion.ASC.TryActivateAbility(minion.AttackAbility);
-                if (!success) Debug.LogWarning($"[HomingSuicideLogic] Failed to activate ability {minion.AttackAbility?.name}");
-            }
-            else
-            {
-                Debug.LogWarning($"[HomingSuicideLogic] No AttackAbility instance for {minion.UnitID}");
+                minion.ASC.TryActivateAbility(minion.AttackAbility);
             }
 
             // Self-destruct

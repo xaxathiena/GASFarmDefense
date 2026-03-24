@@ -1,12 +1,12 @@
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
     /// <summary>
     /// Data container for Multi-target attacks (Simultaneous & Sequential/Chain).
     /// </summary>
-    [CreateAssetMenu(menuName = "TD/Abilities/Multi Attack Data", fileName = "TD_MultiAttackData")]
+    [CreateAssetMenu(menuName = "GAS/Abilities/Multi Attack Data", fileName = "TD_MultiAttackData")]
     public class TD_MultiAttackData : GameplayAbilityData
     {
         [Header("Weapon Config")]

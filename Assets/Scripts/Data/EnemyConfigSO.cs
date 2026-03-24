@@ -7,7 +7,7 @@ namespace FD.Data
     /// ScriptableObject wrapper cho EnemyData
     /// Dùng để design enemies trong Inspector
     /// </summary>
-    [CreateAssetMenu(fileName = "EnemyConfig", menuName = "FD/Enemy Config")]
+    [CreateAssetMenu(fileName = "EnemyConfig", menuName = "Map/RandomFarmTD/Enemy Config")]
     public class EnemyConfigSO : ScriptableObject
     {
         [Header("Identification")]
