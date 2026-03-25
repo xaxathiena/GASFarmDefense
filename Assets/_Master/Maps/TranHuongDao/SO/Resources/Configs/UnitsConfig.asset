@@ -59,10 +59,10 @@ MonoBehaviour:
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_champion_boar
-    UnitRenderID: 
+    UnitRenderID: unit_champion_boar
     ScaleFactor: 1
     MaxHealth: 1000
-    MoveSpeed: 0.7
+    MoveSpeed: 0.4
     BaseDamage: 10
     ROF: 1
     AttackRange: 5
@@ -464,7 +464,7 @@ MonoBehaviour:
     AttackAbilityID: attack_towerbase
     SkillAbilityID: 
   - UnitID: unit_scout_tower
-    UnitRenderID: unit_rookie_king_arthur
+    UnitRenderID: unit_ultimate_morgan
     ScaleFactor: 1
     MaxHealth: 1000
     MoveSpeed: 0
@@ -476,13 +476,13 @@ MonoBehaviour:
     TargetType: 1
     BuildCost: 600
     Tier: 1
-    AttackAbilityID: attack_towerbase
-    SkillAbilityID: 
+    AttackAbilityID: TD_GoblinAttackAbility
+    SkillAbilityID: TD_GoblinFactoryAbility
   - UnitID: unit_wisdom_tower
-    UnitRenderID: unit_rookie_king_arthur
+    UnitRenderID: unit_ultimate_boar_0381
     ScaleFactor: 1
     MaxHealth: 1000
-    MoveSpeed: 0
+    MoveSpeed: 5
     BaseDamage: 17
     ROF: 1
     AttackRange: 3
@@ -491,8 +491,8 @@ MonoBehaviour:
     TargetType: 1
     BuildCost: 900
     Tier: 1
-    AttackAbilityID: single_attack_towerbase
-    SkillAbilityID: TD_MountainKingAbility
+    AttackAbilityID: TD_WisdomAttackAbility
+    SkillAbilityID: 
   - UnitID: unit_turle_tower
     UnitRenderID: unit_rookie_king_arthur
     ScaleFactor: 1

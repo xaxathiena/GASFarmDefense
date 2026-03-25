@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using FD.Modules.VFX;
+using GAS;
 using UnityEngine;
 using VContainer;
-using GAS;
-using FD.Modules.VFX;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
@@ -51,6 +52,7 @@ namespace Abel.TranHuongDao.Core.Abilities
         // Logic block executed when proc conditions are met through external game events
         private void ProcessProc(TD_BaseProcData procData, AbilitySystemComponent sourceASC, AbilitySystemComponent targetASC)
         {
+            // UnityEngine.Debug.Log($"[Ability] ProcessProc: {procData.abilityID}");
             List<AbilitySystemComponent> resolvedTargets = ResolveTargets(procData, sourceASC, targetASC);
 
             if (resolvedTargets.Count == 0) return;

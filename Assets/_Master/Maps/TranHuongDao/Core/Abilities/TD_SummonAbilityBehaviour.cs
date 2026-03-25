@@ -1,5 +1,5 @@
-using UnityEngine;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
@@ -23,18 +23,23 @@ namespace Abel.TranHuongDao.Core.Abilities
 
         public void OnActivated(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec)
         {
+            // UnityEngine.Debug.Log($"[Ability] ProcessProc: {data.abilityID}");
             var summonData = data as TD_SummonAbilityData;
             if (summonData == null) return;
 
             Vector3 basePos = asc.Position;
-            
+
+
             for (int i = 0; i < summonData.count; i++)
             {
                 // Simple radial spawning if multiple
-                Vector3 offset = summonData.count > 1 
-                    ? Quaternion.Euler(0, (360f / summonData.count) * i, 0) * summonData.spawnOffset 
+                Vector3 offset = summonData.count > 1
+
+                    ? Quaternion.Euler(0, (360f / summonData.count) * i, 0) * summonData.spawnOffset
+
                     : summonData.spawnOffset;
-                
+
+
                 Vector3 spawnPos = basePos + offset;
                 _minionManager.SpawnMinion(summonData.unitID, spawnPos, summonData.overrideLogic);
             }

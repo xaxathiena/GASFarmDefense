@@ -1,7 +1,7 @@
 using System;
-using UnityEngine;
-using GAS;
 using Abel.TranHuongDao.Core.VFX;
+using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -13,8 +13,9 @@ namespace Abel.TranHuongDao.Core
     {
         public int InstanceID { get; private set; }
         public string UnitID { get; private set; }
-        
+
         // --- IGASAvatar Implementation ---
+
         public Vector3 Position { get; set; }
         public Vector3 Scale => Vector3.one;
         public bool IsValid => true;
@@ -25,8 +26,9 @@ namespace Abel.TranHuongDao.Core
         public AbilitySystemComponent ASC { get; }
         public UnitAttributeSet AttributeSet { get; } = new UnitAttributeSet();
         public UnitConfig Config { get; private set; }
-        
+
         // The resolved ability definition from config
+
         public GameplayAbilityData AttackAbility { get; private set; }
 
         private readonly IUnitLogic _logic;
@@ -77,9 +79,10 @@ namespace Abel.TranHuongDao.Core
             }
 
             // Render & VFX
-            renderService.RenderUnit(UnitID, InstanceID, Position, Rotation);
+            renderService.RenderUnit(config.UnitRenderID, InstanceID, Position, Rotation);
             _renderInitialized = true;
-            
+
+
             _vfxController = new StatusEffectVFXController(instanceID, () => Position, eventBus, vfxManager, vfxConfig);
 
             _logic?.OnEnter(this);
@@ -91,8 +94,9 @@ namespace Abel.TranHuongDao.Core
             _logic?.Tick(this, dt);
 
             if (_renderInitialized)
-                _renderService.UpdateRender(UnitID, InstanceID, Position, Rotation);
-            
+                _renderService.UpdateRender(Config.UnitRenderID, InstanceID, Position, Rotation);
+
+
             _vfxController?.Tick(dt);
         }
 
@@ -107,7 +111,7 @@ namespace Abel.TranHuongDao.Core
         {
             if (_renderInitialized)
             {
-                _renderService.RemoveRender(UnitID, InstanceID);
+                _renderService.RemoveRender(Config.UnitRenderID, InstanceID);
                 _renderInitialized = false;
             }
             _vfxController?.Dispose();
