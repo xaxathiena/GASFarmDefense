@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcc03542f436a4747ab3baf837d8b96a, type: 3}
-  m_Name: TD_GoblinSaipaAttackAbility
+  m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
+  m_Name: TD_IceCrownSkillAbility
   m_EditorClassIdentifier: 
-  abilityID: ga_goblin_saipa_attack
-  abilityName: 
+  abilityID: TD_IceCrownSkillAbility
+  abilityName: TD_IceCrownSkillAbility
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -53,10 +53,14 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  trailID: 
-  trailVfxID: bullet_vfx_new_6
-  hitVfxID: hit_vfx_new_5
-  attackRange: 5
-  bulletSpeed: 10
-  hitEffect: {fileID: 11400000, guid: bea9fc25ee498334fbf77fe19e8591e5, type: 2}
-  baseDamage: 10
+  triggerType: 1
+  chance: 10
+  countThreshold: 3
+  executionTarget: 1
+  abilityToTrigger: {fileID: 11400000, guid: b4ebb8e47f00c9742bb5561827c3e515, type: 2}
+  targetSelection: 0
+  targetType: 0
+  targetCount: 1
+  effectsToApply: []
+  flatDamage: 0
+  hitVfxID: 

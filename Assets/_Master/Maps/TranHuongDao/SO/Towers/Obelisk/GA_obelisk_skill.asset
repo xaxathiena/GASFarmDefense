@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcc03542f436a4747ab3baf837d8b96a, type: 3}
-  m_Name: TD_GoblinSaipaAttackAbility
+  m_Script: {fileID: 11500000, guid: 2b3749ca2cc654ecca765ef9f247be0a, type: 3}
+  m_Name: GA_obelisk_skill
   m_EditorClassIdentifier: 
-  abilityID: ga_goblin_saipa_attack
-  abilityName: 
-  description: 
+  abilityID: ga_obelisk_skill
+  abilityName: ga_obelisk_skill
+  description: "C\xF3 kh\u1EA3 n\u0103ng l\xE0m ch\u1EADm 12% t\u1ED1c \u0111\u1ED9
+    di chuy\u1EC3n c\u1EE7a \u0111\u1ECBch trong ph\u1EA1m vi 800"
   icon: {fileID: 0}
-  activationPolicy: 0
+  activationPolicy: 1
   cooldownDuration: 0
   costAmount:
     scalingMode: 0
@@ -49,14 +50,13 @@ MonoBehaviour:
     csvColumn: 
     previewLevel: 1
     attributeType: 0
-  endPolicy: 0
-  abilityTags: 
+  endPolicy: 1
+  abilityTags: 20
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  trailID: 
-  trailVfxID: bullet_vfx_new_6
-  hitVfxID: hit_vfx_new_5
-  attackRange: 5
-  bulletSpeed: 10
-  hitEffect: {fileID: 11400000, guid: bea9fc25ee498334fbf77fe19e8591e5, type: 2}
-  baseDamage: 10
+  targetType: 1
+  captureRadius: 5
+  auraUpdateRate: 0.2
+  effectsToApply:
+  - {fileID: 11400000, guid: c94b78220732e644689326d4710cef28, type: 2}
+  castVfxPrefab: {fileID: 0}

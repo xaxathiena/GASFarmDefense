@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcc03542f436a4747ab3baf837d8b96a, type: 3}
-  m_Name: TD_GoblinSaipaAttackAbility
+  m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
+  m_Name: GA_oak_jugunet_proc
   m_EditorClassIdentifier: 
-  abilityID: ga_goblin_saipa_attack
-  abilityName: 
+  abilityID: ga_oak_jugunet_proc
+  abilityName: ga_oak_jugunet_proc
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -53,10 +53,15 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  trailID: 
-  trailVfxID: bullet_vfx_new_6
-  hitVfxID: hit_vfx_new_5
-  attackRange: 5
-  bulletSpeed: 10
-  hitEffect: {fileID: 11400000, guid: bea9fc25ee498334fbf77fe19e8591e5, type: 2}
-  baseDamage: 10
+  triggerType: 1
+  chance: 5
+  countThreshold: 3
+  executionTarget: 1
+  abilityToTrigger: {fileID: 0}
+  targetSelection: 0
+  targetType: 0
+  targetCount: 1
+  effectsToApply:
+  - {fileID: 11400000, guid: ddb30281be4c35e4786067e4e5eabbdc, type: 2}
+  flatDamage: 50
+  hitVfxID: 

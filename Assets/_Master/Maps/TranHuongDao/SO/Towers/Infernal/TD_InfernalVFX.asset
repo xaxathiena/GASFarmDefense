@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcc03542f436a4747ab3baf837d8b96a, type: 3}
-  m_Name: TD_GoblinSaipaAttackAbility
+  m_Script: {fileID: 11500000, guid: e97783adc0a699e4c894a09a4aa65400, type: 3}
+  m_Name: TD_InfernalVFX
   m_EditorClassIdentifier: 
-  abilityID: ga_goblin_saipa_attack
-  abilityName: 
+  abilityID: TD_InfernalVFX
+  abilityName: TD_InfernalVFX
   description: 
   icon: {fileID: 0}
-  activationPolicy: 0
+  activationPolicy: 1
   cooldownDuration: 0
   costAmount:
     scalingMode: 0
@@ -49,14 +49,14 @@ MonoBehaviour:
     csvColumn: 
     previewLevel: 1
     attributeType: 0
-  endPolicy: 0
+  endPolicy: 1
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  trailID: 
-  trailVfxID: bullet_vfx_new_6
-  hitVfxID: hit_vfx_new_5
-  attackRange: 5
-  bulletSpeed: 10
-  hitEffect: {fileID: 11400000, guid: bea9fc25ee498334fbf77fe19e8591e5, type: 2}
-  baseDamage: 10
+  radius: 5
+  tickInterval: 1
+  auraEffect: {fileID: 11400000, guid: 99922ee2688202443a53580a2889826c, type: 2}
+  vfxID: TD_InfernalVFX
+  vfxInterval: -1
+  vfxLifeTime: -1
+  auraDuration: 5.1
