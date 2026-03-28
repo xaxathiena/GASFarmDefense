@@ -19,1499 +19,411 @@ MonoBehaviour:
   - weapon_
   - Enemy
   units:
-  - unitID: unit_frog_tower
-    maxCapacity: 1000
+  - unitID: unit_Rookie_Egg_0013
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 1e9be1b8984e68d4cbab1894250f6075, type: 2}
+    animData: {fileID: 11400000, guid: 6a2df424dc5f6d94b9adaff65dfd8932, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_horse_tower
-    maxCapacity: 1000
+  - unitID: unit_rookiemagician0084
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 0265b6609a3d2a341a37e536875e6861, type: 2}
+    animData: {fileID: 11400000, guid: c67f6ccd81158a74aa3afd41736d99bc, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_murlock_tower
-    maxCapacity: 1000
+  - unitID: unit_rookie_plant_0073
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 08647c071c4dc714b8120003e7e934c4, type: 2}
+    animData: {fileID: 11400000, guid: 19db46097e2dfc64ca5fce980c7a1678, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_golin_tower
-    maxCapacity: 1000
+  - unitID: unit_rookie_boxcat_0417
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 2713ace128ee37d4bb6256d71eb8759a, type: 2}
+    animData: {fileID: 11400000, guid: d3103da2b4749464eb0452ad225fdd3d, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_scout_tower
-    maxCapacity: 1000
+  - unitID: unit_champion_manekineko_0312
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMaterial: {fileID: 2100000, guid: beb975198b19997459b56edc2195ddb4, type: 2}
+    animData: {fileID: 11400000, guid: fc77a8e9457d53f499cc3974516d6f68, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_wisdom_tower
-    maxCapacity: 1000
+  - unitID: unit_rookie_ninja_04light
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
+    baseMaterial: {fileID: 2100000, guid: ba4b88545b69e4949a22591e30e611d7, type: 2}
+    animData: {fileID: 11400000, guid: 894744033ed12db48b5f4a28da0fb7df, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_turle_tower
-    maxCapacity: 1000
+  - unitID: unit_champion_plant_0080
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_radar_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_chiken_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_siren
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_saipa
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dryad
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_crab
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_windrider
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_flying_sheep
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_royal_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_zepplin
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_canon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_huntress
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_owl
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_demolisher
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_cow
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_hydra
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_blaster
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_obelisk
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_mountain_giant
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_sentinel
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_oak_jugunet
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_pig
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_coreta
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_factory
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_magic_castle
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_chimera
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_stone
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_daemon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dimension
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_ice_crown
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_black_citadel
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_azshara
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_fascia
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_doom_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dread_lord
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_malfurion
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_alchemist
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_prison_wagon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_infernal
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_holy_azhzra
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_hell_fire
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_anthony_das
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_world_tree
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_avatar_benence
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_arthas
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_mountain_king
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_frog_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_horse_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_murlock_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_golin_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_scout_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_wisdom_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_turle_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_radar_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_chiken_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_siren
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_saipa
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dryad
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_crab
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_windrider
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_flying_sheep
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_royal_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_zepplin
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_canon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_huntress
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_owl
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_demolisher
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_cow
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_hydra
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_blaster
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_obelisk
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_mountain_giant
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_sentinel
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_oak_jugunet
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_pig
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_coreta
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_factory
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_magic_castle
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_chimera
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_stone
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_daemon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dimension
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_ice_crown
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_black_citadel
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_azshara
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_fascia
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_doom_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dread_lord
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_malfurion
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_alchemist
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_prison_wagon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_infernal
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_holy_azhzra
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_hell_fire
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_anthony_das
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_world_tree
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_avatar_benence
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_arthas
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_mountain_king
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_frog_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_grunt_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_horse_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_murlock_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_golin_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_scout_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_wisdom_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_turle_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_radar_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_chiken_tower
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_siren
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_saipa
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dryad
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_crab
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_windrider
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_flying_sheep
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_royal_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_zepplin
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_canon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_huntress
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_owl
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_demolisher
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_cow
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_hydra
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_blaster
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_obelisk
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_mountain_giant
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_sentinel
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_oak_jugunet
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_pig
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_coreta
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_goblin_factory
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_magic_castle
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_chimera
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_stone
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_daemon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dimension
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_ice_crown
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_black_citadel
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_azshara
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_fascia
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_doom_guard
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_dread_lord
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_malfurion
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_alchemist
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_prison_wagon
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_infernal
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_holy_azhzra
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_hell_fire
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_anthony_das
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_world_tree
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_avatar_benence
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_arthas
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_mountain_king
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_championgalahad
-    maxCapacity: 10000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: a99cded1462b4c646b36d020b4257ecc, type: 2}
-    animData: {fileID: 11400000, guid: 9de97d90ac5ad344cb039786f03a2574, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_rookie_king_arthur
-    maxCapacity: 500
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: Enemyrookie_king_arthur
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 254fe4e265997b741b550468acaa51da, type: 2}
-    animData: {fileID: 11400000, guid: 4d504b1306611ad4282fac9cf34c6dfa, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_champion_boar
-    maxCapacity: 10000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 94f9f14d71f600645b0d848e6e3f75db, type: 2}
-    animData: {fileID: 11400000, guid: 572def7995f841641aa32b47a52e082c, type: 2}
-    baseMoveSpeed: 1
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: bullet_normal
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: a2673828acfc64c78b623b1c2095ff63, type: 2}
-    animData: {fileID: 11400000, guid: 3b6da8f1d2d98444693c05a2764119cd, type: 2}
-    baseMoveSpeed: 10
-    baseAttackSpeed: 1
-    showHealthBar: 0
-  - unitID: unit_champion_shank_0057
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: f1ac421a212d30b408f4b804f2c47d37, type: 2}
-    animData: {fileID: 11400000, guid: 0468265291407994499fbb065215d221, type: 2}
+    baseMaterial: {fileID: 2100000, guid: c89805a477d5c884887ca710b94cfd93, type: 2}
+    animData: {fileID: 11400000, guid: 3b3f835861da67e4f9eddd477770276a, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
   - unitID: unit_champion_shank_0056
-    maxCapacity: 1000
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 54a079e8bbc3e584c9c7095f2b1a4644, type: 2}
     animData: {fileID: 11400000, guid: a0cd745db99ff174588bc633f5b017a7, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_shank_0058
-    maxCapacity: 1000
+  - unitID: unit_champion_egg_0018
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 9b9256a5e8e206341826178a2b7b65fe, type: 2}
-    animData: {fileID: 11400000, guid: b7ba62a35505a524ea740b3820b73e02, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 05cc58eebdb32f2478af09352bdd8721, type: 2}
+    animData: {fileID: 11400000, guid: 8e33c998fccd15143a540fc186c9d232, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_sten_0006_
-    maxCapacity: 1000
+  - unitID: unit_ultimate_manekineko_0313
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 08d9852fda5b32d4aa91391a15a4739d, type: 2}
-    animData: {fileID: 11400000, guid: a5b11277307df7e4fb856755595a3075, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 33e0297a4799d0741b4f72e18c4c50fa, type: 2}
+    animData: {fileID: 11400000, guid: 596bc1d9b994cb340bbaee1f51efee5d, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_sten_0007
-    maxCapacity: 1000
+  - unitID: unit_champion_boxcat_0416
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 39107af391a6f1b4ebf9b252e67d3e35, type: 2}
-    animData: {fileID: 11400000, guid: 20e50199dbf0ecf4c90651a5e040e646, type: 2}
+    baseMaterial: {fileID: 2100000, guid: a228bbc85dd506b44b8d197276b50cdc, type: 2}
+    animData: {fileID: 11400000, guid: 8c63f2f65ffaa7d48a5cb818bb383134, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_sten_0008_
-    maxCapacity: 1000
+  - unitID: unit_rookie_magician_0082
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: cd323061931c9554ea939f648f92814f, type: 2}
-    animData: {fileID: 11400000, guid: 8b87121bb7103fe4385bc008201882b5, type: 2}
+    baseMaterial: {fileID: 2100000, guid: fdaddecda24814c46b59536d97996031, type: 2}
+    animData: {fileID: 11400000, guid: c05ae8af5db9219408d6ef18f14f7220, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_sten_0009
-    maxCapacity: 1000
+  - unitID: unit_rookie_ninja_05dark
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 335392eb96433064db5ef6bc0918fd24, type: 2}
-    animData: {fileID: 11400000, guid: 50f76c4245e064f4f80526efa6976f69, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 933e66c1ad9e824419aa14e555f2c235, type: 2}
+    animData: {fileID: 11400000, guid: 9079ca5f72c30de4597853ee57134ade, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_sten_0010_
-    maxCapacity: 1000
+  - unitID: unit_champion_ninja_02fire
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 73129e55d65e7904a998527e6a58a6f0, type: 2}
-    animData: {fileID: 11400000, guid: 06b3c3486362abe46ad1f133e1a88450, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 3b2caee25c5a0cd4eb38f6386c770c4d, type: 2}
+    animData: {fileID: 11400000, guid: b134937d6d9c3c748abfb3efc377c229, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_igraine
-    maxCapacity: 1000
+  - unitID: unit_champion_ninja_04light
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 990db3befa4b5b14998d0c23804a2dfb, type: 2}
-    animData: {fileID: 11400000, guid: d0a6063ae2aa82a4eafa6027d6420f0a, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 3a461e39e65aa854ba8b05380bc20182, type: 2}
+    animData: {fileID: 11400000, guid: bb170a86867529247975b819ebb2176f, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_rookie_ganieda
-    maxCapacity: 1000
+  - unitID: unit_champion_magician_0090
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 91dfe0c5a7b647146b93da9f3ee2a5a1, type: 2}
-    animData: {fileID: 11400000, guid: e91cccd248cea8744a74739567972ed1, type: 2}
+    baseMaterial: {fileID: 2100000, guid: d6a9630e24c980a4eb28e7843a801a50, type: 2}
+    animData: {fileID: 11400000, guid: d81b211b4374d244596b6cf07cf0f922, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_rookie_vivian
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 88dc50ae3d541c344ac866f35828b55e, type: 2}
+    animData: {fileID: 11400000, guid: 08f846fda7eb1534dbedfc01c8724b7a, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_ninja_03wood
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 8c7dd065de01ed0419076d029e823136, type: 2}
+    animData: {fileID: 11400000, guid: 39815d63c5a7d7c4e87c31b2488a8c19, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_manekineko_0307
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: aa68ef56c404c344bbb50a9b6cf07e16, type: 2}
+    animData: {fileID: 11400000, guid: 1eb493c1376bd724681136087a872d07, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_flaskbean
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 64048f95106b5834facacd2ceff068a1, type: 2}
+    animData: {fileID: 11400000, guid: 99f665ba7e8577246aebe3ec8035a413, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
   - unitID: unit_rookie_guinevere
-    maxCapacity: 1000
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 0fe2ccb99b2c48b4a863b670ceb77d46, type: 2}
     animData: {fileID: 11400000, guid: 35d4426c60f83494b99619059860a9ad, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_ultimate_ganieda
+  - unitID: 'unit_rookie_mordred '
     maxCapacity: 1000
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: c86ed3dd28db18c4382e26a957688157, type: 2}
-    animData: {fileID: 11400000, guid: fc834dc18a181804fb0750feb85351df, type: 2}
+    baseMaterial: {fileID: 2100000, guid: e8e2a6b0bbd3e2044b7e532cfc1247e0, type: 2}
+    animData: {fileID: 11400000, guid: bf31acc118032fc47a17b7a592b55110, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_ultimate_guinevere
+  - unitID: unit_ultimate_plant_0399
     maxCapacity: 1000
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 0c6ee636b841af54dbd5bc960a81394b, type: 2}
-    animData: {fileID: 11400000, guid: e974bd747999a984981a2f65cd7e1355, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 586de44f190baa44199da67967583ae0, type: 2}
+    animData: {fileID: 11400000, guid: f45317664ab46734689910945639e1e8, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_flyingegg_0370
+    maxCapacity: 1000
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: c43108764d8d40c42b666aa2c69a708f, type: 2}
+    animData: {fileID: 11400000, guid: 6b24c0eb03e30e3498c16bb5d7e8e217, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_rookie_morgan
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 3991e730cbe330b4580f78e02e8f613a, type: 2}
+    animData: {fileID: 11400000, guid: 52f0f9f62a3b35846b8825c87847f5aa, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_champion_ganieda
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: bb3bdd779c211a64cb431abc58da43a7, type: 2}
+    animData: {fileID: 11400000, guid: 1bcaf5515e6362045ad9e04a0f981d97, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_champion_apollon
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: c526370588ef03440be10e2fe352be74, type: 2}
+    animData: {fileID: 11400000, guid: 8f9700e7b68b3ef4ab9844e21754fead, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_champion_athena
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: b357ecd9c8ff6314fab2406b40b09464, type: 2}
+    animData: {fileID: 11400000, guid: 4c461c3de9b63674aa8d56021ac9ee56, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_champion_igraine
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 990db3befa4b5b14998d0c23804a2dfb, type: 2}
+    animData: {fileID: 11400000, guid: d0a6063ae2aa82a4eafa6027d6420f0a, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_champion_merlin
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 492f568f0a9415a4cac7a96c10ccc43f, type: 2}
+    animData: {fileID: 11400000, guid: 254901e7ad82f8143aa6236e63966f79, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_champion_lancelot
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: d7e81b45c5d627c4090516fe89f46ae2, type: 2}
+    animData: {fileID: 11400000, guid: f2e43aacc89de8e479e70f01ade8da42, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate poseidon
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 0c16bd6e8c0e36e42bcc5e4a3b7dd507, type: 2}
+    animData: {fileID: 11400000, guid: 5e2ccb9732d4251418d451be8a7aeb09, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_dionysos
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: d4cd7125cdfd221439cb66f327958eaa, type: 2}
+    animData: {fileID: 11400000, guid: 6734900f19bb815478a60b71bd74f538, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
   - unitID: unit_ultimate_vivian
-    maxCapacity: 1000
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: dc17dc09d1999b44bbbdd270974fd94c, type: 2}
     animData: {fileID: 11400000, guid: af8ac08c272e51744af3e33ca4a7cc1c, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_ultimate_ragnel
-    maxCapacity: 1000
+  - unitID: unit_ultimate_athena
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: ac343f989876ad84b879a4669569fc3b, type: 2}
-    animData: {fileID: 11400000, guid: aa0393add664d2a48941923b8abad247, type: 2}
+    baseMaterial: {fileID: 2100000, guid: a76f66c0096d7744194e12b38091ec47, type: 2}
+    animData: {fileID: 11400000, guid: a67181e82279312498d40c9338d04e83, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_artemis
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 7df597b836da3894cae28b5777ae3570, type: 2}
+    animData: {fileID: 11400000, guid: 27c80f4bb81a5ea40aeff2aca95316dd, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_apollon
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 86b19021a2ee53c489c578685344910a, type: 2}
+    animData: {fileID: 11400000, guid: 1c98c7e3b367a8e4698d906363ce36f0, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: 'unit_ultimate_aphrodite '
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 03662461311e2cc42b0e95e08e84bc72, type: 2}
+    animData: {fileID: 11400000, guid: 6f53ea37682d4b143906ad41637856a2, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_hephaistos
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 512954007c9f37b49a35a98b0698fceb, type: 2}
+    animData: {fileID: 11400000, guid: 8460a6e152ea32d45915cb4bc88df23e, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_hermes
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: f9eddd99a0c6e99419e75f54c6e984da, type: 2}
+    animData: {fileID: 11400000, guid: 4ec6fabb02c700040b91a30cf449d292, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_mordred
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 3169408669df2284883212a7b707654f, type: 2}
+    animData: {fileID: 11400000, guid: f30b80e518bce76499eba95f7414a9a1, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_leah
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 891c9aa48b31abb4eba55b14a2051dcf, type: 2}
+    animData: {fileID: 11400000, guid: cdc72af656f9ab843b8607372b2c36bb, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_demeter
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 6c775f623dabc8f4c8fe93630bae3e97, type: 2}
+    animData: {fileID: 11400000, guid: 1b40039da03b62a4fb0329a83855f7e2, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_galahad
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 1aa33dce1c00d1444b0b8ab856235240, type: 2}
+    animData: {fileID: 11400000, guid: bfb05d5fa49ec9c46b78cb5ca6e09ba6, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: 'unit_ultimate_ares '
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: cb06075c22fbe8f4e9106b8c14fd18cd, type: 2}
+    animData: {fileID: 11400000, guid: 5f7ed7df14b6e6b4da205155b671d87c, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_igraine
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: cf573bab0871e654c90582d17226fc29, type: 2}
+    animData: {fileID: 11400000, guid: 07a814021aa1bde43b7788163704c017, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_kronos
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 8cded15d8b2e82d48b271d0aae5050d5, type: 2}
+    animData: {fileID: 11400000, guid: 4e1338f5e449fa741ba1be0de6f8d7c0, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_ultimate_earth_dragon
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: bcae876f2b3be114a90cf7a66e66882b, type: 2}
+    animData: {fileID: 11400000, guid: ae7b500c68b2b4545ab191272a76299c, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
   - unitID: unit_ultimate_morgan
-    maxCapacity: 1000
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 11dcb9a7f8f83474dad41aa8ad3e9efa, type: 2}
     animData: {fileID: 11400000, guid: bc21ce8019b6e5645810012ba9c2c65e, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_guinevere
-    maxCapacity: 1000
+  - unitID: unit_ultimate merlin
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 2e1831c53707d3443bf8732fc39f692a, type: 2}
-    animData: {fileID: 11400000, guid: 1dc9efbb6aa5d104ebf5133939d56225, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 5f4b250cb6ba54a48a232ad96cfe633f, type: 2}
+    animData: {fileID: 11400000, guid: 68d53df5a86961d46b406749ab8810ac, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_champion_vivian
-    maxCapacity: 1000
+  - unitID: unit_ultimate_king_arthur
+    maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: c74332ca8a4847340bbb08e6cb12d525, type: 2}
-    animData: {fileID: 11400000, guid: 627bcc0575f87b84f93d0783bc67c90d, type: 2}
-    baseMoveSpeed: 5
-    baseAttackSpeed: 1
-    showHealthBar: 1
-  - unitID: unit_ultimate_boar_0381
-    maxCapacity: 1000
-    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-    baseMaterial: {fileID: 2100000, guid: 5605a3c4288bc6545b62f09ceaf1e925, type: 2}
-    animData: {fileID: 11400000, guid: 65eee56a9c6d55843841dc29fac359d9, type: 2}
+    baseMaterial: {fileID: 2100000, guid: 26ddf0d1f8deacb41bb1fdf23c885cdf, type: 2}
+    animData: {fileID: 11400000, guid: 26ab1028193b99448b965e1ede7661ec, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
