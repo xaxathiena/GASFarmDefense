@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using FD.Ability;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -101,9 +102,13 @@ namespace Abel.TranHuongDao.Core
 
         /// <summary>Gold cost to place this unit.</summary>
         public int BuildCost;
+        public int Armor;
 
         /// <summary>Upgrade tier: 1 = base form, higher values = upgraded forms.</summary>
         public int Tier;
+
+        /// <summary>Armor category for resistance calculation.</summary>
+        public EArmorType ArmorType;
 
         // ── Ability IDs ─────────────────────────────────────────────────────────
 
@@ -131,8 +136,10 @@ namespace Abel.TranHuongDao.Core
             float projectileSpeed,
             AttackType attackType,
             TargetType targetType,
+            int armor,
             int buildCost,
             int tier,
+            EArmorType armorType,
             string attackAbilityID = "",
             string skillAbilityID = "",
             string unitRenderID = "",
@@ -150,7 +157,9 @@ namespace Abel.TranHuongDao.Core
             AttackType = attackType;
             TargetType = targetType;
             BuildCost = buildCost;
+            Armor = armor;
             Tier = tier;
+            ArmorType = armorType;
             AttackAbilityID = attackAbilityID;
             SkillAbilityID = skillAbilityID;
             _pad0 = 0;

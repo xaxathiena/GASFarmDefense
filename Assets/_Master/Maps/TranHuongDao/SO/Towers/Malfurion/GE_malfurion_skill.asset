@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13ff7eafa15209349a4ced771f94c260, type: 3}
-  m_Name: GE_coreta_skill_proc
+  m_Name: GE_malfurion_skill
   m_EditorClassIdentifier: 
-  effectName: GE_coreta_skill_proc
+  effectName: TD_MalfurionEffect
   description: 
   icon: {fileID: 0}
   durationType: 0
-  durationMagnitude: 2.5
+  durationMagnitude: 0.5
   isPeriodic: 0
   period: 1
   modifiers:
@@ -26,7 +26,7 @@ MonoBehaviour:
     calculationType: 0
     scalableMagnitude:
       scalingMode: 0
-      flatValue: -400
+      flatValue: -450
       scalingCurve:
         serializedVersion: 2
         m_Curve: []

@@ -187,7 +187,7 @@ MonoBehaviour:
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: 'unit_rookie_mordred '
+  - unitID: unit_rookie_mordred
     maxCapacity: 1000
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: e8e2a6b0bbd3e2044b7e532cfc1247e0, type: 2}
@@ -267,7 +267,7 @@ MonoBehaviour:
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_ultimate poseidon
+  - unitID: unit_ultimate_poseidon
     maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 0c16bd6e8c0e36e42bcc5e4a3b7dd507, type: 2}
@@ -315,7 +315,7 @@ MonoBehaviour:
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: 'unit_ultimate_aphrodite '
+  - unitID: unit_ultimate_aphrodite
     maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 03662461311e2cc42b0e95e08e84bc72, type: 2}
@@ -371,7 +371,7 @@ MonoBehaviour:
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: 'unit_ultimate_ares '
+  - unitID: unit_ultimate_ares
     maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: cb06075c22fbe8f4e9106b8c14fd18cd, type: 2}
@@ -411,7 +411,7 @@ MonoBehaviour:
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1
-  - unitID: unit_ultimate merlin
+  - unitID: unit_ultimate_merlin
     maxCapacity: 50
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 5f4b250cb6ba54a48a232ad96cfe633f, type: 2}
@@ -424,6 +424,14 @@ MonoBehaviour:
     mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
     baseMaterial: {fileID: 2100000, guid: 26ddf0d1f8deacb41bb1fdf23c885cdf, type: 2}
     animData: {fileID: 11400000, guid: 26ab1028193b99448b965e1ede7661ec, type: 2}
+    baseMoveSpeed: 5
+    baseAttackSpeed: 1
+    showHealthBar: 1
+  - unitID: unit_rookie_shank
+    maxCapacity: 50
+    mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+    baseMaterial: {fileID: 2100000, guid: 02dec668975945b47b469dbf38f2b363, type: 2}
+    animData: {fileID: 11400000, guid: 41e12c9d81d06cc48a9a502c4462c6ac, type: 2}
     baseMoveSpeed: 5
     baseAttackSpeed: 1
     showHealthBar: 1

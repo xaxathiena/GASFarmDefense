@@ -7,6 +7,7 @@ using Abel.TranHuongDao.Core;
 using System.IO;
 using System;
 using System.Globalization;
+using FD.Ability;
 
 namespace Abel.TranHuongDao.EditorTools
 {
@@ -126,9 +127,14 @@ namespace Abel.TranHuongDao.EditorTools
 
                 GUILayout.FlexibleSpace();
 
-                if (GUILayout.Button("Import from CSV", EditorStyles.toolbarButton, GUILayout.Width(120)))
+                if (GUILayout.Button("Import CSV", EditorStyles.toolbarButton, GUILayout.Width(80)))
                 {
                     ImportCSV();
+                }
+
+                if (GUILayout.Button("Export CSV", EditorStyles.toolbarButton, GUILayout.Width(80)))
+                {
+                    ExportCSV();
                 }
 
                 if (GUILayout.Button("Force Refresh", EditorStyles.toolbarButton, GUILayout.Width(100)))
@@ -540,32 +546,81 @@ namespace Abel.TranHuongDao.EditorTools
 
                 _config.unitEntries.Clear();
 
+                // Header mapping
+                var headerMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                if (lines.Length > 0)
+                {
+                    string[] headers = lines[0].Split(new[] { ',', '\t' });
+                    for (int j = 0; j < headers.Length; j++)
+                    {
+                        string h = headers[j].Trim().Replace(" ", "").ToLower();
+                        if (!headerMap.ContainsKey(h)) headerMap[h] = j;
+                    }
+                }
+
+                // Helper to get value securely
+                string GetVal(string[] cols, string headerName)
+                {
+                    string cleanHeader = headerName.Replace(" ", "").ToLower();
+                    if (headerMap.TryGetValue(cleanHeader, out int index) && index < cols.Length)
+                        return cols[index].Trim();
+                    return "";
+                }
+
                 int importedCount = 0;
                 for (int i = 1; i < lines.Length; i++)
                 {
                     string line = lines[i];
                     if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    string[] cols = line.Split(',');
-                    if (cols.Length < 11) continue;
+                    string[] cols = line.Split(new[] { ',', '\t' });
+                    if (cols.Length < 5) continue; // Min valid check
 
-                    string id = cols[0];
-                    float maxHp = float.Parse(cols[1], CultureInfo.InvariantCulture);
-                    float moveSpd = float.Parse(cols[2], CultureInfo.InvariantCulture);
-                    float baseDmg = float.Parse(cols[3], CultureInfo.InvariantCulture);
-                    float atkCooldown = float.Parse(cols[4], CultureInfo.InvariantCulture);
-                    float atkRange = float.Parse(cols[5], CultureInfo.InvariantCulture);
-                    float projSpd = float.Parse(cols[6], CultureInfo.InvariantCulture);
+                    string id = GetVal(cols, "UnitID");
+                    string renderID = GetVal(cols, "UnitRenderID");
+                    if (string.IsNullOrEmpty(renderID)) renderID = id;
 
-                    Enum.TryParse(cols[7], true, out AttackType atkType);
-                    Enum.TryParse(cols[8], true, out TargetType tgtType);
+                    float.TryParse(GetVal(cols, "ScaleFactor"), NumberStyles.Float, CultureInfo.InvariantCulture, out float scale);
+                    if (scale <= 0) scale = 1.0f;
 
-                    int buildCost = int.Parse(cols[9]);
-                    int tier = int.Parse(cols[10]);
+                    int.TryParse(GetVal(cols, "Tier"), out int tier);
+                    float.TryParse(GetVal(cols, "MaxHealth"), NumberStyles.Float, CultureInfo.InvariantCulture, out float maxHp);
+                    float.TryParse(GetVal(cols, "MoveSpeed"), NumberStyles.Float, CultureInfo.InvariantCulture, out float moveSpd);
+                    float.TryParse(GetVal(cols, "BaseDamage"), NumberStyles.Float, CultureInfo.InvariantCulture, out float baseDmg);
+                    float.TryParse(GetVal(cols, "ROF"), NumberStyles.Float, CultureInfo.InvariantCulture, out float rof);
+                    float.TryParse(GetVal(cols, "AttackRange"), NumberStyles.Float, CultureInfo.InvariantCulture, out float atkRange);
+                    float.TryParse(GetVal(cols, "ProjectileSpeed"), NumberStyles.Float, CultureInfo.InvariantCulture, out float projSpd);
+
+                    string rawAtkType = GetVal(cols, "AttackType");
+                    Enum.TryParse(rawAtkType, true, out AttackType atkType);
+
+                    string rawTgtType = GetVal(cols, "TargetType");
+                    TargetType tgtType = TargetType.Both;
+                    if (rawTgtType.Equals("Everything", StringComparison.OrdinalIgnoreCase))
+                    {
+                        tgtType = TargetType.Both;
+                    }
+                    else
+                    {
+                        Enum.TryParse(rawTgtType, true, out tgtType);
+                    }
+
+                    int.TryParse(GetVal(cols, "BuildCost"), out int buildCost);
+                    int.TryParse(GetVal(cols, "Armor"), out int armor);
+                    
+                    // Support both "Armor Type" and "Armor Typ"
+                    string rawArmorType = GetVal(cols, "ArmorType");
+                    if (string.IsNullOrEmpty(rawArmorType)) rawArmorType = GetVal(cols, "ArmorTyp");
+                    Enum.TryParse(rawArmorType, true, out EArmorType armType);
+
+                    string atkAbility = GetVal(cols, "AttackAbilityID");
+                    string skillAbility = GetVal(cols, "SkillAbilityID");
 
                     var parsedData = new UnitConfig(
-                        id, maxHp, moveSpd, baseDmg, atkCooldown, atkRange, projSpd,
-                        atkType, tgtType, buildCost, tier
+                        id, maxHp, moveSpd, baseDmg, rof, atkRange, projSpd,
+                        atkType, tgtType, armor, buildCost, tier, 
+                        armType,
+                        atkAbility, skillAbility, renderID, scale
                     );
 
                     _config.unitEntries.Add(parsedData);
@@ -583,6 +638,55 @@ namespace Abel.TranHuongDao.EditorTools
             {
                 Debug.LogError($"[Import CSV] Lỗi: {ex.Message}");
                 EditorUtility.DisplayDialog("Error", $"Lỗi khi đọc file: {ex.Message}", "OK");
+            }
+        }
+
+        private void ExportCSV()
+        {
+            if (_config == null || _config.unitEntries == null) return;
+
+            string path = EditorUtility.SaveFilePanel("Save Unit Configs CSV", "Assets", "UnitsConfig.csv", "csv");
+            if (string.IsNullOrEmpty(path)) return;
+
+            try
+            {
+                using (var sw = new StreamWriter(path))
+                {
+                    // Write Header (Removed Speed column)
+                    sw.WriteLine("UnitID,UnitRenderID,ScaleFactor,Tier,MaxHealth,MoveSpeed,BaseDamage,ROF,AttackRange,ProjectileSpeed,Attack Type,TargetType,BuildCost,Armor,Armor Type,AttackAbilityID,SkillAbilityID");
+
+                    foreach (var unit in _config.unitEntries)
+                    {
+                        string line = string.Format(CultureInfo.InvariantCulture,
+                            "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16}",
+                            unit.UnitID,
+                            unit.UnitRenderID,
+                            unit.ScaleFactor,
+                            unit.Tier,
+                            unit.MaxHealth,
+                            unit.MoveSpeed,
+                            unit.BaseDamage,
+                            unit.ROF,
+                            unit.AttackRange,
+                            unit.ProjectileSpeed,
+                            unit.AttackType.ToString(),
+                            unit.TargetType.ToString(),
+                            unit.BuildCost,
+                            unit.Armor,
+                            unit.ArmorType.ToString(),
+                            unit.AttackAbilityID,
+                            unit.SkillAbilityID
+                        );
+                        sw.WriteLine(line);
+                    }
+                }
+
+                EditorUtility.DisplayDialog("Export CSV", "Xuất file thành công!", "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[Export CSV] Lỗi: {ex.Message}");
+                EditorUtility.DisplayDialog("Error", $"Lỗi khi xuất file: {ex.Message}", "OK");
             }
         }
     }

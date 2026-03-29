@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
-  m_Name: GA_goblin_proc
+  m_Name: GA_dread_lord_skill
   m_EditorClassIdentifier: 
-  abilityID: TD_GoblinFactoryAbility
-  abilityName: TD_GoblinFactoryAbility
+  abilityID: ga_dread_lord_skill
+  abilityName: ga_dread_load_skill
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -54,13 +54,14 @@ MonoBehaviour:
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
   triggerType: 1
-  chance: 50
+  chance: 10
   countThreshold: 3
-  executionTarget: 0
-  abilityToTrigger: {fileID: 11400000, guid: b6edc4a3365bf184fad42a8f51c8a714, type: 2}
-  targetSelection: 0
+  executionTarget: 1
+  abilityToTrigger: {fileID: 0}
+  targetSelection: 4
   targetType: 0
-  targetCount: 1
-  effectsToApply: []
+  targetCount: 100
+  effectsToApply:
+  - {fileID: 11400000, guid: cd8f98fcd2d677548b2cdb49ed79d7ac, type: 2}
   flatDamage: 0
-  hitVfxID: 
+  hitVfxID: bullet_vfx_new_8

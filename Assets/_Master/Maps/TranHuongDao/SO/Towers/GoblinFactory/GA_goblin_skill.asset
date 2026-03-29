@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 642ff5516b8e12c4e9b42d7fc572a356, type: 3}
+  m_Script: {fileID: 11500000, guid: ad4d0ca25cb454147b683e0215045cfd, type: 3}
   m_Name: GA_goblin_skill
   m_EditorClassIdentifier: 
-  abilityID: TD_GoblinFactory_Create_Golbin
-  abilityName: 
+  abilityID: ga_goblin_skill
+  abilityName: ga_goblin_skill
   description: 
   icon: {fileID: 0}
   activationPolicy: 0
@@ -53,7 +53,14 @@ MonoBehaviour:
   abilityTags: 
   cancelAbilitiesWithTags: 
   blockAbilitiesWithTags: 
-  unitID: unit_wisdom_tower
-  overrideLogic: 3
-  spawnOffset: {x: 0, y: 0, z: 0}
-  count: 1
+  triggerType: 1
+  chance: 50
+  countThreshold: 3
+  executionTarget: 0
+  abilityToTrigger: {fileID: 11400000, guid: b6edc4a3365bf184fad42a8f51c8a714, type: 2}
+  targetSelection: 0
+  targetType: 0
+  targetCount: 1
+  effectsToApply: []
+  flatDamage: 0
+  hitVfxID: 

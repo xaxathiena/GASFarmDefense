@@ -3,7 +3,9 @@ using UnityEditor;
 using System.IO;
 using System;
 using System.Globalization;
+using System.Collections.Generic;
 using Abel.TranHuongDao.Core;
+using FD.Ability;
 
 namespace Abel.TranHuongDao.EditorTools
 {
@@ -52,45 +54,86 @@ namespace Abel.TranHuongDao.EditorTools
                 targetAsset.unitEntries.Clear();
 
                 // Bỏ qua dòng số 0 (Dòng tiêu đề - Header)
+                // Header mapping
+                var headerMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                if (lines.Length > 0)
+                {
+                    string[] headers = lines[0].Split(new[] { ',', '\t' });
+                    for (int j = 0; j < headers.Length; j++)
+                    {
+                        string h = headers[j].Trim().Replace(" ", "").ToLower();
+                        if (!headerMap.ContainsKey(h)) headerMap[h] = j;
+                    }
+                }
+
+                // Helper to get value securely
+                string GetVal(string[] cols, string headerName)
+                {
+                    string cleanHeader = headerName.Replace(" ", "").ToLower();
+                    if (headerMap.TryGetValue(cleanHeader, out int index) && index < cols.Length)
+                        return cols[index].Trim();
+                    return "";
+                }
+
                 int importedCount = 0;
                 for (int i = 1; i < lines.Length; i++)
                 {
                     string line = lines[i];
                     if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    string[] cols = line.Split(',');
+                    string[] cols = line.Split(new[] { ',', '\t' });
+                    if (cols.Length < 5) continue; // Min valid check
 
-                    // Phải đảm bảo đủ 11 cột như lúc chúng ta export
-                    if (cols.Length < 11)
+                    // Parse dữ liệu
+                    string id = GetVal(cols, "UnitID");
+                    string renderID = GetVal(cols, "UnitRenderID");
+                    if (string.IsNullOrEmpty(renderID)) renderID = id;
+
+                    float.TryParse(GetVal(cols, "ScaleFactor"), NumberStyles.Float, CultureInfo.InvariantCulture, out float scale);
+                    if (scale <= 0) scale = 1.0f;
+
+                    int.TryParse(GetVal(cols, "Tier"), out int tier);
+                    float.TryParse(GetVal(cols, "MaxHealth"), NumberStyles.Float, CultureInfo.InvariantCulture, out float maxHp);
+                    float.TryParse(GetVal(cols, "MoveSpeed"), NumberStyles.Float, CultureInfo.InvariantCulture, out float moveSpd);
+                    float.TryParse(GetVal(cols, "BaseDamage"), NumberStyles.Float, CultureInfo.InvariantCulture, out float baseDmg);
+                    float.TryParse(GetVal(cols, "ROF"), NumberStyles.Float, CultureInfo.InvariantCulture, out float rof);
+                    float.TryParse(GetVal(cols, "AttackRange"), NumberStyles.Float, CultureInfo.InvariantCulture, out float atkRange);
+                    float.TryParse(GetVal(cols, "ProjectileSpeed"), NumberStyles.Float, CultureInfo.InvariantCulture, out float projSpd);
+
+                    string rawAtkType = GetVal(cols, "AttackType");
+                    Enum.TryParse(rawAtkType, true, out AttackType atkType);
+
+                    string rawTgtType = GetVal(cols, "TargetType");
+                    TargetType tgtType = TargetType.Both;
+                    if (rawTgtType.Equals("Everything", StringComparison.OrdinalIgnoreCase))
                     {
-                        Debug.LogWarning($"[Import CSV] Bỏ qua dòng {i + 1} vì thiếu dữ liệu.");
-                        continue;
+                        tgtType = TargetType.Both;
+                    }
+                    else
+                    {
+                        Enum.TryParse(rawTgtType, true, out tgtType);
                     }
 
-                    // Parse dữ liệu (Dùng InvariantCulture để tránh lỗi dấu phẩy/chấm ở các win khác nhau)
-                    string id = cols[0];
-                    float maxHp = float.Parse(cols[1], CultureInfo.InvariantCulture);
-                    float moveSpd = float.Parse(cols[2], CultureInfo.InvariantCulture);
-                    float baseDmg = float.Parse(cols[3], CultureInfo.InvariantCulture);
-                    float atkCooldown = float.Parse(cols[4], CultureInfo.InvariantCulture);
-                    float atkRange = float.Parse(cols[5], CultureInfo.InvariantCulture);
-                    float projSpd = float.Parse(cols[6], CultureInfo.InvariantCulture);
+                    int.TryParse(GetVal(cols, "BuildCost"), out int buildCost);
+                    int.TryParse(GetVal(cols, "Armor"), out int armor);
+                    
+                    // Support both "Armor Type" and "Armor Typ"
+                    string rawArmorType = GetVal(cols, "ArmorType");
+                    if (string.IsNullOrEmpty(rawArmorType)) rawArmorType = GetVal(cols, "ArmorTyp");
+                    Enum.TryParse(rawArmorType, true, out EArmorType armType);
 
-                    Enum.TryParse(cols[7], true, out AttackType atkType);
-                    Enum.TryParse(cols[8], true, out TargetType tgtType);
-
-                    int buildCost = int.Parse(cols[9]);
-                    int tier = int.Parse(cols[10]);
+                    string atkAbility = GetVal(cols, "AttackAbilityID");
+                    string skillAbility = GetVal(cols, "SkillAbilityID");
 
                     // Tạo Struct
                     UnitConfig parsedData = new UnitConfig(
-                        id, maxHp, moveSpd, baseDmg, atkCooldown, atkRange, projSpd,
-                        atkType, tgtType, buildCost, tier
+                        id, maxHp, moveSpd, baseDmg, rof, atkRange, projSpd,
+                        atkType, tgtType, armor, buildCost, tier,
+                        armType,
+                        atkAbility, skillAbility, renderID, scale
                     );
 
-                    // Thêm vào List
                     targetAsset.unitEntries.Add(parsedData);
-
                     importedCount++;
                 }
 

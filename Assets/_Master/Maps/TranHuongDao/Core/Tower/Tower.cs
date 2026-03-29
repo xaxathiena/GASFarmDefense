@@ -219,10 +219,10 @@ namespace Abel.TranHuongDao.Core
             // Tick down the ROF timer.
             // Scale the decrement by the NormalCooldownRate attribute so attack speed
             // buffs/debuffs that affect cooldown rate also affect the tower's firing interval.
-            float rate = _attributeSet.NormalCooldownRate.CurrentValue;
-            if (rate > 0.0001f)
+            float cooldownRate = _attributeSet.NormalCooldownRate.CurrentValue;
+            if (cooldownRate > 0.0001f)
             {
-                _attackTimer -= dt / rate;
+                _attackTimer -= dt / cooldownRate;
             }
 
             if (_attackTimer > 0f) return;

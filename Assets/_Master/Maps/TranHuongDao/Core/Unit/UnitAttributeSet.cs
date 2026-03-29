@@ -17,6 +17,7 @@ namespace Abel.TranHuongDao.Core
         public readonly GameplayAttribute MaxHealth       = new GameplayAttribute(0f);
         public readonly GameplayAttribute MoveSpeed       = new GameplayAttribute(0f);
         public readonly GameplayAttribute Damage          = new GameplayAttribute(0f);
+        public readonly GameplayAttribute Armor           = new GameplayAttribute(0f);
         public readonly GameplayAttribute AttackRange     = new GameplayAttribute(0f);
         public readonly GameplayAttribute ROF             = new GameplayAttribute(1f);
         public readonly GameplayAttribute ProjectileSpeed   = new GameplayAttribute(0f);
@@ -36,6 +37,7 @@ namespace Abel.TranHuongDao.Core
             RegisterAttribute(nameof(MaxHealth),       MaxHealth);
             RegisterAttribute(nameof(MoveSpeed),       MoveSpeed);
             RegisterAttribute(nameof(Damage),          Damage);
+            RegisterAttribute(nameof(Armor),           Armor);
             RegisterAttribute(nameof(AttackRange),     AttackRange);
             RegisterAttribute(nameof(ROF),             ROF);
             RegisterAttribute(nameof(ProjectileSpeed),   ProjectileSpeed);
@@ -70,6 +72,9 @@ namespace Abel.TranHuongDao.Core
 
             Damage.BaseValue          = config.BaseDamage;
             Damage.CurrentValue       = config.BaseDamage;
+
+            Armor.BaseValue           = config.Armor;
+            Armor.CurrentValue        = config.Armor;
 
             AttackRange.BaseValue     = config.AttackRange;
             AttackRange.CurrentValue  = config.AttackRange;

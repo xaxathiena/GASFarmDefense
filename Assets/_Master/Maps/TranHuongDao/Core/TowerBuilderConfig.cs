@@ -16,11 +16,7 @@ namespace Abel.TranHuongDao.Core
         // ── Data ─────────────────────────────────────────────────────────────────
 
         [Tooltip("List of tower IDs available for random selection (e.g. Tower_Archer, Tower_Mage).")]
-        public List<string> availableTowerIDs = new List<string>
-        {
-            "Tower_Archer",
-            "Tower_Mage"
-        };
+        public List<string> availableTowerIDs = new List<string>();
         private Dictionary<int, List<string>> tierToTowerIDs  = new Dictionary<int, List<string>>();
         // ── Query ─────────────────────────────────────────────────────────────────
 
