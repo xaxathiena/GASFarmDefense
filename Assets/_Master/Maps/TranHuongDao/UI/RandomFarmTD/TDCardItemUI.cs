@@ -22,7 +22,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         public event Action<TDCardItemUI, Vector2> OnCardPlayed;
         public event Action<TDCardItemUI> OnCardClicked;
-
+        private string _towerID;
         private Abel.TranHuongDao.Core.TowerDragDropManager _dragManager;
 
         public TDCardItemUI(VisualTreeAsset template, Abel.TranHuongDao.Core.TowerDragDropManager dragManager)
@@ -38,15 +38,20 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             Root.RegisterCallback<TransitionEndEvent>(OnTransitionEnd);
         }
 
-        public void SetData(string name, string level, bool isGold = false)
+        public void SetData(string name, int tier, string towerID)
         {
+            _towerID = towerID;
             Root.Q<Label>("card-name").text = name;
-            Root.Q<Label>("card-lvl").text = level;
+            Root.Q<Label>("card-lvl").text = tier.ToString();
 
-            // Initial states: gold has special border, but base class is standard
+            // Clear old tier classes
+            Root.RemoveFromClassList("tier-1");
+            Root.RemoveFromClassList("tier-5");
+            Root.RemoveFromClassList("gold");
 
-            if (isGold) Root.AddToClassList("gold");
-            else Root.RemoveFromClassList("gold");
+            // Add new tier class
+            Root.AddToClassList($"tier-{tier}");
+            if (tier >= 5) Root.AddToClassList("gold");
         }
 
         private void OnPointerDown(PointerDownEvent evt)
@@ -145,11 +150,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             if (_dragManager != null && _dragManager.IsValidPlacement(endPos, out var gridPos, out var snappedPos))
             {
                 // Spawn and destroy card
-                string cardName = Root.Q<Label>("card-name").text;
-                // Normalize ID if needed, e.g., Archer Tower -> ARCHER_TOWER
-                string towerID = cardName.Replace(" ", "_").ToUpper();
-
-                _dragManager.TryDropTower(gridPos, snappedPos, towerID);
+                _dragManager.TryDropTower(gridPos, snappedPos, _towerID);
                 _dragManager.StopDragging();
 
                 // Card disappears

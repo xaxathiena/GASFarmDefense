@@ -115,6 +115,7 @@ namespace Abel.TranHuongDao.Core
 
             // ── Economy & Farming ──────────────────────────────────────────────────
             builder.RegisterEntryPoint<TDEconomyService>(Lifetime.Singleton).AsSelf();
+            builder.Register<TDHandService>(Lifetime.Singleton).AsSelf();
         }
     }
 }

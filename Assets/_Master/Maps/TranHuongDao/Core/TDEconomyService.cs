@@ -11,7 +11,7 @@ namespace Abel.TranHuongDao.Core
     {
         public event Action OnDataChanged;
 
-        public int Gold { get; private set; } = 125;
+        public int Gold { get; private set; } = 9999;
         public int Seeds { get; private set; } = 50;
 
         public Dictionary<string, int> Inventory { get; private set; } = new Dictionary<string, int>()

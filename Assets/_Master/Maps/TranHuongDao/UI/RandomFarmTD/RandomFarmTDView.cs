@@ -23,8 +23,12 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         [VContainer.Inject] private Abel.TranHuongDao.Core.TowerDragDropManager _towerDragManager;
         [VContainer.Inject] private ViewManager _viewManager;
         [VContainer.Inject] private PopupManager _popupManager;
-        [VContainer.Inject] private GASFarmDefense.UIToolkit.Core.UIManager _uiManager;
         [VContainer.Inject] private SceneLoaderService _sceneLoader;
+        [VContainer.Inject] private GASFarmDefense.UIToolkit.Core.UIManager _uiManager;
+        [VContainer.Inject] private Abel.TranHuongDao.Core.TDHandService _handService;
+        private Abel.TranHuongDao.Core.UnitsConfig _unitsConfig;
+        [VContainer.Inject] private Abel.TranHuongDao.Core.IConfigService _configService;
+        [VContainer.Inject] private FD.IEventBus _eventBus;
 
         protected override void OnSetup()
         {
@@ -34,6 +38,11 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _lblCarrot = RootElement.Q<Label>("lbl-carrot");
             _lblPumpkin = RootElement.Q<Label>("lbl-pumpkin");
             _lblGrape = RootElement.Q<Label>("lbl-grape");
+
+            if (_configService != null)
+            {
+                _unitsConfig = _configService.GetConfig<Abel.TranHuongDao.Core.UnitsConfig>();
+            }
 
             if (_economyService != null)
             {
@@ -56,7 +65,27 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _btnMenu = RootElement.Q<Button>("btn-menu");
             if (_btnMenu != null) _btnMenu.clicked += OnMenuClicked;
 
-            SetupCardItems();
+            if (_eventBus != null)
+            {
+                _eventBus.Subscribe<Abel.TranHuongDao.Core.TDHandService.CardAddedEvent>(OnCardAdded);
+            }
+
+            if (_handService != null)
+            {
+                // Initial hand setup
+                foreach (var cardID in _handService.CurrentCards)
+                {
+                    // For initial setup, we don't need animation
+                    _ = CreateCardUI(cardID, 1, Vector2.zero, animate: false);
+                }
+            }
+
+            // SetupCardItems(); // Removed hardcoded
+        }
+
+        private void OnCardAdded(Abel.TranHuongDao.Core.TDHandService.CardAddedEvent evt)
+        {
+            _ = CreateCardUI(evt.TowerID, evt.Tier, evt.StartScreenPos, animate: true);
         }
 
         private void RefreshResources()
@@ -71,37 +100,60 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         [SerializeField] private VisualTreeAsset _cardTemplate;
         private List<TDCardItemUI> _cards = new List<TDCardItemUI>();
 
-        private void SetupCardItems()
+        private async UniTaskVoid CreateCardUI(string towerID, int tier, Vector2 startScreenPos, bool animate)
         {
             _cardTemplate = Resources.Load<VisualTreeAsset>("UI/Templates/TDCardItemUI");
             var cardContainer = RootElement.Q<VisualElement>("card-container");
-            if (cardContainer == null) return;
-            if (_cardTemplate == null) return;
+            if (cardContainer == null || _cardTemplate == null) return;
 
-            cardContainer.Clear();
-            _cards.Clear();
+            var cardUI = new TDCardItemUI(_cardTemplate, _towerDragManager);
 
-            // Example: Generate 5 cards dynamically
-            var cardData = new[]
+            // Get Display Name from UnitsConfig if available
+
+            string displayName = towerID;
+            if (_unitsConfig != null && _unitsConfig.TryGetConfig(towerID, out var config))
             {
-                new { name = "", lvl = "1", gold = false },
-                new { name = "", lvl = "1", gold = false },
-                new { name = "", lvl = "1", gold = false },
-                new { name = "", lvl = "5", gold = true },
-                new { name = "", lvl = "Item", gold = false }
-            };
+                displayName = config.UnitID; // Using UnitID as name
+            }
 
-            foreach (var data in cardData)
+
+            cardUI.SetData(displayName, tier, towerID);
+            cardUI.OnCardPlayed += (c, pos) => Debug.Log($"Card Played at {pos}");
+
+
+            var root = cardUI.Root;
+            cardContainer.Add(root);
+            _cards.Add(cardUI);
+
+            if (animate)
             {
-                var cardUI = new TDCardItemUI(_cardTemplate, _towerDragManager);
-                cardUI.SetData(data.name, data.lvl, data.gold);
+                // Wait for layout to calculate the target position
+                await UniTask.WaitForEndOfFrame();
 
+                // Calculate the offset from the click position to the final layout position
+                // Note: startScreenPos is in world space. root.worldBound gives current world position.
+                Vector2 targetPos = root.worldBound.center;
+                Vector2 offset = startScreenPos - targetPos;
 
-                cardUI.OnCardPlayed += (c, pos) => Debug.Log($"Card Played at {pos}");
-                cardUI.OnCardClicked += (c) => Debug.Log("Card Clicked");
+                // Set initial "flying" state
+                root.AddToClassList("card-flying");
+                root.style.translate = new Translate(offset.x, offset.y, 0);
+                root.style.scale = new Scale(new Vector3(0.5f, 0.5f, 1));
+                root.style.opacity = 0.5f;
 
-                cardContainer.Add(cardUI.Root);
-                _cards.Add(cardUI);
+                // Wait one frame to start the transition
+                await UniTask.WaitForEndOfFrame();
+
+                root.RemoveFromClassList("card-flying");
+                root.AddToClassList("card-spawn-animate");
+                root.style.translate = new Translate(0, 0, 0);
+                root.style.scale = new Scale(Vector3.one);
+                root.style.opacity = 1f;
+
+                // Clean up animation class after it's done
+
+                await UniTask.Delay(600);
+                root.RemoveFromClassList("card-spawn-animate");
             }
         }
 
