@@ -46,6 +46,10 @@ namespace Abel.TranHuongDao.Core
             // DebugService implements IStartable + IDisposable; RegisterEntryPoint
             // wires those interfaces into VContainer's PlayerLoop automatically.
             builder.RegisterEntryPoint<DebugService>(Lifetime.Singleton).As<IDebugService>();
+            
+            // ── Floating Text System ──────────────────────────────────────────────
+            builder.RegisterEntryPoint<Abel.TranHuongDao.Core.UI.FloatingTextManager>(Lifetime.Singleton).AsSelf();
+
             // ── GAS – Singleton services (stateless logic, shared across all ASCs) ─
             builder.Register<GameplayEffectCalculationService>(Lifetime.Singleton);
             builder.Register<GameplayEffectService>(Lifetime.Singleton);

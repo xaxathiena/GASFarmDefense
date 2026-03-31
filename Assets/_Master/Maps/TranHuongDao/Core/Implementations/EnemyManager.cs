@@ -28,6 +28,7 @@ namespace Abel.TranHuongDao.Core
 
         private readonly FD.IEventBus eventBus;
         private readonly FD.Modules.VFX.IVFXManager vfxManager;
+        private readonly Abel.TranHuongDao.Core.UI.FloatingTextManager floatingTextManager;
 
         // ── Active enemies ────────────────────────────────────────────────────────
         private readonly Dictionary<int, Enemy> activeEnemies = new Dictionary<int, Enemy>(128);
@@ -62,7 +63,8 @@ namespace Abel.TranHuongDao.Core
             IConfigService configService,
             IInstanceIDService instanceIDService,
             FD.IEventBus eventBus,
-            FD.Modules.VFX.IVFXManager vfxManager)
+            FD.Modules.VFX.IVFXManager vfxManager,
+            Abel.TranHuongDao.Core.UI.FloatingTextManager floatingTextManager)
         {
             this.container = container;
             this.renderService = renderService;
@@ -70,6 +72,7 @@ namespace Abel.TranHuongDao.Core
             this.instanceIDService = instanceIDService;
             this.eventBus = eventBus;
             this.vfxManager = vfxManager;
+            this.floatingTextManager = floatingTextManager;
         }
 
         // ── VContainer entry points ──────────────────────────────────────────────
@@ -316,7 +319,7 @@ namespace Abel.TranHuongDao.Core
 
             var tagVFXConfig = configService.GetConfig<TagVFXConfig>();
 
-            enemy.Initialize(id, enemyID, config, waypoints, renderService, eventBus, vfxManager, tagVFXConfig);
+            enemy.Initialize(id, enemyID, config, waypoints, renderService, eventBus, vfxManager, tagVFXConfig, floatingTextManager);
 
             enemy.OnDeath += HandleEnemyDeath;
             enemy.OnReachedEnd += HandleEnemyReachedEnd;

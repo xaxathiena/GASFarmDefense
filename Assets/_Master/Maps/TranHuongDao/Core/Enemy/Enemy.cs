@@ -55,6 +55,9 @@ namespace Abel.TranHuongDao.Core
         // Cached max-health inverse: avoids a division every time HP changes.
         private float maxHealthInverse;
 
+        // ── Floating Text ────────────────────────────────────────────────────────
+        private Abel.TranHuongDao.Core.UI.FloatingTextManager floatingTextManager;
+
         // ── Path following ───────────────────────────────────────────────────────
         private IReadOnlyList<Vector3> path;
         private int waypointIndex;
@@ -93,7 +96,8 @@ namespace Abel.TranHuongDao.Core
             IRender2DService renderService,
             FD.IEventBus eventBus,
             FD.Modules.VFX.IVFXManager vfxManager,
-            TagVFXConfig vfxConfig)
+            TagVFXConfig vfxConfig,
+            Abel.TranHuongDao.Core.UI.FloatingTextManager floatingTextManager)
         {
             InstanceID = instanceID;
             EnemyID = enemyID;
@@ -101,6 +105,7 @@ namespace Abel.TranHuongDao.Core
             this.path = path;
             this.moveSpeed = config.MoveSpeed;   // cached for per-frame use in MoveAlongPath
             this.renderService = renderService;
+            this.floatingTextManager = floatingTextManager;
 
             waypointIndex = 0;
             HasReachedEnd = false;
@@ -221,6 +226,20 @@ namespace Abel.TranHuongDao.Core
             // Event-driven: called only when HP changes, never every frame.
             if (renderInitialized)
                 renderService.SetHpPercent(_renderID, InstanceID, newValue * maxHealthInverse);
+
+            // Trigger floating text for damage
+            if (newValue < oldValue)
+            {
+                float damageTaken = oldValue - newValue;
+                // Currently, HandleHealthValueChanged doesn't receive the hit context (like Critical Strike).
+                // We default to a standard scale. If the hit was a crit, scale can be updated here later once GAS exposes it.
+                floatingTextManager?.ShowText(
+                    Position + new Vector3(0f, 1f, 0f), // Lift the text slightly above the unit base
+                    $"-{Mathf.CeilToInt(damageTaken)}",
+                    Color.yellow,
+                    scale: 1f
+                );
+            }
         }
 
         private void HandleHealthDepleted()
