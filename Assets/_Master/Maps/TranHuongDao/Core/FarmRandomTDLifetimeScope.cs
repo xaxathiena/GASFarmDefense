@@ -30,8 +30,7 @@ namespace Abel.TranHuongDao.Core
         [Header("Tower Drag & Drop")]
         [SerializeField] private TowerDragDropManager towerDragDropManager;
 
-        [Header("Tower Selection UI")]
-        [SerializeField] private UnitSelectionUIView towerSelectionUIView;
+
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -85,8 +84,7 @@ namespace Abel.TranHuongDao.Core
             // VContainer also calls [Inject] Construct() to supply IMapLayoutManager.
             builder.RegisterComponent(towerDragDropManager)
                    .As<ITickable>();
-            builder.RegisterComponent(towerSelectionUIView)
-                   .AsSelf(); // Inject into TowerSelectionManager, resolved by TowerManager
+
 
             // EnemyManager: ITickable + IStartable + IDisposable exposed as IEnemyManager
             builder.RegisterEntryPoint<EnemyManager>(Lifetime.Singleton).As<IEnemyManager>();

@@ -217,3 +217,105 @@
     transition-duration: 0.6s;
     transition-timing-function: ease-out-back;
 }
+
+/* Unit Info Panel */
+.unit-info-panel {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    translate: 0 -50%;
+    width: 320px;
+    background-color: #1a2a1a; /* Dark green */
+    border-color: #d4af37; /* Golden */
+    border-width: 3px;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    transition-property: opacity, translate;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+}
+
+.unit-info-panel.panel-hidden {
+    opacity: 0;
+    translate: -50px -50%;
+    pointer-events: none;
+}
+
+.unit-info-header {
+    align-items: center;
+    border-bottom-color: #d4af37;
+    border-bottom-width: 1px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.unit-portrait-bg {
+    width: 100px;
+    height: 140px;
+    background-color: #2c2011;
+    border-color: #5c4322;
+    border-width: 2px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.unit-portrait {
+    width: 100%;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.info-title {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.stat-row {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.stat-label {
+    color: #a0a0a0;
+    font-size: 10px;
+    padding: 0;
+}
+
+.stat-value {
+    color: white;
+    font-size: 10px;
+    -unity-text-align: middle-right;
+    padding: 0;
+}
+
+.info-slot {
+    width: 40px;
+    height: 40px;
+    background-color: #111;
+    border-color: #555;
+    border-width: 1px;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+.btn-sell {
+    background-color: #8b0000;
+    border-color: #aa0000;
+    border-width: 2px;
+    border-radius: 6px;
+    height: 30px;
+    margin-top: 10px;
+}
+
+.btn-sell:hover {
+    background-color: #aa0000;
+    border-color: #ff4444;
+}
+
+.btn-sell:active {
+    background-color: #550000;
+}

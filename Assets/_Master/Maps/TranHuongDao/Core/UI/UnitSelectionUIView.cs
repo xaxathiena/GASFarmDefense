@@ -1,8 +1,8 @@
+using Abel.TowerDefense.Config;
+using FD.Ability;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Abel.TowerDefense.Config;
-using FD.Ability;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -53,19 +53,8 @@ namespace Abel.TranHuongDao.Core
 
         private void Awake()
         {
-            // UIPortraitAnimator lives on the same GameObject as the RawImage reference.
-            if (portraitImage != null)
-                _portraitAnimator = portraitImage.GetComponent<UIPortraitAnimator>();
-
-            // Attempt to auto-find the MergeButton if not assigned.
-            if (mergeBtn == null)
-            {
-                var tr = panelRoot != null ? panelRoot.transform : transform;
-                var found = tr.Find("MergeButton");
-                if (found != null) mergeBtn = found.GetComponent<Button>();
-            }
-            if (mergeBtn != null)
-                mergeBtn.gameObject.SetActive(false); // Default hidden
+            SetPanelActive(false);
+            if (gameObject != null) gameObject.SetActive(false);
         }
 
         // ── Public property ──────────────────────────────────────────────────────

@@ -4,7 +4,7 @@
     
     <ui:VisualElement class="hud-root" picking-mode="Ignore">
         <!-- Top Bar -->
-        <ui:VisualElement class="res-bar">
+        <ui:VisualElement class="res-bar" picking-mode="Ignore">
             <ui:VisualElement name="stat-gold" class="stat-item">
                 <ui:VisualElement class="icon-box icon-gold" />
                 <ui:Label name="lbl-gold" text="125" class="gold-text" />
@@ -41,7 +41,7 @@
         </ui:VisualElement>
 
         <!-- Right Menu -->
-        <ui:VisualElement class="side-menu">
+        <ui:VisualElement class="side-menu" picking-mode="Ignore">
             <ui:Button name="btn-shop" class="menu-btn game-button">
                 <ui:VisualElement class="menu-btn-icon icon-gold" />
                 <ui:Label text="SHOP" class="menu-btn-text" />
@@ -66,7 +66,50 @@
             </ui:Button>
         </ui:VisualElement>
 
+        <!-- Unit Info Panel -->
+        <ui:VisualElement name="unit-info-panel" class="unit-info-panel panel-hidden" picking-mode="Ignore">
+            <ui:VisualElement class="unit-info-header">
+                <ui:Label text="UNIT INFO" class="gold-text" style="font-size: 14px; -unity-font-style: bold;" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement style="flex-direction: row; margin: 10px;">
+                <!-- Portrait -->
+                <ui:VisualElement class="unit-portrait-bg">
+                    <ui:VisualElement name="unit-portrait" class="unit-portrait" />
+                </ui:VisualElement>
+                
+                <!-- Stats -->
+                <ui:VisualElement style="flex-direction: column; flex-grow: 1; margin-left: 10px;">
+                    <ui:Label name="info-name" text="Unit Name" class="info-title" />
+                    <ui:Label text="Stats:" style="color: #d4af37; -unity-font-style: bold; margin-bottom: 4px; font-size: 12px;" />
+                    
+                    <ui:VisualElement class="stat-row"><ui:Label text="HP:" class="stat-label"/><ui:Label name="info-hp" text="0/0" class="stat-value"/></ui:VisualElement>
+                    <ui:VisualElement class="stat-row"><ui:Label text="Damage:" class="stat-label"/><ui:Label name="info-dmg" text="0" class="stat-value"/></ui:VisualElement>
+                    <ui:VisualElement class="stat-row"><ui:Label text="Dmg Type:" class="stat-label"/><ui:Label name="info-dmg-type" text="N/A" class="stat-value"/></ui:VisualElement>
+                    <ui:VisualElement class="stat-row"><ui:Label text="Armor Type:" class="stat-label"/><ui:Label name="info-armor-type" text="N/A" class="stat-value"/></ui:VisualElement>
+                    <ui:VisualElement class="stat-row"><ui:Label text="RoF:" class="stat-label"/><ui:Label name="info-rof" text="0" class="stat-value"/></ui:VisualElement>
+                    <ui:VisualElement class="stat-row"><ui:Label text="Move Speed:" class="stat-label"/><ui:Label name="info-speed" text="0" class="stat-value"/></ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Items & Buffs -->
+            <ui:VisualElement style="flex-direction: row; justify-content: center; margin-bottom: 5px;">
+                <ui:VisualElement class="info-slot item-slot" />
+                <ui:VisualElement class="info-slot item-slot" />
+                <ui:VisualElement class="info-slot item-slot" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-direction: row; justify-content: center; margin-bottom: 10px;">
+                <ui:VisualElement class="info-slot buff-slot" />
+                <ui:VisualElement class="info-slot buff-slot" />
+                <ui:VisualElement class="info-slot buff-slot" />
+            </ui:VisualElement>
+            
+            <ui:Button name="btn-sell" class="game-button btn-sell">
+                <ui:Label text="Sell" style="color: white; -unity-font-style: bold;" />
+            </ui:Button>
+        </ui:VisualElement>
+
         <!-- Card Deck -->
-        <ui:VisualElement name="card-container" class="card-container" />
+        <ui:VisualElement name="card-container" class="card-container" picking-mode="Ignore" />
     </ui:VisualElement>
 </ui:UXML>

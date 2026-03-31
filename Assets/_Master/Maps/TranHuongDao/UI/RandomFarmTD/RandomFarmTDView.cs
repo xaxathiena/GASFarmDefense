@@ -27,8 +27,26 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         [VContainer.Inject] private GASFarmDefense.UIToolkit.Core.UIManager _uiManager;
         [VContainer.Inject] private Abel.TranHuongDao.Core.TDHandService _handService;
         private Abel.TranHuongDao.Core.UnitsConfig _unitsConfig;
+        [VContainer.Inject] private Abel.TranHuongDao.Core.ITowerManager _towerManager;
+        [VContainer.Inject] private Abel.TowerDefense.Config.UnitRenderDatabase _renderDatabase;
         [VContainer.Inject] private Abel.TranHuongDao.Core.IConfigService _configService;
         [VContainer.Inject] private FD.IEventBus _eventBus;
+
+        private VisualElement _unitInfoPanel;
+        private Label _lblInfoName;
+        private Label _lblInfoHp;
+        private Label _lblInfoDmg;
+        private Label _lblInfoDmgType;
+        private Label _lblInfoArmorType;
+        private Label _lblInfoRof;
+        private Label _lblInfoSpeed;
+        private VisualElement _unitPortrait;
+        private Button _btnInfoSell;
+
+        private Abel.TranHuongDao.Core.UI.UIToolkitPortraitAnimator _portraitAnimator;
+        private int _selectedInstanceID = -1;
+        private int _selectedSellCost = 0;
+        private bool _isSelectedIsTower = false;
 
         protected override void OnSetup()
         {
@@ -65,9 +83,32 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _btnMenu = RootElement.Q<Button>("btn-menu");
             if (_btnMenu != null) _btnMenu.clicked += OnMenuClicked;
 
+            _unitInfoPanel = RootElement.Q<VisualElement>("unit-info-panel");
+            _lblInfoName = RootElement.Q<Label>("info-name");
+            _lblInfoHp = RootElement.Q<Label>("info-hp");
+            _lblInfoDmg = RootElement.Q<Label>("info-dmg");
+            _lblInfoDmgType = RootElement.Q<Label>("info-dmg-type");
+            _lblInfoArmorType = RootElement.Q<Label>("info-armor-type");
+            _lblInfoRof = RootElement.Q<Label>("info-rof");
+            _lblInfoSpeed = RootElement.Q<Label>("info-speed");
+            _unitPortrait = RootElement.Q<VisualElement>("unit-portrait");
+            _btnInfoSell = RootElement.Q<Button>("btn-sell");
+
+            if (_unitPortrait != null)
+            {
+                _portraitAnimator = new Abel.TranHuongDao.Core.UI.UIToolkitPortraitAnimator(_unitPortrait);
+            }
+
+            if (_btnInfoSell != null)
+            {
+                _btnInfoSell.clicked += OnSellClicked;
+            }
+
             if (_eventBus != null)
             {
                 _eventBus.Subscribe<Abel.TranHuongDao.Core.TDHandService.CardAddedEvent>(OnCardAdded);
+                _eventBus.Subscribe<Abel.TranHuongDao.Core.TowerSelectionManager.UnitSelectedEvent>(OnUnitSelected);
+                _eventBus.Subscribe<Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent>(OnUnitDeselected);
             }
 
             if (_handService != null)
@@ -185,6 +226,94 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         {
             Debug.Log("Return to Main Menu... Unloading Map.");
             _sceneLoader.ReturnToHome().Forget();
+        }
+
+        private void OnUnitSelected(Abel.TranHuongDao.Core.TowerSelectionManager.UnitSelectedEvent evt)
+        {
+            if (_unitInfoPanel != null) _unitInfoPanel.RemoveFromClassList("panel-hidden");
+
+            _selectedInstanceID = evt.InstanceID;
+            _selectedSellCost = Mathf.FloorToInt(evt.Config.BuildCost * 0.5f);
+            _isSelectedIsTower = evt.IsTower;
+
+            if (_btnInfoSell != null)
+            {
+                _btnInfoSell.style.display = evt.IsTower ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            if (_lblInfoName != null) _lblInfoName.text = evt.Config.UnitID;
+            if (_lblInfoDmgType != null) _lblInfoDmgType.text = evt.Config.AttackType.ToString();
+            if (_lblInfoArmorType != null) _lblInfoArmorType.text = evt.Config.ArmorType.ToString();
+
+            if (evt.ASC != null)
+            {
+                _currentStatsLoopID++;
+                UpdateStatsLoop(evt.ASC, _currentStatsLoopID).Forget();
+            }
+
+            if (_portraitAnimator != null && _renderDatabase != null)
+            {
+                var renderProfile = _renderDatabase.GetUnitByID(evt.Config.UnitRenderID);
+                if (renderProfile != null && renderProfile.animData != null)
+                {
+                    if (renderProfile.animData.GetAnim(Abel.TowerDefense.Config.UnitAnimState.Idle, out var idleClip))
+                    {
+                        float speed = idleClip.speedModifier > 0f ? idleClip.speedModifier : 1f;
+                        _portraitAnimator.PlayAnimation(renderProfile.animData.textureArray, idleClip.startFrame, idleClip.frameCount, idleClip.fps * speed);
+                    }
+                    else if (renderProfile.animData.animations.Count > 0)
+                    {
+                        var first = renderProfile.animData.animations[0];
+                        float speed = first.speedModifier > 0f ? first.speedModifier : 1f;
+                        _portraitAnimator.PlayAnimation(renderProfile.animData.textureArray, first.startFrame, first.frameCount, first.fps * speed);
+                    }
+                }
+                else
+                {
+                    _portraitAnimator.Clear();
+                }
+            }
+        }
+
+        private int _currentStatsLoopID = 0;
+
+        private async UniTaskVoid UpdateStatsLoop(GAS.AbilitySystemComponent asc, int loopID)
+        {
+            while (loopID == _currentStatsLoopID && asc != null)
+            {
+                var attrs = asc.GetAttributeSet<Abel.TranHuongDao.Core.UnitAttributeSet>();
+                if (attrs != null)
+                {
+                    if (_lblInfoHp != null) _lblInfoHp.text = $"{Mathf.CeilToInt(attrs.Health.CurrentValue)}/{Mathf.CeilToInt(attrs.MaxHealth.CurrentValue)}";
+                    if (_lblInfoDmg != null) _lblInfoDmg.text = Mathf.CeilToInt(attrs.Damage.CurrentValue).ToString();
+                    if (_lblInfoRof != null) _lblInfoRof.text = attrs.ROF.CurrentValue.ToString("0.##");
+                    if (_lblInfoSpeed != null) _lblInfoSpeed.text = attrs.MoveSpeed.CurrentValue <= 0 ? "N/A" : attrs.MoveSpeed.CurrentValue.ToString("0.##");
+                }
+                await UniTask.Yield();
+            }
+        }
+
+        private void OnUnitDeselected(Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent evt)
+        {
+            if (_unitInfoPanel != null) _unitInfoPanel.AddToClassList("panel-hidden");
+            if (_portraitAnimator != null) _portraitAnimator.Stop();
+            _selectedInstanceID = -1;
+            _currentStatsLoopID++;
+        }
+
+        private void OnSellClicked()
+        {
+            if (_selectedInstanceID != -1 && _isSelectedIsTower)
+            {
+                if (_economyService != null) _economyService.AddGold(_selectedSellCost);
+                if (_towerManager != null) _towerManager.RemoveTower(_selectedInstanceID);
+                
+                if (_eventBus != null) {
+                    _eventBus.Publish(new Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent());
+                } else {
+                    OnUnitDeselected(new Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent());
+                }
+            }
         }
     }
 }
