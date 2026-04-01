@@ -42,9 +42,12 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private Label _lblInfoSpeed;
         private VisualElement _unitPortrait;
         private Button _btnInfoSell;
+        private VisualElement _itemsContainer;
+        private VisualElement _buffsContainer;
 
         private Abel.TranHuongDao.Core.UI.UIToolkitPortraitAnimator _portraitAnimator;
         private int _selectedInstanceID = -1;
+        private int _lastSelectedInstanceID = -1;
         private int _selectedSellCost = 0;
         private bool _isSelectedIsTower = false;
 
@@ -93,6 +96,8 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _lblInfoSpeed = RootElement.Q<Label>("info-speed");
             _unitPortrait = RootElement.Q<VisualElement>("unit-portrait");
             _btnInfoSell = RootElement.Q<Button>("btn-sell");
+            _itemsContainer = RootElement.Q<VisualElement>("items-container");
+            _buffsContainer = RootElement.Q<VisualElement>("buffs-container");
 
             if (_unitPortrait != null)
             {
@@ -233,12 +238,31 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             if (_unitInfoPanel != null) _unitInfoPanel.RemoveFromClassList("panel-hidden");
 
             _selectedInstanceID = evt.InstanceID;
+            _lastSelectedInstanceID = evt.InstanceID;
             _selectedSellCost = Mathf.FloorToInt(evt.Config.BuildCost * 0.5f);
             _isSelectedIsTower = evt.IsTower;
 
             if (_btnInfoSell != null)
             {
                 _btnInfoSell.style.display = evt.IsTower ? DisplayStyle.Flex : DisplayStyle.None;
+
+
+                var sellLbl = _btnInfoSell.Q<Label>();
+                if (sellLbl != null)
+
+                {
+                    sellLbl.text = $"SELL (+{_selectedSellCost})";
+                }
+            }
+
+            if (_itemsContainer != null)
+            {
+                _itemsContainer.style.display = evt.IsTower ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            if (_buffsContainer != null)
+            {
+                _buffsContainer.style.display = evt.IsTower ? DisplayStyle.Flex : DisplayStyle.None;
             }
 
             if (_lblInfoName != null) _lblInfoName.text = evt.Config.UnitID;
@@ -303,14 +327,24 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         private void OnSellClicked()
         {
-            if (_selectedInstanceID != -1 && _isSelectedIsTower)
+            Debug.Log($"[RandomFarmTDView] OnSellClicked! ID: {_selectedInstanceID}, lastID: {_lastSelectedInstanceID}, isTower: {_isSelectedIsTower}");
+            if (_lastSelectedInstanceID != -1 && _isSelectedIsTower)
             {
                 if (_economyService != null) _economyService.AddGold(_selectedSellCost);
-                if (_towerManager != null) _towerManager.RemoveTower(_selectedInstanceID);
-                
-                if (_eventBus != null) {
+                if (_towerManager != null)
+                {
+                    Debug.Log($"[RandomFarmTDView] Calling RemoveTower for {_lastSelectedInstanceID}");
+                    _towerManager.RemoveTower(_lastSelectedInstanceID);
+                }
+
+                _lastSelectedInstanceID = -1;
+
+                if (_eventBus != null)
+                {
                     _eventBus.Publish(new Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent());
-                } else {
+                }
+                else
+                {
                     OnUnitDeselected(new Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent());
                 }
             }

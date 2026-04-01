@@ -98,6 +98,11 @@ namespace Abel.TranHuongDao.Core
                     _renderManager.PushDataToRender(kv.Key, buf.Data, buf.HighWatermark);
                     buf.Dirty = false;
                 }
+                else if (buf.Dirty)
+                {
+                    _renderManager.PushDataToRender(kv.Key, buf.Data, 0);
+                    buf.Dirty = false;
+                }
             }
         }
 

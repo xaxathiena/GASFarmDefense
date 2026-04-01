@@ -93,12 +93,12 @@
             </ui:VisualElement>
             
             <!-- Items & Buffs -->
-            <ui:VisualElement style="flex-direction: row; justify-content: center; margin-bottom: 5px;">
+            <ui:VisualElement name="items-container" style="flex-direction: row; justify-content: center; margin-bottom: 5px;">
                 <ui:VisualElement class="info-slot item-slot" />
                 <ui:VisualElement class="info-slot item-slot" />
                 <ui:VisualElement class="info-slot item-slot" />
             </ui:VisualElement>
-            <ui:VisualElement style="flex-direction: row; justify-content: center; margin-bottom: 10px;">
+            <ui:VisualElement name="buffs-container" style="flex-direction: row; justify-content: center; margin-bottom: 10px;">
                 <ui:VisualElement class="info-slot buff-slot" />
                 <ui:VisualElement class="info-slot buff-slot" />
                 <ui:VisualElement class="info-slot buff-slot" />

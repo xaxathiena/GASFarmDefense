@@ -25,40 +25,43 @@ namespace Abel.TranHuongDao.Core
         /// <summary>
         /// Service for generating unique instance IDs for towers.  Used for render mapping and GAS targeting.
         /// </summary>
-        private readonly IInstanceIDService instanceIDService;
+            private readonly IInstanceIDService instanceIDService;
 
-        private readonly FD.IEventBus eventBus;
-        private readonly FD.Modules.VFX.IVFXManager vfxManager;
+            private readonly FD.IEventBus eventBus;
+            private readonly FD.Modules.VFX.IVFXManager vfxManager;
+            private readonly IMapLayoutManager mapLayoutManager;
 
-        // ── Tower registry ────────────────────────────────────────────────────────
-        private readonly Dictionary<int, Tower> activeTowers = new Dictionary<int, Tower>(32);
-        private readonly List<Tower> pendingRemoval = new List<Tower>(8);
-        private readonly List<int> activeIDBuffer = new List<int>(32);
-        private readonly HashSet<Vector3> occupiedCells = new HashSet<Vector3>();
+            // ── Tower registry ────────────────────────────────────────────────────────
+            private readonly Dictionary<int, Tower> activeTowers = new Dictionary<int, Tower>(32);
+            private readonly List<Tower> pendingRemoval = new List<Tower>(8);
+            private readonly List<int> activeIDBuffer = new List<int>(32);
+            private readonly HashSet<Vector3> occupiedCells = new HashSet<Vector3>();
 
-        // ── IEnemyManager events ─────────────────────────────────────────────────
-        public event Action<int> OnTowerPlaced;
-        public event Action<int> OnTowerRemoved;
+            // ── IEnemyManager events ─────────────────────────────────────────────────
+            public event Action<int> OnTowerPlaced;
+            public event Action<int> OnTowerRemoved;
 
-        // ── Counters ─────────────────────────────────────────────────────────────
-        public int ActiveTowerCount => activeTowers.Count;
+            // ── Counters ─────────────────────────────────────────────────────────────
+            public int ActiveTowerCount => activeTowers.Count;
 
-        // ─────────────────────────────────────────────────────────────────────────
-        public TowerManager(
-            IObjectResolver container,
-            IRender2DService renderService,
-            IConfigService configService,
-            IInstanceIDService instanceIDService,
-            FD.IEventBus eventBus,
-            FD.Modules.VFX.IVFXManager vfxManager)
-        {
-            this.container = container;
-            this.renderService = renderService;
-            this.configService = configService;
-            this.instanceIDService = instanceIDService;
-            this.eventBus = eventBus;
-            this.vfxManager = vfxManager;
-        }
+            // ─────────────────────────────────────────────────────────────────────────
+            public TowerManager(
+                IObjectResolver container,
+                IRender2DService renderService,
+                IConfigService configService,
+                IInstanceIDService instanceIDService,
+                FD.IEventBus eventBus,
+                FD.Modules.VFX.IVFXManager vfxManager,
+                IMapLayoutManager mapLayoutManager)
+            {
+                this.container = container;
+                this.renderService = renderService;
+                this.configService = configService;
+                this.instanceIDService = instanceIDService;
+                this.eventBus = eventBus;
+                this.vfxManager = vfxManager;
+                this.mapLayoutManager = mapLayoutManager;
+            }
 
         public void Tick()
         {
@@ -267,6 +270,12 @@ namespace Abel.TranHuongDao.Core
             tower.Cleanup();
             activeTowers.Remove(tower.InstanceID);
             occupiedCells.Remove(tower.Position);
+            
+            if (mapLayoutManager != null)
+            {
+                var gridPos = mapLayoutManager.WorldToGridPosition(tower.Position);
+                mapLayoutManager.SetCellState(gridPos, GridCellType.Buildable);
+            }
 
             if (notify) OnTowerRemoved?.Invoke(tower.InstanceID);
         }
