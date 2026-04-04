@@ -37,8 +37,8 @@ namespace GASFarmDefense.UIToolkit.Core
             if (_viewDict.TryGetValue(type, out ViewBase nextView))
             {
                 _currentView = nextView;
-                await _currentView.Show();
-                return (T)_currentView;
+                await nextView.Show();
+                return (T)nextView;
             }
             else
             {

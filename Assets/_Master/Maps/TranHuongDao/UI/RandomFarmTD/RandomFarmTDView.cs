@@ -21,6 +21,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         [VContainer.Inject] private Abel.TranHuongDao.Core.TDEconomyService _economyService;
         [VContainer.Inject] private Abel.TranHuongDao.Core.TowerDragDropManager _towerDragManager;
+        [VContainer.Inject] private Abel.TranHuongDao.Core.TowerSelectionManager _towerSelectionManager;
         [VContainer.Inject] private ViewManager _viewManager;
         [VContainer.Inject] private PopupManager _popupManager;
         [VContainer.Inject] private SceneLoaderService _sceneLoader;
@@ -42,6 +43,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private Label _lblInfoSpeed;
         private VisualElement _unitPortrait;
         private Button _btnInfoSell;
+        private Button _btnInfoMerge;
         private VisualElement _itemsContainer;
         private VisualElement _buffsContainer;
 
@@ -50,6 +52,9 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         private int _lastSelectedInstanceID = -1;
         private int _selectedSellCost = 0;
         private bool _isSelectedIsTower = false;
+
+        private int _pendingMergeIDA = -1;
+        private int _pendingMergeIDB = -1;
 
         protected override void OnSetup()
         {
@@ -96,6 +101,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             _lblInfoSpeed = RootElement.Q<Label>("info-speed");
             _unitPortrait = RootElement.Q<VisualElement>("unit-portrait");
             _btnInfoSell = RootElement.Q<Button>("btn-sell");
+            _btnInfoMerge = RootElement.Q<Button>("btn-merge");
             _itemsContainer = RootElement.Q<VisualElement>("items-container");
             _buffsContainer = RootElement.Q<VisualElement>("buffs-container");
 
@@ -109,11 +115,18 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 _btnInfoSell.clicked += OnSellClicked;
             }
 
+            if (_btnInfoMerge != null)
+            {
+                _btnInfoMerge.clicked += OnMergeClicked;
+            }
+
             if (_eventBus != null)
             {
                 _eventBus.Subscribe<Abel.TranHuongDao.Core.TDHandService.CardAddedEvent>(OnCardAdded);
                 _eventBus.Subscribe<Abel.TranHuongDao.Core.TowerSelectionManager.UnitSelectedEvent>(OnUnitSelected);
                 _eventBus.Subscribe<Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent>(OnUnitDeselected);
+                _eventBus.Subscribe<Abel.TranHuongDao.Core.TowerSelectionManager.UnitsReadyToMergeEvent>(OnUnitsReadyToMerge);
+                _eventBus.Subscribe<Abel.TranHuongDao.Core.TowerSelectionManager.CancelMergeEvent>(OnCancelMerge);
             }
 
             if (_handService != null)
@@ -237,6 +250,15 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         {
             if (_unitInfoPanel != null) _unitInfoPanel.RemoveFromClassList("panel-hidden");
 
+            // Hide the merge button by default when a new unit is selected.
+            // Using opacity+pointer-events instead of display:none to keep layout space stable — 
+            // if display:none is used, btn-sell expands to full width and covers btn-merge's hit area.
+            if (_btnInfoMerge != null)
+            {
+                _btnInfoMerge.style.opacity = 0f;
+                _btnInfoMerge.pickingMode = UnityEngine.UIElements.PickingMode.Ignore;
+            }
+
             _selectedInstanceID = evt.InstanceID;
             _lastSelectedInstanceID = evt.InstanceID;
             _selectedSellCost = Mathf.FloorToInt(evt.Config.BuildCost * 0.5f);
@@ -330,6 +352,9 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
             Debug.Log($"[RandomFarmTDView] OnSellClicked! ID: {_selectedInstanceID}, lastID: {_lastSelectedInstanceID}, isTower: {_isSelectedIsTower}");
             if (_lastSelectedInstanceID != -1 && _isSelectedIsTower)
             {
+                // Prevent the same click from re-entering tower selection in TowerSelectionManager.Tick().
+                _towerSelectionManager?.BlockClickThisFrame();
+
                 if (_economyService != null) _economyService.AddGold(_selectedSellCost);
                 if (_towerManager != null)
                 {
@@ -347,6 +372,37 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 {
                     OnUnitDeselected(new Abel.TranHuongDao.Core.TowerSelectionManager.UnitDeselectedEvent());
                 }
+            }
+        }
+
+        private void OnMergeClicked()
+        {
+            if (_towerSelectionManager != null && _pendingMergeIDA != -1 && _pendingMergeIDB != -1)
+            {
+                _towerSelectionManager.ExecuteMergeByID(_pendingMergeIDA, _pendingMergeIDB);
+                _pendingMergeIDA = -1;
+                _pendingMergeIDB = -1;
+            }
+        }
+
+        private void OnUnitsReadyToMerge(Abel.TranHuongDao.Core.TowerSelectionManager.UnitsReadyToMergeEvent evt)
+        {
+            if (_btnInfoMerge != null)
+            {
+                _pendingMergeIDA = evt.TowerA.InstanceID;
+                _pendingMergeIDB = evt.TowerB.InstanceID;
+                // Show via opacity — keeps layout space so btn-sell stays at 50% width.
+                _btnInfoMerge.style.opacity = 1f;
+                _btnInfoMerge.pickingMode = UnityEngine.UIElements.PickingMode.Position;
+            }
+        }
+
+        private void OnCancelMerge(Abel.TranHuongDao.Core.TowerSelectionManager.CancelMergeEvent evt)
+        {
+            if (_btnInfoMerge != null)
+            {
+                _btnInfoMerge.style.opacity = 0f;
+                _btnInfoMerge.pickingMode = UnityEngine.UIElements.PickingMode.Ignore;
             }
         }
     }

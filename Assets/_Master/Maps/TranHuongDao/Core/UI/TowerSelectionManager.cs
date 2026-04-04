@@ -30,6 +30,8 @@ namespace Abel.TranHuongDao.Core
         private readonly IConfigService _configService;
         private readonly FD.IEventBus _eventBus;
         private readonly GameRenderManager _renderManager;
+        private readonly IMapLayoutManager _mapLayoutManager;
+        private readonly TowerBuilderConfig _towerBuilderConfig;
 
         // ── Events ────────────────────────────────────────────────────────────────
         public readonly struct UnitSelectedEvent
@@ -52,6 +54,15 @@ namespace Abel.TranHuongDao.Core
 
         public readonly struct UnitDeselectedEvent { }
 
+        public readonly struct UnitsReadyToMergeEvent
+        {
+            public readonly Tower TowerA;
+            public readonly Tower TowerB;
+            public UnitsReadyToMergeEvent(Tower a, Tower b) { TowerA = a; TowerB = b; }
+        }
+
+        public readonly struct CancelMergeEvent { }
+
         // ── Tuning ────────────────────────────────────────────────────────────────
 
         // Click hit radius in pixels. Larger = easier to click small units.
@@ -62,7 +73,8 @@ namespace Abel.TranHuongDao.Core
         private const float BodyHeightOffset = 0.0f;
 
         // Towers at this tier cannot be merged further (they are already at max evolution).
-        private const int MaxMergeTier = 3;
+        // Tier 6 is the current max in UnitsConfig data.
+        private const int MaxMergeTier = 6;
 
         // Reusable list for next-tier candidates — avoids allocation on every merge evaluation.
         private readonly List<string> _mergeCandidates = new List<string>(8);
@@ -84,7 +96,16 @@ namespace Abel.TranHuongDao.Core
         private UnitConfig _selectedConfig;
         // Cached ASC of the currently selected unit — passed to the UI for the effects panel.
         private GAS.AbilitySystemComponent _selectedASC;
-        // ── Constructor ───────────────────────────────────────────────────────────
+
+        // ── Pending Merge State ───────────────────────────────────────────────────
+        private Tower _pendingMergeTowerA;
+        private Tower _pendingMergeTowerB;
+        private int _pendingMergeTier;
+
+        // When a UI button (Merge/Sell) is pressed, set this true so
+        // Tick() skips the world raycast on that same frame.
+        // Prevents the button click from simultaneously triggering a tower selection change.
+        private bool _skipClickThisFrame;
 
         public TowerSelectionManager(
             ITowerManager towerManager,
@@ -92,7 +113,9 @@ namespace Abel.TranHuongDao.Core
             IEnemyManager enemyManager,
             IConfigService configService,
             FD.IEventBus eventBus,
-            GameRenderManager renderManager)
+            GameRenderManager renderManager,
+            IMapLayoutManager mapLayoutManager,
+            TowerBuilderConfig towerBuilderConfig)
         {
             _towerManager = towerManager;
             _towerSpawner = towerSpawner;
@@ -100,6 +123,8 @@ namespace Abel.TranHuongDao.Core
             _configService = configService;
             _eventBus = eventBus;
             _renderManager = renderManager;
+            _mapLayoutManager = mapLayoutManager;
+            _towerBuilderConfig = towerBuilderConfig;
         }
 
         // ── IInitializable ────────────────────────────────────────────────────────
@@ -154,30 +179,29 @@ namespace Abel.TranHuongDao.Core
 
             Debug.Log("[TowerSelectionManager] Mouse Clicked!");
 
-            // Do not raycast if the mouse is clicking on the Canvas UI (like the Merge button)
-            if (UnityEngine.EventSystems.EventSystem.current != null &&
-                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            // ── Pending merge guard ───────────────────────────────────────────────
+            // If there are two towers awaiting merge confirmation, block ALL world
+            // raycast processing on this click. Unity's Tick() runs before UI Toolkit
+            // dispatches button events. If we allowed the raycast here, it could
+            // Deselect() (clearing _pendingMergeTowerA/B) before OnMergeClicked
+            // ever fires, causing the merge to silently fail.
+            // The player confirms merge via the UI button; we do nothing in Tick()
+            // while waiting for that confirmation.
+            if (_pendingMergeTowerA != null && _pendingMergeTowerB != null)
             {
-                var eventData = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current)
-                {
-                    position = Input.mousePosition
-                };
-                var results = new List<UnityEngine.EventSystems.RaycastResult>();
-                UnityEngine.EventSystems.EventSystem.current.RaycastAll(eventData, results);
-                
-                string hitNames = "";
-                foreach (var res in results)
-                {
-                    hitNames += res.gameObject.name + " ";
-                }
-
-                if (results.Count > 0)
-                {
-                    // Uncomment this to see exactly which UI object is blocking your click!
-                    Debug.Log($"[TowerSelectionManager] Click went through UI: {hitNames}. (Bypassing return to allow selecting units)");
-                    // return; // Bypassed because transparent UI (UI Toolkit or legacy Canvas) is blocking the screen.
-                }
+                Debug.Log("[TowerSelectionManager] Pending merge active — skipping world raycast this frame.");
+                return;
             }
+
+            // Skip this frame's world raycast if a UI button (Merge/Sell) was clicked.
+            // UI Toolkit covers the full screen so EventSystem.RaycastAll always returns hits,
+            // making it impossible to filter by UI hit count. Instead we use a flag.
+            if (_skipClickThisFrame)
+            {
+                _skipClickThisFrame = false;
+                return;
+            }
+            _skipClickThisFrame = false;
 
             if (_mainCamera == null || _renderManager == null)
             {
@@ -345,21 +369,31 @@ namespace Abel.TranHuongDao.Core
                 return;
             }
 
+            bool sameType = towerA.TowerID == towerB.TowerID;
             bool sameTier = configA.Tier == configB.Tier;
             bool belowMaxTier = configA.Tier < MaxMergeTier;
 
-            if (sameTier && belowMaxTier)
+            if (sameType && sameTier && belowMaxTier)
             {
                 // ── VALID MERGE ──────────────────────────────────────────────────
-                // Handle merge logic here and dispatch to EventBus or UI if needed
-                // For now, auto-merge or handle differently since uGUI merge button is removed
-                ExecuteMerge(towerA, towerB, configA.Tier, unitsConfig);
+                // Prepare manual merge state and notify the UI to show the Merge button.
+                _pendingMergeTowerA = towerA;
+                _pendingMergeTowerB = towerB;
+                _pendingMergeTier = configA.Tier;
+
+                // Select Tower B so its stats show up on the UI while waiting for the merge decision
+                SelectUnit(towerB.TowerID, towerB.ASC, isTower: true, tower: towerB, enemy: null);
+
+                _eventBus.Publish(new UnitsReadyToMergeEvent(towerA, towerB));
             }
             else
             {
                 // ── INVALID MERGE ────────────────────────────────────────────────
                 // Different tiers, or already at the tier cap — cancel merge intent
                 // and treat the second click as a plain selection change.
+                _pendingMergeTowerA = null;
+                _pendingMergeTowerB = null;
+                _eventBus.Publish(new CancelMergeEvent());
                 if (!sameTier)
                     Debug.Log($"[TowerSelectionManager] Merge cancelled: tier mismatch " +
                               $"(A={configA.Tier}, B={configB.Tier}).");
@@ -377,6 +411,11 @@ namespace Abel.TranHuongDao.Core
             SelectedTower = null;
             SelectedEnemy = null;
             _selectedASC = null;
+
+            _pendingMergeTowerA = null;
+            _pendingMergeTowerB = null;
+            _eventBus.Publish(new CancelMergeEvent());
+
             _eventBus.Publish(new UnitDeselectedEvent());
         }
 
@@ -385,45 +424,65 @@ namespace Abel.TranHuongDao.Core
         // ─────────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Carries out a confirmed merge:
-        ///   1. Finds a random next-tier tower type from UnitsConfig.
-        ///   2. Removes both source towers.
-        ///   3. Spawns the result at Tower A's position.
-        ///   4. Resets selection state.
+        /// Call this from a UI button handler to prevent Tick() from processing
+        /// the same mouse click as a world-space tower selection event.
         /// </summary>
-        private void ExecuteMerge(Tower towerA, Tower towerB, int currentTier, UnitsConfig unitsConfig)
+        public void BlockClickThisFrame() => _skipClickThisFrame = true;
+
+        /// <summary>
+        /// Carries out a confirmed pending merge initiated by the UI.
+        /// Uses IDs to survive UI click-through which might clear the immediate selection state.
+        /// </summary>
+        public void ExecuteMergeByID(int instanceIdA, int instanceIdB)
         {
-            int targetTier = currentTier + 1;
+            // Block world raycast this frame — the Merge button click must not
+            // simultaneously trigger a CheckMerge or Deselect in Tick().
+            _skipClickThisFrame = true;
 
-            // Collect all unit IDs whose authored Tier equals targetTier.
-            // _mergeCandidates is cleared and reused to avoid allocation.
-            string nextTierID = FindNextTierID(unitsConfig, targetTier);
-
-            if (nextTierID == null)
+            if (!_towerManager.TryGetTower(instanceIdA, out Tower towerA) ||
+                !_towerManager.TryGetTower(instanceIdB, out Tower towerB))
             {
-                // No matching next-tier entry in the database — merge is not possible.
-                // Fall back to selecting Tower B so the player isn't left in a broken state.
-                Debug.LogWarning($"[TowerSelectionManager] Merge aborted: no tower config found " +
-                                 $"for Tier {targetTier}. Check UnitsConfig entries.");
-                SelectUnit(towerB.TowerID, towerB.ASC, isTower: true, tower: towerB, enemy: null);
+                Debug.LogWarning("[TowerSelectionManager] Merge failed: One or both towers no longer exist.");
+                Deselect();
                 return;
             }
 
-            // Cache Tower A's world position before removal (it will no longer be accessible after).
-            Vector3 spawnPosition = towerA.Position;
+            var unitsConfig = _configService.GetConfig<UnitsConfig>();
+            if (unitsConfig == null) return;
+
+            unitsConfig.TryGetConfig(towerA.TowerID, out UnitConfig configA);
+            int targetTier = configA.Tier + 1;
+
+            string nextTierID = FindNextTierID(unitsConfig, targetTier);
+
+            if (string.IsNullOrEmpty(nextTierID))
+            {
+                Debug.LogWarning($"[TowerSelectionManager] Merge aborted: no tower found " +
+                                 $"for Tier {targetTier} in UnitsConfig. Add Tier {targetTier} entries to fix this.");
+                Deselect();
+                return;
+            }
+
+            Vector3 spawnPosition = towerB.Position;
 
             Debug.Log($"[TowerSelectionManager] Merging '{towerA.TowerID}' + '{towerB.TowerID}' " +
                       $"→ '{nextTierID}' at {spawnPosition}");
 
-            // Remove both source towers from the field.
-            // RemoveTower handles render pipeline cleanup, GAS teardown, and occupied-cell release.
+            // Remove both source towers first (this marks their cells as Buildable via DestroyTower).
             _towerManager.RemoveTower(towerA.InstanceID);
             _towerManager.RemoveTower(towerB.InstanceID);
 
-            // Spawn the evolved tower at Tower A's original footprint.
+            // Re-mark towerB's cell as TowerOccupied for the new merged tower.
+            // SpawnTower (via SpawnTowerInternal) updates occupiedCells but doesn't call SetCellState,
+            // so we do it here to keep mapLayoutManager consistent.
+            if (_mapLayoutManager != null)
+            {
+                var gridPos = _mapLayoutManager.WorldToGridPosition(spawnPosition);
+                _mapLayoutManager.SetCellState(gridPos, GridCellType.TowerOccupied);
+            }
+
             _towerSpawner.SpawnTower(nextTierID, spawnPosition);
 
-            // Clear selection — the new tower is not automatically selected.
             Deselect();
         }
 

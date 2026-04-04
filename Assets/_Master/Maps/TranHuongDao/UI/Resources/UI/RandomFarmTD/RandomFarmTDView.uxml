@@ -67,7 +67,7 @@
         </ui:VisualElement>
 
         <!-- Unit Info Panel -->
-        <ui:VisualElement name="unit-info-panel" class="unit-info-panel panel-hidden" picking-mode="Ignore">
+        <ui:VisualElement name="unit-info-panel" class="unit-info-panel panel-hidden">
             <ui:VisualElement class="unit-info-header">
                 <ui:Label text="UNIT INFO" class="gold-text" style="font-size: 14px; -unity-font-style: bold;" />
             </ui:VisualElement>
@@ -104,9 +104,14 @@
                 <ui:VisualElement class="info-slot buff-slot" />
             </ui:VisualElement>
             
-            <ui:Button name="btn-sell" class="game-button btn-sell">
-                <ui:Label text="Sell" style="color: white; -unity-font-style: bold;" />
-            </ui:Button>
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between; padding-left: 10px; padding-right: 10px; margin-bottom: 10px;">
+                <ui:Button name="btn-sell" class="game-button btn-sell" picking-mode="Position" style="flex-grow: 1; margin-right: 5px;">
+                    <ui:Label text="Sell" style="color: white; -unity-font-style: bold;" />
+                </ui:Button>
+                <ui:Button name="btn-merge" class="game-button btn-merge" picking-mode="Position" style="flex-grow: 1; margin-left: 5px; background-color: #27ae60; opacity: 0;">
+                    <ui:Label text="Merge" style="color: white; -unity-font-style: bold;" />
+                </ui:Button>
+            </ui:VisualElement>
         </ui:VisualElement>
 
         <!-- Card Deck -->

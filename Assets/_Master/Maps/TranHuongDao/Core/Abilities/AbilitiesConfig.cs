@@ -1,7 +1,7 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using GAS;
+using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -29,6 +29,12 @@ namespace Abel.TranHuongDao.Core
             foreach (var ability in allAbilities)
             {
                 if (ability == null) continue;
+                if (string.IsNullOrEmpty(ability.abilityID))
+                {
+                    Debug.LogWarning($"[AbilitiesConfig] Found ability '{ability.name}' with null or empty ID, ignoring it.");
+                    continue;
+                }
+
                 if (!_lookup.ContainsKey(ability.abilityID))
                     _lookup[ability.abilityID] = ability;
                 else

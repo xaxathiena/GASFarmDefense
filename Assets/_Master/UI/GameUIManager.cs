@@ -51,7 +51,6 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
                 topBar.pickingMode = PickingMode.Ignore; // Don't block background clicks
                 TopBarContainer.Add(topBar);
             }
-            ViewManager.SwitchView<MainMenuView>().Forget();
         }
 
         private IObjectResolver _resolver;
