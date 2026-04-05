@@ -13,7 +13,7 @@ namespace Abel.TowerDefense.Data
         public int    instanceID;
 
         // 1. Transform Data (Position, Rotation, Scale)
-        public float2 position;
+        public float3 position;
         public float  rotation;   // In degrees
         public float  scale;
 

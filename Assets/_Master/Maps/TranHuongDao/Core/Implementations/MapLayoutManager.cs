@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Abel.TowerDefense.Config;
 using UnityEngine;
 using VContainer;
-using Abel.TowerDefense.Config;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -10,6 +10,7 @@ namespace Abel.TranHuongDao.Core
     /// DOD grid-and-path layout manager for the Tower Defense map.
     /// Uses MapConfigSO to build the grid and multiple enemy paths.
     /// </summary>
+    [ExecuteAlways]
     public class MapLayoutManager : MonoBehaviour, IMapLayoutManager
     {
         // ─────────────────────────────────────────────────────────────────────────
@@ -17,7 +18,8 @@ namespace Abel.TranHuongDao.Core
         // ─────────────────────────────────────────────────────────────────────────
 
         private GridCellType[] _grid;
-        private IReadOnlyList<Vector3>[] _cachedPaths;
+        private IReadOnlyList<Vector3>[] _cachedPaths;      // Local space coordinates
+        private IReadOnlyList<Vector3>[] _cachedWorldPaths; // World space coordinates
         private IConfigService _configService;
 
         // ─────────────────────────────────────────────────────────────────────────
@@ -38,53 +40,42 @@ namespace Abel.TranHuongDao.Core
         {
             _configService = configService;
         }
+
         void Start()
         {
-            LoadMap("Map_1"); // Temporary default
-            
-        }
-        /// <summary>
-        /// Loads map layout configuration from MapConfigSO via ConfigService.
-        /// </summary>
-        public void LoadMap(string mapID)
-        {
-            var config = _configService.GetConfig<MapConfigSO>();
-            if (config == null)
+            if (Application.isPlaying && _configService != null)
             {
-                Debug.LogError("[MapLayoutManager] Missing MapConfigSO in ConfigService.");
-                return;
+                LoadMap("Map_1"); // Temporary default
             }
+        }
 
-            // Apply grid dimensions and origin
+        /// <summary>
+        /// Allows the editor to manually trigger a map load for Gizmo visualization.
+        /// </summary>
+        [ContextMenu("Reload Map (Editor Only)")]
+        public void EditorLoadMap()
+        {
+            if (_editorPreviewConfig == null) return;
+            Initialize(_editorPreviewConfig);
+        }
+
+        public void Initialize(MapConfigSO config)
+        {
+            if (config == null) return;
+
             GridWidth = config.GridWidth;
             GridHeight = config.GridHeight;
             CellSize = config.CellSize;
             OriginPosition = config.OriginPosition;
-
-            // Initialize every cell as Blocked — only explicitly whitelisted cells are buildable.
             _grid = new GridCellType[GridWidth * GridHeight];
-            for (int i = 0; i < _grid.Length; i++)
-            {
-                _grid[i] = GridCellType.Blocked;
-            }
 
-            // Mark designer-whitelisted cells as Buildable.
-            if (config.BuildableCells != null)
-            {
-                foreach (var cellPos in config.BuildableCells)
-                {
-                    SetCellStateInternal(cellPos, GridCellType.Buildable);
-                }
-            }
-
-            // Rebuild _cachedPaths and overlay path cells on top (path overrides buildable).
+            // Convert List<PathData> to IReadOnlyList<Vector3>[]
             if (config.EnemyPaths != null)
             {
                 _cachedPaths = new IReadOnlyList<Vector3>[config.EnemyPaths.Count];
                 for (int i = 0; i < config.EnemyPaths.Count; i++)
                 {
-                    _cachedPaths[i] = new List<Vector3>(config.EnemyPaths[i].waypoints);
-                    MarkPathCells(config.EnemyPaths[i].waypoints);
+                    _cachedPaths[i] = config.EnemyPaths[i].waypoints;
                 }
             }
             else
@@ -92,32 +83,61 @@ namespace Abel.TranHuongDao.Core
                 _cachedPaths = Array.Empty<IReadOnlyList<Vector3>>();
             }
 
-            Debug.Log($"[MapLayoutManager] Loaded Map {mapID}: {GridWidth}x{GridHeight}, {_cachedPaths.Length} paths.");
+
+            _cachedWorldPaths = null; // Clear world cache
+
+            // Mark buildable cells
+            if (config.BuildableCells != null)
+            {
+                foreach (var cell in config.BuildableCells)
+                    SetCellStateInternal(cell, GridCellType.Buildable);
+            }
+
+            // Mark path cells
+            if (_cachedPaths != null)
+            {
+                foreach (var path in _cachedPaths)
+                    MarkPathCells(path);
+            }
         }
 
-        private void MarkPathCells(List<Vector3> waypoints)
+        public void LoadMap(string mapID)
         {
-            if (waypoints == null || waypoints.Count == 0) return;
+            if (_configService == null) return;
 
-            for (int i = 0; i < waypoints.Count; i++)
+            var config = _configService.GetConfig<MapConfigSO>();
+            if (config == null)
             {
-                SetCellStateInternal(WorldToGridPosition(waypoints[i]), GridCellType.Path);
+                Debug.LogError($"[MapLayoutManager] Missing MapConfigSO in ConfigService for {mapID}.");
+                return;
+            }
+            Initialize(config);
+        }
 
-                if (i >= waypoints.Count - 1) continue;
+        private void MarkPathCells(IEnumerable<Vector3> waypoints)
+        {
+            if (waypoints == null) return;
 
-                Vector3 from = waypoints[i];
-                Vector3 to = waypoints[i + 1];
-                float length = Vector3.Distance(from, to);
-                if (CellSize <= 0f) continue;
 
-                int steps = Mathf.CeilToInt(length / (CellSize * 0.5f));
+            Vector3? lastPoint = null;
+            foreach (var point in waypoints)
+            {
+                SetCellStateInternal(WorldToGridPosition(transform.TransformPoint(point)), GridCellType.Path);
 
-                for (int s = 1; s <= steps; s++)
+
+                if (lastPoint.HasValue)
                 {
-                    float t = (float)s / steps;
-                    Vector3 sample = Vector3.Lerp(from, to, t);
-                    SetCellStateInternal(WorldToGridPosition(sample), GridCellType.Path);
+                    Vector3 from = lastPoint.Value;
+                    Vector3 to = point;
+                    float length = Vector3.Distance(from, to);
+                    int steps = Mathf.CeilToInt(length / (CellSize * 0.5f));
+                    for (int s = 1; s <= steps; s++)
+                    {
+                        Vector3 sample = Vector3.Lerp(from, to, (float)s / steps);
+                        SetCellStateInternal(WorldToGridPosition(transform.TransformPoint(sample)), GridCellType.Path);
+                    }
                 }
+                lastPoint = point;
             }
         }
 
@@ -127,72 +147,70 @@ namespace Abel.TranHuongDao.Core
 
         public Vector3 GridToWorldPosition(int x, int y)
         {
-            return new Vector3(
+            // Calculate local offset from OriginPosition
+            Vector3 localPos = new Vector3(
                 OriginPosition.x + (x + 0.5f) * CellSize,
                 OriginPosition.y + (y + 0.5f) * CellSize,
                 OriginPosition.z
             );
+
+            // Map local offset into world space using the GameObject's Transform (handles Rotation/Tilt)
+            return transform.TransformPoint(localPos);
         }
 
         public Vector2Int WorldToGridPosition(Vector3 worldPosition)
         {
-            if (CellSize <= 0) return Vector2Int.zero; // Sandbox safety
+            if (CellSize <= 0) return Vector2Int.zero;
 
-            int x = Mathf.FloorToInt((worldPosition.x - OriginPosition.x) / CellSize);
-            int y = Mathf.FloorToInt((worldPosition.y - OriginPosition.y) / CellSize);
-            x = Mathf.Clamp(x, 0, Mathf.Max(0, GridWidth - 1));
-            y = Mathf.Clamp(y, 0, Mathf.Max(0, GridHeight - 1));
-            return new Vector2Int(x, y);
+            // Map world position back into local space
+            Vector3 localPos = transform.InverseTransformPoint(worldPosition);
+
+            int x = Mathf.FloorToInt((localPos.x - OriginPosition.x) / CellSize);
+            int y = Mathf.FloorToInt((localPos.y - OriginPosition.y) / CellSize);
+
+            return new Vector2Int(
+                Mathf.Clamp(x, 0, Mathf.Max(0, GridWidth - 1)),
+                Mathf.Clamp(y, 0, Mathf.Max(0, GridHeight - 1))
+            );
         }
 
-        // ─────────────────────────────────────────────────────────────────────────
-        //  IMapLayoutManager – Cell state
-        // ─────────────────────────────────────────────────────────────────────────
-
-        public GridCellType GetCellState(Vector2Int gridPos)
-        {
-            if (!IsValidCell(gridPos)) return GridCellType.Blocked;
-            return _grid[gridPos.y * GridWidth + gridPos.x];
-        }
-
-        public void SetCellState(Vector2Int gridPos, GridCellType state)
-        {
-            SetCellStateInternal(gridPos, state);
-        }
-
-        public bool CanBuildAt(Vector3 worldPosition)
-        {
-            if (_grid == null) return false;
-            return GetCellState(WorldToGridPosition(worldPosition)) == GridCellType.Buildable;
-        }
-
-        // ─────────────────────────────────────────────────────────────────────────
-        //  IMapLayoutManager – Path query
-        // ─────────────────────────────────────────────────────────────────────────
+        public GridCellType GetCellState(Vector2Int gridPos) => IsValidCell(gridPos) ? _grid[gridPos.y * GridWidth + gridPos.x] : GridCellType.Blocked;
+        public void SetCellState(Vector2Int gridPos, GridCellType state) => SetCellStateInternal(gridPos, state);
+        public bool CanBuildAt(Vector3 worldPosition) => GetCellState(WorldToGridPosition(worldPosition)) == GridCellType.Buildable;
 
         public IReadOnlyList<Vector3>[] GetEnemyPath()
         {
-            return _cachedPaths ?? Array.Empty<IReadOnlyList<Vector3>>();
-        }
+            // If the local cache is empty, return empty
+            if (_cachedPaths == null) return Array.Empty<IReadOnlyList<Vector3>>();
 
-        // ─────────────────────────────────────────────────────────────────────────
-        //  Private helpers
-        // ─────────────────────────────────────────────────────────────────────────
+            // Recompute world paths if needed
+            if (_cachedWorldPaths == null || _cachedWorldPaths.Length != _cachedPaths.Length)
+            {
+                _cachedWorldPaths = new IReadOnlyList<Vector3>[_cachedPaths.Length];
+                for (int i = 0; i < _cachedPaths.Length; i++)
+                {
+                    var localPath = _cachedPaths[i];
+                    var worldPath = new Vector3[localPath.Count];
+                    for (int j = 0; j < localPath.Count; j++)
+                    {
+                        // Transform each local waypoint into world space based on current Transform
+                        worldPath[j] = transform.TransformPoint(localPath[j]);
+                    }
+                    _cachedWorldPaths[i] = worldPath;
+                }
+            }
+
+            return _cachedWorldPaths;
+        }
 
         private void SetCellStateInternal(Vector2Int gridPos, GridCellType state)
         {
-            if (!IsValidCell(gridPos)) return;
-            _grid[gridPos.y * GridWidth + gridPos.x] = state;
+            if (IsValidCell(gridPos)) _grid[gridPos.y * GridWidth + gridPos.x] = state;
         }
-
-        private bool IsValidCell(Vector2Int gridPos)
-        {
-            return gridPos.x >= 0 && gridPos.x < GridWidth &&
-                   gridPos.y >= 0 && gridPos.y < GridHeight;
-        }
+        private bool IsValidCell(Vector2Int gridPos) => gridPos.x >= 0 && gridPos.x < GridWidth && gridPos.y >= 0 && gridPos.y < GridHeight;
 
         // ─────────────────────────────────────────────────────────────────────────
-        //  Gizmos — Editor-only visualization
+        //  Gizmos
         // ─────────────────────────────────────────────────────────────────────────
 
         private static readonly Color GizmoColorBuildable = new Color(0.20f, 0.80f, 0.20f, 0.35f);
@@ -204,61 +222,85 @@ namespace Abel.TranHuongDao.Core
         private static readonly Color GizmoColorWaypoint = new Color(1.00f, 0.60f, 0.00f, 1.00f);
         private static readonly Color GizmoColorPathLine = new Color(1.00f, 0.40f, 0.10f, 0.90f);
 
+        [Header("Editor Visualization")]
+        [SerializeField] private MapConfigSO _editorPreviewConfig;
+        [SerializeField] private bool _showGrid = true;
+        [SerializeField] private bool _showPaths = true;
+
         private void OnDrawGizmos()
         {
-            // Only draw if grid is initialized (to suppress errors outside Play Mode initially)
-            if (GridWidth <= 0 || GridHeight <= 0 || CellSize <= 0) return;
+            if (GridWidth <= 0 || GridHeight <= 0 || CellSize <= 0)
+            {
+                // Try automatic reload if config is available
+                if (!Application.isPlaying && _editorPreviewConfig != null) EditorLoadMap();
+                return;
+            }
 
-            DrawGridGizmos();
-            DrawEnemyPathGizmos();
+            if (_showGrid) DrawGridGizmos();
+            if (_showPaths) DrawEnemyPathGizmos();
         }
 
         private void DrawGridGizmos()
         {
             Vector3 cellExtents = new Vector3(CellSize * 0.94f, CellSize * 0.94f, 0.01f);
-            Vector3 cellBorder = new Vector3(CellSize, CellSize, 0.01f);
-
             for (int y = 0; y < GridHeight; y++)
             {
                 for (int x = 0; x < GridWidth; x++)
                 {
                     Vector3 center = GridToWorldPosition(x, y);
-
-                    GridCellType type = (_grid != null && Application.isPlaying)
-                        ? _grid[y * GridWidth + x]
-                        : GridCellType.Buildable;
+                    GridCellType type = (_grid != null && y * GridWidth + x < _grid.Length) ? _grid[y * GridWidth + x] : GridCellType.Empty;
 
                     Gizmos.color = CellGizmoColor(type);
                     Gizmos.DrawCube(center, cellExtents);
-
                     Gizmos.color = GizmoColorGridLine;
-                    Gizmos.DrawWireCube(center, cellBorder);
+                    Gizmos.DrawWireCube(center, new Vector3(CellSize, CellSize, 0.01f));
                 }
             }
         }
 
         private void DrawEnemyPathGizmos()
         {
-            if (_cachedPaths == null || _cachedPaths.Length == 0) return;
+            // IMPORTANT: GetEnemyPath() now returns WORLD coordinates.
+            var worldPaths = GetEnemyPath();
+            if (worldPaths == null || worldPaths.Length == 0) return;
+
 
             float sphereRadius = CellSize * 0.25f;
 
-            foreach (var path in _cachedPaths)
+            for (int pIdx = 0; pIdx < worldPaths.Length; pIdx++)
             {
-                if (path == null || path.Count == 0) continue;
+                var path = worldPaths[pIdx];
+                if (path == null) continue;
 
                 Gizmos.color = GizmoColorPathLine;
                 for (int i = 0; i < path.Count - 1; i++)
                 {
-                    Gizmos.DrawLine(path[i], path[i + 1]);
+                    Vector3 from = path[i];
+                    Vector3 to = path[i + 1];
+                    DrawArrow(from, to, CellSize * 0.4f);
+                    Gizmos.DrawLine(from, to);
                 }
 
-                Gizmos.color = GizmoColorWaypoint;
-                foreach (Vector3 wp in path)
+                for (int i = 0; i < path.Count; i++)
                 {
-                    Gizmos.DrawSphere(wp, sphereRadius);
+                    Vector3 worldPos = path[i];
+                    Gizmos.color = (i == 0) ? Color.green : (i == path.Count - 1 ? Color.red : GizmoColorWaypoint);
+                    Gizmos.DrawSphere(worldPos, sphereRadius);
+#if UNITY_EDITOR
+                    UnityEditor.Handles.Label(worldPos + Vector3.up * sphereRadius * 2f, $"P{pIdx}:{i}");
+#endif
                 }
             }
+        }
+
+        private void DrawArrow(Vector3 from, Vector3 to, float arrowHeadLength)
+        {
+            Vector3 direction = (to - from).normalized;
+            if (direction == Vector3.zero) return;
+            Vector3 right = Quaternion.LookRotation(Vector3.forward, direction) * Quaternion.Euler(0, 0, 150) * Vector3.up;
+            Vector3 left = Quaternion.LookRotation(Vector3.forward, direction) * Quaternion.Euler(0, 0, -150) * Vector3.up;
+            Gizmos.DrawRay(to, right * arrowHeadLength);
+            Gizmos.DrawRay(to, left * arrowHeadLength);
         }
 
         private static Color CellGizmoColor(GridCellType type) => type switch
@@ -267,7 +309,6 @@ namespace Abel.TranHuongDao.Core
             GridCellType.Path => GizmoColorPath,
             GridCellType.Blocked => GizmoColorBlocked,
             GridCellType.TowerOccupied => GizmoColorTowerOccupied,
-            GridCellType.Empty => GizmoColorEmpty,
             _ => GizmoColorEmpty,
         };
     }

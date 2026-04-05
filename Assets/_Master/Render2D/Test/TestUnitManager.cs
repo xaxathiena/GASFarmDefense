@@ -1,9 +1,9 @@
-using UnityEngine;
-using Unity.Mathematics;
 using System.Collections.Generic;
 using System.Linq;
 using Abel.TowerDefense.Config;
 using Abel.TowerDefense.Core;
+using Unity.Mathematics;
+using UnityEngine;
 
 namespace Abel.TowerDefense.Test
 {
@@ -30,14 +30,14 @@ namespace Abel.TowerDefense.Test
         {
             public int instanceID;
             public string id;
-            public float2 position;
+            public float3 position;
             public float rotation;
             public float scale;
             public UnitAnimState currentState;
 
             // Implementing ILogicEntity
             public string UnitID => id;
-            public float2 Position => position;
+            public float3 Position => position;
             public float Rotation => rotation;
             public float Scale => scale;
             public UnitAnimState CurrentState => currentState;
@@ -58,7 +58,7 @@ namespace Abel.TowerDefense.Test
 
             HandleSpawnCountChanges();
             HandleRemoveRequest();
-            
+
             // Call the base class method to push everything to the GPU!
             PushDataToRenderSystem();
         }
@@ -69,9 +69,9 @@ namespace Abel.TowerDefense.Test
             while (activeEntities.Count < spawnCount)
             {
                 string randomID = unitIDsToSpawn[UnityEngine.Random.Range(0, unitIDsToSpawn.Count)];
-                float2 pos = (spawnCount == 1)
-                    ? float2.zero
-                    : new float2(UnityEngine.Random.Range(-20f, 20f), UnityEngine.Random.Range(-20f, 20f));
+                float3 pos = (spawnCount == 1)
+                    ? float3.zero
+                    : new float3(UnityEngine.Random.Range(-20f, 20f), 0, UnityEngine.Random.Range(-20f, 20f));
 
                 var newEntity = new SimEntity
                 {
@@ -82,9 +82,9 @@ namespace Abel.TowerDefense.Test
                     scale = 1f,
                     currentState = targetAnimState
                 };
-                
+
                 // Use the base class method to register
-                AddEntity(newEntity); 
+                AddEntity(newEntity);
             }
 
             // Sync animation state if changed in Inspector

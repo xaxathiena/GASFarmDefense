@@ -20,6 +20,30 @@ MonoBehaviour:
       startDelay: 0
       spawnEntries:
       - enemyID: unit_frog_tower
-        count: 200
+        count: 1
         intervalBetweenSpawns: 0.5
+        pathIndex: 0
+    - waveName: Wave 2
+      preparationTime: 1
+      startDelay: 1
+      spawnEntries:
+      - enemyID: unit_frog_tower
+        count: 1
+        intervalBetweenSpawns: 1
+        pathIndex: 0
+    - waveName: Wave 3
+      preparationTime: 1
+      startDelay: 1
+      spawnEntries:
+      - enemyID: unit_frog_tower
+        count: 1
+        intervalBetweenSpawns: 0.5
+        pathIndex: 0
+    - waveName: Wave 4
+      preparationTime: 5
+      startDelay: 2
+      spawnEntries:
+      - enemyID: unit_frog_tower
+        count: 1
+        intervalBetweenSpawns: 1
         pathIndex: 0

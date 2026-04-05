@@ -8,7 +8,7 @@ namespace Abel.TowerDefense.Render
     public struct UnitSyncData
     {
         public int    instanceID;
-        public float2 position;
+        public float3 position;
         public float  rotation;
         public float  scale;
         public int    animIndex;  // Tells the render system which animation clip to play

@@ -88,7 +88,7 @@ namespace Abel.TowerDefense.Render
 
                 // Map the logical 2D position onto the 3D XZ plane, then lift in world-Y.
                 // This matches how UnitBatchRenderer positions sprites.
-                Vector3 worldPos = new Vector3(u.position.x, 0f, u.position.y) + BarOffset;
+                Vector3 worldPos = (Vector3)u.position + BarOffset;
 
                 // Build the TRS matrix by composing the constant RS block with the world translation.
                 // Equivalent to Matrix4x4.TRS(worldPos, BarRotation, BarScale) but avoids

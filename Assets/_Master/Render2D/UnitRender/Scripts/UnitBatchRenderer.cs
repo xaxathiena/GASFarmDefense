@@ -72,7 +72,7 @@ namespace Abel.TowerDefense.Render
                 Quaternion rot = Quaternion.Euler(cameraTilt, 0, 0);
                 
                 // Map the logical 2D position to the 3D XZ plane
-                Vector3 pos = new Vector3(u.position.x, 0, u.position.y);
+                Vector3 pos = u.position;
                 
                 // Retrieve safe scale and aspect ratio values
                 float safeAspectRatio = (info.aspectRatio > 0.01f) ? info.aspectRatio : 1.0f;

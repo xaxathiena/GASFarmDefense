@@ -151,7 +151,7 @@ namespace Abel.TranHuongDao.Core
             if (!buf.InstanceToSlot.TryGetValue(instanceID, out int slot)) return;
 
             var s       = buf.Data[slot];
-            s.position  = new float2(position.x, position.y);
+            s.position  = (float3)position;
             s.rotation  = rotation;
             s.scale     = scale;
             buf.Data[slot] = s;
@@ -229,7 +229,7 @@ namespace Abel.TranHuongDao.Core
             => new UnitSyncData
             {
                 instanceID = instanceID,
-                position   = new float2(position.x, position.y),
+                position   = (float3)position,
                 rotation   = rotation,
                 scale      = scale,
                 animIndex  = 0,

@@ -11,7 +11,7 @@ namespace Abel.TowerDefense.Core
     public interface ILogicEntity : IUnitDebugInfo
     {
         string UnitID { get; }
-        float2 Position { get; }
+        float3 Position { get; }
         float Rotation { get; }
         float Scale { get; }
         UnitAnimState CurrentState { get; }

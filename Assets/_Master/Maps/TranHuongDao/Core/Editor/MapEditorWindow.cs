@@ -469,19 +469,26 @@ namespace Abel.TranHuongDao.Core.Editor
         {
             if (activeMap == null) return;
 
-            DrawGridOverlay();
+            // Try to find the manager in the scene to get its orientation (tilt).
+            var manager = GameObject.FindAnyObjectByType<MapLayoutManager>();
+            Matrix4x4 gridMatrix = manager != null ? manager.transform.localToWorldMatrix : Matrix4x4.identity;
 
-            // Show buildable cells overlay in Paths and Buildable Cells modes.
-            if (currentMode == EditMode.EditPaths || currentMode == EditMode.PaintObstacles)
-                DrawBuildableCells();
+            // Wrap all grid-space drawing in a DrawingScope with the tilted matrix.
+            // This allows us to use local coordinates (X/Y) while Unity handles the 45-degree tilt.
+            using (new Handles.DrawingScope(gridMatrix))
+            {
+                DrawGridOverlay();
 
-            // Show path handles in Paths and Buildable Cells modes.
-            if (currentMode == EditMode.EditPaths || currentMode == EditMode.PaintObstacles)
-                DrawPathHandles();
+                if (currentMode == EditMode.EditPaths || currentMode == EditMode.PaintObstacles)
+                    DrawBuildableCells();
 
-            // Mouse brush is only active in Buildable Cells mode.
+                if (currentMode == EditMode.EditPaths || currentMode == EditMode.PaintObstacles)
+                    DrawPathHandles(manager != null ? manager.transform : null);
+            }
+
+            // Mouse brush input needs to handle the tilted plane for raycasting.
             if (currentMode == EditMode.PaintObstacles)
-                HandlePaintInput();
+                HandlePaintInput(manager);
         }
 
         /// <summary>
@@ -558,13 +565,16 @@ namespace Abel.TranHuongDao.Core.Editor
         /// Coordinate convention: waypoints live in world XY at fixed Z = OriginPosition.z,
         /// matching MapLayoutManager.GridToWorldPosition.
         /// </summary>
-        private void DrawPathHandles()
+        private void DrawPathHandles(Transform contextTransform)
         {
             var   paths    = activeMap.EnemyPaths;
             float cell     = activeMap.CellSize;
             float discSize = cell * WaypointDiscSize;
-            float z        = activeMap.OriginPosition.z; // fixed depth plane
+            float z        = activeMap.OriginPosition.z;
 
+            // Note: Since we are inside Handles.DrawingScope(matrix), all coordinates 
+            // and Handles calls are in the Grid's LOCAL space.
+            
             for (int pi = 0; pi < paths.Count; pi++)
             {
                 var   pathData  = paths[pi];
@@ -574,10 +584,8 @@ namespace Abel.TranHuongDao.Core.Editor
                 if (waypoints.Count == 0) continue;
 
                 // ── Connecting lines ──────────────────────────────────────────────
-                // Build a point array for DrawAAPolyLine (thicker than DrawLine).
                 var linePoints = new Vector3[waypoints.Count];
                 for (int wi = 0; wi < waypoints.Count; wi++)
-                    // Lock Z to the grid's depth plane so lines stay flat.
                     linePoints[wi] = new Vector3(waypoints[wi].x, waypoints[wi].y, z);
 
                 Handles.color = pathColor;
@@ -587,30 +595,29 @@ namespace Abel.TranHuongDao.Core.Editor
                 // ── Waypoint handles & labels ─────────────────────────────────────
                 for (int wi = 0; wi < waypoints.Count; wi++)
                 {
-                    Vector3 worldPos = new Vector3(waypoints[wi].x, waypoints[wi].y, z);
+                    Vector3 localPos = new Vector3(waypoints[wi].x, waypoints[wi].y, z);
 
-                    // Filled disc facing the camera (normal = Vector3.back for XY plane).
                     Handles.color = pathColor;
-                    Handles.DrawSolidDisc(worldPos, Vector3.back, discSize);
+                    Handles.DrawSolidDisc(localPos, Vector3.forward, discSize);
 
-                    // Waypoint index label offset to the right of the disc.
                     Handles.Label(
-                        worldPos + new Vector3(discSize * 1.4f, discSize * 0.5f, 0f),
+                        localPos + new Vector3(discSize * 1.4f, discSize * 0.5f, 0f),
                         $"P{pi}:W{wi}",
                         EditorStyles.miniLabel);
 
-                    // PositionHandle: X and Y are meaningful; Z is locked to the grid plane.
+                    // PositionHandle in local space
                     EditorGUI.BeginChangeCheck();
                     Handles.color = Color.white;
-                    Vector3 newWorld = Handles.PositionHandle(worldPos, Quaternion.identity);
+                    
+                    // Inside DrawingScope, PositionHandle returns local coordinates!
+                    Vector3 newLocal = Handles.PositionHandle(localPos, Quaternion.identity);
 
                     if (EditorGUI.EndChangeCheck())
                     {
                         Undo.RecordObject(activeMap, "Move Waypoint");
-                        // Write back X/Y only; keep Z pinned to the grid's depth plane.
-                        waypoints[wi] = new Vector3(newWorld.x, newWorld.y, z);
+                        pathData.waypoints[wi] = new Vector3(newLocal.x, newLocal.y, z);
                         EditorUtility.SetDirty(activeMap);
-                        Repaint(); // Sync the Vector3 fields in the GUI panel.
+                        Repaint();
                     }
                 }
             }
@@ -671,47 +678,55 @@ namespace Abel.TranHuongDao.Core.Editor
         ///   gridY = Floor((hitY - origin.y) / cellSize)
         /// The ray is cast onto the plane z = OriginPosition.z (forward-normal plane).
         /// </summary>
-        private void HandlePaintInput()
+        private void HandlePaintInput(MapLayoutManager manager)
         {
-            // Prevent Unity from de-selecting the active GameObject when the user clicks
-            // in the Scene View while this window owns the mouse.
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
             HandleUtility.AddDefaultControl(controlID);
 
             Event e = Event.current;
 
-            // Only act on left-mouse button down or drag events.
             bool isPaint = (e.type == EventType.MouseDown || e.type == EventType.MouseDrag)
                            && e.button == 0;
             if (!isPaint) return;
 
-            // ── Ray → XY plane intersection ──────────────────────────────────────────
-            // The grid lives at z = OriginPosition.z. Define a forward-normal plane there.
-            // Plane(normal, d): dot(point, normal) + d = 0  ⇒  z + d = 0  ⇒  d = -origin.z
-            var   plane = new Plane(Vector3.forward, -activeMap.OriginPosition.z);
-            Ray   ray   = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+            // ── Ray → Tilted Plane intersection ──────────────────────────────────────────
+            // If we have a manager, we use its transform to define the plane.
+            // Otherwise fallback to a horizontal plane at activeMap.OriginPosition.z.
+            Plane plane;
+            if (manager != null)
+            {
+                // Normal is the transform's forward (Z axis)
+                plane = new Plane(manager.transform.forward, manager.transform.position + manager.transform.TransformDirection(activeMap.OriginPosition));
+            }
+            else
+            {
+                plane = new Plane(Vector3.forward, -activeMap.OriginPosition.z);
+            }
+            
+            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
 
-            if (!plane.Raycast(ray, out float enterDist)) return; // ray is parallel to the plane
+            if (!plane.Raycast(ray, out float enterDist)) return;
 
-            Vector3 hitPoint = ray.GetPoint(enterDist);
+            Vector3 hitPointWorld = ray.GetPoint(enterDist);
+            
+            // Convert world hit to local space if we have a manager
+            Vector3 localHit = manager != null 
+                ? manager.transform.InverseTransformPoint(hitPointWorld) 
+                : hitPointWorld;
 
-            // ── Convert world XY hit to grid cell ───────────────────────────────────────
-            // Identical to MapLayoutManager.WorldToGridPosition (no clamping here so we
-            // can reject out-of-bounds cells rather than silently clamping them).
+            // ── Convert local hit to grid cell ───────────────────────────────────────
             float   cell   = activeMap.CellSize;
             Vector3 origin = activeMap.OriginPosition;
 
-            int gx = Mathf.FloorToInt((hitPoint.x - origin.x) / cell);
-            int gy = Mathf.FloorToInt((hitPoint.y - origin.y) / cell);
+            int gx = Mathf.FloorToInt((localHit.x - origin.x) / cell);
+            int gy = Mathf.FloorToInt((localHit.y - origin.y) / cell);
 
-            // Reject clicks outside the grid bounds.
             if (gx < 0 || gx >= activeMap.GridWidth || gy < 0 || gy >= activeMap.GridHeight)
                 return;
 
             var  cellCoord = new Vector2Int(gx, gy);
             bool erase     = e.shift;
 
-            // ── Apply paint / erase ───────────────────────────────────────────────
             bool listContains = activeMap.BuildableCells.Contains(cellCoord);
 
             if (erase && listContains)
@@ -729,7 +744,6 @@ namespace Abel.TranHuongDao.Core.Editor
                 Repaint();
             }
 
-            // Consume the event so Unity doesn't pass it to the default scene tools.
             e.Use();
         }
 
