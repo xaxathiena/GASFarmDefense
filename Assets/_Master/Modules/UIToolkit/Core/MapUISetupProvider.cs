@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Abel.TranHuongDao.Core;
+using Cysharp.Threading.Tasks;
+using GASFarmDefense.UIToolkit.Core;
+using GASFarmDefense.UIToolkit.Core.Animations;
+using GASFarmDefense.UIToolkit.TranHuongDao;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VContainer;
 using VContainer.Unity;
-using GASFarmDefense.UIToolkit.Core;
-using GASFarmDefense.UIToolkit.Core.Animations;
-using Abel.TranHuongDao.Core;
-using GASFarmDefense.UIToolkit.TranHuongDao;
-using Cysharp.Threading.Tasks;
-using System.Linq;
-using System.Reflection;
 
 namespace GASFarmDefense.UIToolkit.Core
 {
@@ -88,8 +88,9 @@ namespace GASFarmDefense.UIToolkit.Core
                 hud.Initialize(_hudUxml);
                 hud.UIAnimation = new UIFadeAnimation();
                 _viewManager.RegisterView(hud);
-                
+
                 // Show HUD immediately
+
                 _viewManager.SwitchView<RandomFarmTDView>().Forget();
             }
 
@@ -101,6 +102,7 @@ namespace GASFarmDefense.UIToolkit.Core
                 PopupBase popupInstance = CreatePopupInstance(config);
                 if (popupInstance != null)
                 {
+                    Debug.Log($"[MapUISetupProvider] Injecting into popup: {popupInstance.GetType().Name}");
                     _resolver.Inject(popupInstance);
                     popupInstance.Initialize(config.Uxml);
                     popupInstance.UIAnimation = new UIFadeAnimation();
