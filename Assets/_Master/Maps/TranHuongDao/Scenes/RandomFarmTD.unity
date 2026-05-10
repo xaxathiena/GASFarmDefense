@@ -2883,7 +2883,7 @@ Transform:
   m_GameObject: {fileID: 1297628828}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0, z: 3.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4532,6 +4532,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UnitRender
       objectReference: {fileID: 0}
+    - target: {fileID: 2797311145523910500, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7271351828700597938, guid: 56608fc53c609b04395bcf085ea6d275, type: 3}
       propertyPath: hpQuadMesh
       value: 
@@ -4635,7 +4639,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fec9cfb89036be046b5fc6dec28e0e88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Abel.TranHuongDao.Core.MapLayoutManager
-  _editorConfig: {fileID: 11400000, guid: 4f63b00ad9af77243ae80a19172ef25b, type: 2}
+  _editorPreviewConfig: {fileID: 0}
+  _showGrid: 1
+  _showPaths: 1
 --- !u!4 &2061553635
 Transform:
   m_ObjectHideFlags: 0
