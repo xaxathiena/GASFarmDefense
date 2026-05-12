@@ -87,22 +87,6 @@ namespace Abel.GAS.Samples.OrbCombat
             debugUI.enemyASC = _enemyASC;
         }
 
-        private void OnGUI()
-        {
-            if (_playerASC == null || _enemyASC == null) return;
-
-            GUI.Box(new Rect(10, 10, 250, 100), "Orb Combat Controller");
-
-            if (GUI.Button(new Rect(20, 40, 100, 30), "Cast Fireball"))
-            {
-                ExecuteFireball();
-            }
-
-            if (GUI.Button(new Rect(130, 40, 100, 30), "Apply Slow"))
-            {
-                ExecuteSlow();
-            }
-        }
 
         private void ExecuteFireball()
         {

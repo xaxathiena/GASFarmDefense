@@ -16,33 +16,75 @@ namespace Abel.GAS.Samples.OrbCombat
         public AbilitySystemComponent playerASC;
         public AbilitySystemComponent enemyASC;
 
+        private Vector2 playerScroll;
+        private Vector2 enemyScroll;
+
         private void OnGUI()
         {
-            // Set a larger font for better readability
             GUI.skin.label.fontSize = 12;
+
+            // Draw Background Boxes for clear separation
+            GUI.Box(new Rect(5, 5, 360, 450), "PLAYER STATUS");
+            GUI.Box(new Rect(370, 5, 360, 450), "ENEMY STATUS");
 
             if (playerASC != null && playerASC.AttributeSet is OrbAttributeSet pAttr)
             {
-                DrawASCDetails(new Rect(10, 50, 350, 400), "[PLAYER]", pAttr, playerASC);
+                playerScroll = DrawASCDetails(new Rect(10, 25, 350, 420), pAttr, playerASC, playerScroll);
             }
 
             if (enemyASC != null && enemyASC.AttributeSet is OrbAttributeSet eAttr)
             {
-                DrawASCDetails(new Rect(400, 50, 350, 400), "[ENEMY]", eAttr, enemyASC);
+                enemyScroll = DrawASCDetails(new Rect(375, 25, 350, 420), eAttr, enemyASC, enemyScroll);
             }
 
-            DrawTestButtons(new Rect(10, 460, 740, 100));
+            DrawTestButtons(new Rect(5, 460, 725, 120));
         }
+
+        private Vector2 testScroll;
 
         private void DrawTestButtons(Rect rect)
         {
-            GUI.Box(rect, "PHASE 1: MATH VERIFICATION");
-            GUILayout.BeginArea(new Rect(rect.x + 10, rect.y + 20, rect.width - 20, rect.height - 30));
+            GUI.Box(rect, "TEST SUITE & ACTIONS");
+
+            // Inner area for scrolling
+
+            GUILayout.BeginArea(new Rect(rect.x + 5, rect.y + 20, rect.width - 10, rect.height - 25));
+            testScroll = GUILayout.BeginScrollView(testScroll);
+
+            // --- SECTION: COMBAT ACTIONS ---
+            GUI.color = Color.cyan;
+            GUILayout.Label("COMBAT ACTIONS");
+            GUI.color = Color.white;
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Cast Fireball (Ability)"))
+            {
+                // Logic from bootstrap: -10 HP to enemy, -20 Mana to player
+                var geDmg = CreateSimpleGE("FireballDmg", EGameplayAttributeType.Health, EGameplayModifierOp.Add, -10f, EGameplayEffectDurationType.Instant);
+                playerASC.ApplyGameplayEffectToTarget(geDmg, enemyASC, playerASC);
+
+
+                if (playerASC.AttributeSet is OrbAttributeSet p) p.Mana.ModifyCurrentValue(-20f);
+                Debug.Log("OrbDebugUI: Cast Fireball!");
+            }
+            if (GUILayout.Button("Apply Slow (Ability)"))
+            {
+                // Logic from bootstrap: -2 Speed for 5s
+                var geSlow = CreateSimpleGE("SlowAbility", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, -2f, EGameplayEffectDurationType.Duration, 5f, new GameplayTag[] { GameplayTag.Debuff_Slow });
+                playerASC.ApplyGameplayEffectToTarget(geSlow, enemyASC, playerASC);
+                Debug.Log("OrbDebugUI: Applied Slow to Enemy!");
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // --- SECTION: PHASE 1 ---
+            GUI.color = Color.yellow;
+            GUILayout.Label("PHASE 1: MATH VERIFICATION");
+            GUI.color = Color.white;
             GUILayout.BeginHorizontal();
 
             if (GUILayout.Button("TC1.1: Add +2, Mult x2 (Speed)"))
             {
-                // Create temp effects
                 var geAdd = CreateSimpleGE("TestAdd", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, 2f, EGameplayEffectDurationType.Duration, 5f);
                 var geMult = CreateSimpleGE("TestMult", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Multiply, 2f, EGameplayEffectDurationType.Duration, 5f);
                 playerASC.ApplyGameplayEffectToSelf(geAdd);
@@ -77,17 +119,55 @@ namespace Abel.GAS.Samples.OrbCombat
                     p.Speed.SetBaseValue(5f);
                 }
             }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // --- SECTION: PHASE 2 ---
+            GUI.color = Color.yellow;
+            GUILayout.Label("PHASE 2: EFFECT LIFECYCLE");
+            GUI.color = Color.white;
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("TC2.1: Slow 3s"))
+            {
+                var geSlow = CreateSimpleGE("SlowDebuff", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Multiply, 0.5f, EGameplayEffectDurationType.Duration, 3f, new GameplayTag[] { GameplayTag.Debuff_Slow });
+                playerASC.ApplyGameplayEffectToSelf(geSlow);
+            }
+
+            if (GUILayout.Button("TC2.2: Poison 10dmg/1s (3s)"))
+            {
+                var gePoison = CreateSimpleGE("PoisonDoT", EGameplayAttributeType.Health, EGameplayModifierOp.Add, -10f, EGameplayEffectDurationType.Duration, 3.1f, new GameplayTag[] { GameplayTag.State_Poisoned });
+                gePoison.isPeriodic = true;
+                gePoison.period = 1f;
+                playerASC.ApplyGameplayEffectToSelf(gePoison);
+            }
+
+            if (GUILayout.Button("TC2.3: Dispel (Remove Slow)"))
+            {
+                playerASC.RemoveGameplayEffectsWithTags(GameplayTag.Debuff_Slow);
+            }
+
+            if (GUILayout.Button("TC2.4: Infinite Buff (+2 Speed)"))
+            {
+                var geInf = CreateSimpleGE("InfiniteSpeed", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, 2f, EGameplayEffectDurationType.Infinite);
+                playerASC.ApplyGameplayEffectToSelf(geInf);
+            }
 
             GUILayout.EndHorizontal();
+
+
+            GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
 
-        private GameplayEffect CreateSimpleGE(string name, EGameplayAttributeType attr, EGameplayModifierOp op, float val, EGameplayEffectDurationType durationType, float duration = 0f)
+        private GameplayEffect CreateSimpleGE(string name, EGameplayAttributeType attr, EGameplayModifierOp op, float val, EGameplayEffectDurationType durationType, float duration = 0f, GameplayTag[] tags = null)
         {
             var ge = ScriptableObject.CreateInstance<GameplayEffect>();
             ge.effectName = name;
             ge.durationType = durationType;
             ge.durationMagnitude = duration;
+            ge.grantedTags = tags;
 
 
             var mod = new GameplayEffectModifier(attr, op, val);
@@ -95,15 +175,35 @@ namespace Abel.GAS.Samples.OrbCombat
             return ge;
         }
 
-        private void DrawASCDetails(Rect rect, string header, OrbAttributeSet attrSet, AbilitySystemComponent asc)
+        private Vector2 DrawASCDetails(Rect rect, OrbAttributeSet attrSet, AbilitySystemComponent asc, Vector2 scrollPos)
         {
+            // Define the content height based on active effects
+            float contentHeight = 350 + (asc.GetActiveGameplayEffects().Count * 20);
+            Rect viewRect = new Rect(0, 0, rect.width - 20, contentHeight);
+
+            scrollPos = GUI.BeginScrollView(rect, scrollPos, viewRect);
+
+
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine(header);
             sb.AppendLine(GetAttributeDetails("HP", attrSet.Health));
             sb.AppendLine(GetAttributeDetails("MaxHP", attrSet.MaxHealth));
             sb.AppendLine(GetAttributeDetails("Mana", attrSet.Mana));
             sb.AppendLine(GetAttributeDetails("Speed", attrSet.Speed));
 
+
+            sb.AppendLine("\n[ACTIVE EFFECTS]");
+            var activeEffects = asc.GetActiveGameplayEffects();
+            if (activeEffects.Count > 0)
+            {
+                foreach (var effect in activeEffects)
+                {
+                    sb.AppendLine($"- {effect.ToString()}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("None");
+            }
 
             sb.AppendLine("\n[ACTIVE TAGS]");
             var tags = asc.GetActiveTags();
@@ -116,8 +216,11 @@ namespace Abel.GAS.Samples.OrbCombat
                 sb.AppendLine("None");
             }
 
-            GUI.Box(rect, "");
-            GUI.Label(new Rect(rect.x + 10, rect.y + 5, rect.width - 20, rect.height - 10), sb.ToString());
+            GUI.Label(new Rect(5, 5, viewRect.width, viewRect.height), sb.ToString());
+
+
+            GUI.EndScrollView();
+            return scrollPos;
         }
 
         private string GetAttributeDetails(string name, GameplayAttribute attr)
