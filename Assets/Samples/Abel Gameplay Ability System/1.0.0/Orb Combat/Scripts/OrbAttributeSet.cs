@@ -29,12 +29,15 @@ namespace Abel.GAS.Samples.OrbCombat
             RegisterAttribute(EGameplayAttributeType.MoveSpeed, Speed);
         }
 
-        protected override void PreAttributeChange(GameplayAttribute attribute, float newValue)
+        protected override void PreAttributeChange(GameplayAttribute attribute, ref float newValue)
         {
             if (attribute == Health)
             {
-                // Clamp health between 0 and MaxHealth
                 newValue = Mathf.Clamp(newValue, 0f, MaxHealth.CurrentValue);
+            }
+            else if (attribute == Mana)
+            {
+                newValue = Mathf.Clamp(newValue, 0f, MaxMana.CurrentValue);
             }
         }
     }

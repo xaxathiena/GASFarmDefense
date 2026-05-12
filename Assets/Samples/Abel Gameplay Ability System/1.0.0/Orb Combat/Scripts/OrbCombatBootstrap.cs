@@ -143,6 +143,8 @@ namespace Abel.GAS.Samples.OrbCombat
                 new GameplayEffectModifier(EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, -2f)
             };
 
+            slowEffect.grantedTags = new GameplayTag[] { GameplayTag.Debuff_Slow };
+
             // Apply to enemy
             _playerASC.ApplyGameplayEffectToTarget(slowEffect, _enemyASC, _playerASC);
             Debug.Log("[OrbCombat] Slow Applied to Enemy for 5 seconds!");
