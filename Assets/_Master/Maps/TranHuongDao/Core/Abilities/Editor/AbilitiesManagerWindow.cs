@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using Abel.TranHuongDao.Core;
 
 namespace Abel.TranHuongDao.Core.Abilities.Editor
@@ -508,3 +511,5 @@ namespace Abel.TranHuongDao.Core.Abilities.Editor
     }
 }
 #endif
+
+

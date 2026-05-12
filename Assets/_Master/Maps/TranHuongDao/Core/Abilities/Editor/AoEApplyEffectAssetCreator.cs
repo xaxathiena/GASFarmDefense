@@ -1,7 +1,10 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using Abel.TranHuongDao.Core.Abilities;
 using System.Collections.Generic;
 
@@ -81,3 +84,5 @@ namespace Abel.TranHuongDao.Editor
     }
 }
 #endif
+
+

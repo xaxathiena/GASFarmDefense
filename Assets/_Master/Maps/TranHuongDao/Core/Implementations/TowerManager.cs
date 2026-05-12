@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using System.Linq;
 
 namespace Abel.TranHuongDao.Core
@@ -140,7 +143,7 @@ namespace Abel.TranHuongDao.Core
         public bool TryGetTower(int instanceID, out Tower tower)
             => activeTowers.TryGetValue(instanceID, out tower);
 
-        public bool TryGetTowerASC(int instanceID, out GAS.AbilitySystemComponent asc)
+        public bool TryGetTowerASC(int instanceID, out Abel.GAS.AbilitySystemComponent asc)
         {
             if (activeTowers.TryGetValue(instanceID, out var tower))
             {
@@ -163,7 +166,7 @@ namespace Abel.TranHuongDao.Core
             }
         }
 
-        public void GetTowersInRange(Vector3 center, float radius, List<GAS.AbilitySystemComponent> ignoreList, List<GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue)
+        public void GetTowersInRange(Vector3 center, float radius, List<Abel.GAS.AbilitySystemComponent> ignoreList, List<Abel.GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue)
         {
             float sqrRadius = radius * radius;
 
@@ -287,3 +290,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

@@ -1,7 +1,11 @@
 using FD.Abilities;
+using FD.Ability;
 using FD.Data;
 using FD.Views;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using VContainer;
 using VContainer.Unity;
 namespace FD
@@ -38,7 +42,7 @@ namespace FD
 
             // IMPORTANT: GASInitializer MUST run before FDBattleManager
             // to register ability behaviours before towers are created
-            builder.RegisterEntryPoint<GASInitializer>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<AppGASInitializer>(Lifetime.Singleton);
             builder.RegisterEntryPoint<FDBattleManager>(Lifetime.Singleton);
             
             builder.RegisterEntryPoint<DebugService>(Lifetime.Singleton).As<IDebugService>();
@@ -81,3 +85,5 @@ namespace FD
         }
     }
 }
+
+

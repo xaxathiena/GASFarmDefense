@@ -1,6 +1,9 @@
 using System;
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using Abel.TranHuongDao.Core.Abilities;
 using Abel.TranHuongDao.Core.VFX;
 
@@ -155,7 +158,7 @@ namespace Abel.TranHuongDao.Core
             vfxController = new StatusEffectVFXController(
                 instanceID,
                 () => Position,
-                eventBus,
+                _asc,
                 vfxManager,
                 vfxConfig
             );
@@ -165,7 +168,7 @@ namespace Abel.TranHuongDao.Core
             _asc.UnitInstanceID = instanceID;
 
             // ── Hit Notification Subscription ──────────────────────────────────
-            eventBus.Subscribe<GameplayEffectAppliedEvent>(HandleEffectApplied);
+            _asc.OnEffectApplied += HandleEffectApplied;
         }
 
         /// <summary>Called every frame by TowerManager.Tick().</summary>
@@ -203,9 +206,9 @@ namespace Abel.TranHuongDao.Core
 
             vfxController?.Dispose();
 
-            if (_eventBus != null)
+            if (_asc != null)
             {
-                _eventBus.Unsubscribe<GameplayEffectAppliedEvent>(HandleEffectApplied);
+                _asc.OnEffectApplied -= HandleEffectApplied;
             }
         }
 
@@ -301,3 +304,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

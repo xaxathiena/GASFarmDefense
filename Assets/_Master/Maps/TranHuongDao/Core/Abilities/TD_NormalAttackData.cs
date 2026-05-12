@@ -1,11 +1,14 @@
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using UnityEngine;
 
 namespace Abel.TranHuongDao.Core.Abilities
 {
     /// <summary>
     /// Pure data container for Normal Attack capability.
-    /// Inherits from GAS.GameplayAbilityData to support ASC registration.
+    /// Inherits from Abel.GAS.Abilities.GameplayAbilityData to support ASC registration.
     /// </summary>
     [CreateAssetMenu(menuName = "GAS/Abilities/Normal Attack Data", fileName = "TD_NormalAttackData")]
     public class TD_NormalAttackData : GameplayAbilityData
@@ -34,3 +37,5 @@ namespace Abel.TranHuongDao.Core.Abilities
         public float baseDamage = 10f;
     }
 }
+
+

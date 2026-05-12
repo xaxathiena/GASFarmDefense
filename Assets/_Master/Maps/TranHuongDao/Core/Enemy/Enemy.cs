@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using Abel.TranHuongDao.Core.VFX;
 
 namespace Abel.TranHuongDao.Core
@@ -94,7 +97,6 @@ namespace Abel.TranHuongDao.Core
             UnitConfig config,
             IReadOnlyList<Vector3> path,
             IRender2DService renderService,
-            FD.IEventBus eventBus,
             FD.Modules.VFX.IVFXManager vfxManager,
             TagVFXConfig vfxConfig,
             Abel.TranHuongDao.Core.UI.FloatingTextManager floatingTextManager)
@@ -139,7 +141,7 @@ namespace Abel.TranHuongDao.Core
             vfxController = new StatusEffectVFXController(
                 instanceID,
                 () => Position,
-                eventBus,
+                asc,
                 vfxManager,
                 vfxConfig
             );
@@ -250,3 +252,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

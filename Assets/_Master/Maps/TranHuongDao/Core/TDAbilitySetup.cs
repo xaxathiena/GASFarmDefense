@@ -1,5 +1,8 @@
 using VContainer.Unity;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using Abel.TranHuongDao.Core.Abilities;
 
 namespace Abel.TranHuongDao.Core
@@ -71,3 +74,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

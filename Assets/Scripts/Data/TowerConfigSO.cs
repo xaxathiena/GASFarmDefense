@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 
 namespace FD.Data
 {
@@ -48,3 +51,5 @@ namespace FD.Data
         public bool isPassive = false;
     }
 }
+
+

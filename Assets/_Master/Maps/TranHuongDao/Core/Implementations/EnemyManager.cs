@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using Enemy = Abel.TranHuongDao.Core.Enemy;
 namespace Abel.TranHuongDao.Core
 {
@@ -176,7 +179,7 @@ namespace Abel.TranHuongDao.Core
             }
         }
 
-        public bool TryGetEnemyASC(int instanceID, out GAS.AbilitySystemComponent asc)
+        public bool TryGetEnemyASC(int instanceID, out Abel.GAS.AbilitySystemComponent asc)
         {
             if (activeEnemies.TryGetValue(instanceID, out var enemy))
             {
@@ -319,7 +322,7 @@ namespace Abel.TranHuongDao.Core
 
             var tagVFXConfig = configService.GetConfig<TagVFXConfig>();
 
-            enemy.Initialize(id, enemyID, config, waypoints, renderService, eventBus, vfxManager, tagVFXConfig, floatingTextManager);
+            enemy.Initialize(id, enemyID, config, waypoints, renderService, vfxManager, tagVFXConfig, floatingTextManager);
 
             enemy.OnDeath += HandleEnemyDeath;
             enemy.OnReachedEnd += HandleEnemyReachedEnd;
@@ -359,3 +362,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

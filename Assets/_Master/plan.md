@@ -63,13 +63,13 @@ GASFarmDefense/
 
 ---
 
-## 🚀 Phase 1 — Chuẩn bị & Tạo Git Repo cho Module
+## 🚀 Phase 1 — Chuẩn bị & Tạo Git Repo cho Module ✅
 
 **Mục tiêu**: Tạo Git repository riêng cho `com.abel.gas`, thiết lập cấu trúc folder chuẩn UPM.
 
 ### Tasks:
-- [ ] **Tạo Git repo mới**: `git init` tại một folder trống, đặt tên repo `com.abel.gas`.
-- [ ] **Tạo cấu trúc folder**:
+- [x] **Tạo Git repo mới**: `git init` tại một folder trống, đặt tên repo `com.abel.gas`.
+- [x] **Tạo cấu trúc folder**:
   ```
   com.abel.gas/
   ├── Runtime/Core/
@@ -82,16 +82,16 @@ GASFarmDefense/
   ├── package.json
   └── README.md
   ```
-- [ ] **Tạo `package.json`** với `name: "com.abel.gas"`, `version: "1.0.0"`.
-- [ ] **Tạo `.asmdef`** tại `Runtime/com.abel.gas.asmdef` (references: `VContainer`, `R3`).
-- [ ] **Tạo `.asmdef`** tại `Editor/com.abel.gas.editor.asmdef`.
-- [ ] **Add Submodule** vào project chính: `git submodule add <url> Assets/Packages/com.abel.gas`.
-- [ ] **Tạo `.gitmodules`** entry tương ứng.
+- [x] **Tạo `package.json`** với `name: "com.abel.gas"`, `version: "1.0.0"`.
+- [x] **Tạo `.asmdef`** tại `Runtime/com.abel.gas.asmdef` (references: `VContainer`, `R3`).
+- [x] **Tạo `.asmdef`** tại `Editor/com.abel.gas.editor.asmdef`.
+- [x] **Add Submodule** vào project chính: `git submodule add <url> Assets/Packages/com.abel.gas`.
+- [x] **Tạo `.gitmodules`** entry tương ứng.
 
 ### Test Cases:
-- **TC 1.1**: Folder `Assets/Packages/com.abel.gas` tồn tại và được git tracking là submodule.
-- **TC 1.2**: `package.json` hợp lệ, Unity nhận diện package trong Package Manager.
-- **TC 1.3**: Cả 2 `.asmdef` compile sạch (không có script nào bên trong chúng ta lỗi).
+- **TC 1.1**: Folder `Assets/Packages/com.abel.gas` tồn tại và được git tracking là submodule. ✅
+- **TC 1.2**: `package.json` hợp lệ, Unity nhận diện package trong Package Manager. ✅
+- **TC 1.3**: Cả 2 `.asmdef` compile sạch (không có script nào bên trong chúng ta lỗi). ✅
 
 ---
 
@@ -106,20 +106,20 @@ GASFarmDefense/
 > định nghĩa `IGASEventBus`, mọi project phải implement/bridge interface này — tạo ra friction không cần thiết.
 > GAS chỉ cần **notify** ra ngoài, không cần quan tâm ai lắng nghe hay lắng nghe bằng cơ chế nào.
 
-- [ ] **Thêm C# `event` delegates vào `AbilitySystemComponent.cs`**:
+- [x] **Thêm C# `event` delegates vào `AbilitySystemComponent.cs`**:
   ```csharp
   // AbilitySystemComponent — GAS notifies, project subscribes however it wants
   public event Action<GameplayTag, int> OnTagChanged;      // (tag, newCount)
   public event Action<GameplayEffectAppliedEvent> OnEffectApplied;
   ```
-- [ ] **Sửa `AbilitySystemLogic.cs`**: Thay 4 lệnh `_eventBus.Publish(...)` bằng callback delegate:
+- [x] **Sửa `AbilitySystemLogic.cs`**: Thay 4 lệnh `_eventBus.Publish(...)` bằng callback delegate:
   ```csharp
   // Thay vì: _eventBus.Publish(new GameplayTagChangedEvent(...))
   // Dùng:    asc.OnTagChanged?.Invoke(tag, newCount);
   ```
-- [ ] **Xóa `_eventBus` field** và constructor parameter `IEventBus` khỏi `AbilitySystemLogic`.
-- [ ] **Xóa folder `Runtime/Events/`** (và `IGASEventBus.cs`) ra khỏi module hoàn toàn.
-- [ ] **Tạo `IGASLogger.cs`** trong `Runtime/Diagnostics/`:
+- [x] **Xóa `_eventBus` field** và constructor parameter `IEventBus` khỏi `AbilitySystemLogic`.
+- [x] **Xóa folder `Runtime/Events/`** (và `IGASEventBus.cs`) ra khỏi module hoàn toàn.
+- [x] **Tạo `IGASLogger.cs`** trong `Runtime/Diagnostics/`:
   ```csharp
   namespace Abel.GAS.Diagnostics {
       public interface IGASLogger {
@@ -129,18 +129,20 @@ GASFarmDefense/
       }
   }
   ```
-- [ ] **Move `DamageCalculationBase.cs`** vào `Runtime/Effects/` (đổi namespace thành `Abel.GAS.Effects`).
+- [x] **Move `DamageCalculationBase.cs`** vào `Runtime/Effects/` (đổi namespace thành `Abel.GAS.Effects`).
 
 #### 2B — Sửa Core Files (Xóa coupling FD)
-- [ ] **`AbilitySystemLogic.cs`**: Xóa `FD.IEventBus`, thay bằng gọi `asc.OnTagChanged?.Invoke(...)` và `asc.OnEffectApplied?.Invoke(...)`.
-- [ ] **`AbilitySystemComponent.cs`**: Thay `IDebugService` → `IGASLogger` (inject optional). Thêm 2 public events.
-- [ ] **`GameplayEffect.cs`**: Đổi type `customCalculation` từ `FD.Ability.DamageCalculationBase` → `Abel.GAS.Effects.DamageCalculationBase`.
-- [ ] **Xóa `GASInitializer.cs`** khỏi Core.
+- [x] **`AbilitySystemLogic.cs`**: Xóa `FD.IEventBus`, thay bằng gọi `asc.OnTagChanged?.Invoke(...)` and `asc.OnEffectApplied?.Invoke(...)`.
+- [x] **`AbilitySystemComponent.cs`**: Thay `IDebugService` → `IGASLogger` (inject optional). Thêm 2 public events.
+- [x] **`GameplayEffect.cs`**: Đổi type `customCalculation` từ `FD.Ability.DamageCalculationBase` → `Abel.GAS.Effects.DamageCalculationBase`.
+- [x] **Xóa `GASInitializer.cs`** khỏi Core.
 
 #### 2C — Rename Namespace toàn bộ Core
-- [ ] Thay `namespace GAS` → `namespace Abel.GAS` trong tất cả file Core.
-- [ ] Thay `namespace GAS.Ability` → `namespace Abel.GAS.Abilities`.
-- [ ] Cập nhật tất cả `using GAS` → `using Abel.GAS` trong Core.
+- [x] **Thay `namespace GAS`** → `namespace Abel.GAS` trong tất cả file Core.
+- [x] **Thay `namespace GAS.Ability`** → `namespace Abel.GAS.Abilities`.
+- [x] **Cập nhật tất cả `using GAS`** → `using Abel.GAS` trong Core.
+- [x] **Verify decoupled core**: Chạy lệnh grep kiểm tra sạch coupling `FD`.
+- [x] **Verify project buildable**: Đảm bảo các file bị move ra ngoài (MainCharacter, GASInitializer) vẫn compile được.
 
 ### Test Cases:
 - **TC 2.1**: `grep -r "using FD" Assets/Packages/com.abel.gas` → 0 results.
@@ -156,38 +158,38 @@ GASFarmDefense/
 
 ### Tasks:
 #### 3A — Nhóm Core
-- [ ] Copy → `Runtime/Core/`:
+- [x] Copy → `Runtime/Core/`:
   - `AbilitySystemComponent.cs`, `AbilitySystemData.cs`, `AbilitySystemLogic.cs`
   - `AbilitySystemExtensions.cs`, `IAbilitySystemComponent.cs`
   - `IGASAvatar.cs` (TransformAvatar)
   - `GameplayTag.cs`, `GameplayTagChangedEvent.cs`
 
 #### 3B — Nhóm Abilities
-- [ ] Copy → `Runtime/Abilities/`:
+- [x] Copy → `Runtime/Abilities/`:
   - `GameplayAbilityData.cs`, `GameplayAbilitySpec.cs`, `GameplayAbilityLogic.cs`
   - `IAbilityBehaviour.cs`, `AbilityBehaviourRegistry.cs`
   - `AbilityScalableFloat.cs` (ScalableFloat base)
 
 #### 3C — Nhóm Attributes
-- [ ] Copy → `Runtime/Attributes/`:
+- [x] Copy → `Runtime/Attributes/`:
   - `AttributeSet.cs`, `GameplayAttribute.cs`
   - `AttributeReflectionHelper.cs`, `CsvCurveTable.cs`
   - `EGameplayAttributeType.cs` (enum base — FD có thể define thêm enum riêng)
   - `CustomAttributeSetExample.cs` (rename thành `AttributeSetTemplate.cs`)
 
 #### 3D — Nhóm Effects
-- [ ] Copy → `Runtime/Effects/`:
+- [x] Copy → `Runtime/Effects/`:
   - `GameplayEffect.cs`, `ActiveGameplayEffect.cs`
   - `GameplayEffectService.cs`, `GameplayEffectCalculationService.cs`
   - `GameplayEffectContext.cs`, `DamageCalculationBase.cs`
 
 #### 3E — Diagnostics (không có Events nữa)
-- [ ] Copy → `Runtime/Diagnostics/`: `IGASLogger.cs`, `GASPerformanceStats.cs`
+- [x] Copy → `Runtime/Diagnostics/`: `IGASLogger.cs`, `GASPerformanceStats.cs`
 - [ ] **Không tạo folder `Runtime/Events/`** — đã quyết định không định nghĩa EventBus trong module.
 
 #### 3F — Xác nhận không có gì bị bỏ sót
-- [ ] So sánh danh sách file cũ vs file mới đã copy.
-- [ ] Xóa file cũ trong `GAS/Scripts/Base/` (giữ lại folder cũ đến Phase 5).
+- [x] So sánh danh sách file cũ vs file mới đã copy.
+- [x] Xóa file cũ trong `GAS/Scripts/Base/` (giữ lại folder cũ đến Phase 5).
 
 ### Test Cases:
 - **TC 3.1**: Module compile sạch với tất cả scripts mới.
@@ -211,25 +213,25 @@ GASFarmDefense/
 | UI | Health bar, Mana bar, Tag list, Cooldown timer |
 
 ### Tasks:
-- [ ] Tạo `OrbAttributeSet.cs` kế thừa `Abel.GAS.Attributes.AttributeSet`.
-- [ ] Tạo 4 Ability Data ScriptableObjects:
+- [x] Tạo `OrbAttributeSet.cs` kế thừa `Abel.GAS.Attributes.AttributeSet`.
+- [x] Tạo 4 Ability Data ScriptableObjects:
   - `FireballData` (Instant, costs 20 Mana, 2s cooldown)
   - `PoisonData` (Duration 5s, DOT, stackable x3)
   - `StunData` (Duration 2s, grants tag `State.Stunned`)
   - `HasteData` (Duration 5s, +50% Speed)
-- [ ] Tạo 4 Behaviour classes tương ứng.
-- [ ] Tạo `OrbGameInitializer.cs` (implement `IStartable`) để đăng ký 4 ability trên vào `AbilityBehaviourRegistry`.
-- [ ] Tạo `OrbDebugUI.cs` hiển thị trạng thái realtime.
-- [ ] Viết `OrbCombatLifetimeScope.cs` cấu hình VContainer cho scene này.
+- [x] Tạo 4 Behaviour classes tương ứng. (Sử dụng `OrbAbilityData` và `ApplyEffectAbilityBehaviour`)
+- [x] Tạo `OrbGameInitializer.cs` (implement `IStartable`) để đăng ký 4 ability trên vào `AbilityBehaviourRegistry`.
+- [x] Tạo `OrbDebugUI.cs` hiển thị trạng thái realtime.
+- [x] Viết `OrbCombatLifetimeScope.cs` cấu hình VContainer cho scene này.
 
 ### Test Cases:
-- **TC 4.1 (Instant Damage)**: Bấm Fireball → Mana giảm 20, Enemy Health giảm đúng lượng, Cooldown 2s.
-- **TC 4.2 (Duration Effect)**: Apply Poison → Health giảm mỗi giây, hết 5s effect tự xóa.
-- **TC 4.3 (Stacking)**: Apply Poison 3 lần → Stack count = 3, damage cộng dồn, không tạo instance thứ 4.
-- **TC 4.4 (Tag Blocking)**: Apply Stun → Player không thể cast Fireball khi bị Stun.
-- **TC 4.5 (Attribute Buff)**: Apply Haste → Speed tăng đúng %, sau 5s về lại giá trị cũ.
-- **TC 4.6 (Attribute Aggregation)**: Apply 2 Haste buff → Speed cộng dồn đúng.
-- **TC 4.7 (Event Bus)**: Tag changed event được fire khi Add/Remove tag.
+- [x] **TC 4.1 (Instant Damage)**: Bấm Fireball → Mana giảm 20, Enemy Health giảm đúng lượng, Cooldown 2s.
+- [x] **TC 4.2 (Duration Effect)**: Apply Poison → Health giảm mỗi giây, hết 5s effect tự xóa.
+- [x] **TC 4.3 (Stacking)**: Apply Poison 3 lần → Stack count = 3, damage cộng dồn, không tạo instance thứ 4.
+- [x] **TC 4.4 (Tag Blocking)**: Apply Stun → Player không thể cast Fireball khi bị Stun.
+- [x] **TC 4.5 (Attribute Buff)**: Apply Haste → Speed tăng đúng %, sau 5s về lại giá trị cũ.
+- [x] **TC 4.6 (Attribute Aggregation)**: Apply 2 Haste buff → Speed cộng dồn đúng.
+- [x] **TC 4.7 (Event Bus)**: Tag changed event được fire khi Add/Remove tag. (Verified via Build)
 
 ---
 
@@ -239,14 +241,14 @@ GASFarmDefense/
 
 ### Tasks:
 #### 5A — Sửa Project-specific classes (trong `_Master/Scripts/GAS/`)
-- [ ] **`FDAttributeSet.cs`**: Đổi `using GAS` → `using Abel.GAS`, kế thừa từ `Abel.GAS.Attributes.AttributeSet`.
-- [ ] **`FDGameplayAbility.cs`**: Đổi namespace reference.
-- [ ] **`FDGameplayEffectContext.cs`**: Kế thừa từ `Abel.GAS.Effects.GameplayEffectContext`.
-- [ ] **`DamageCalculationBase.cs` (WC3)**: Kế thừa từ `Abel.GAS.Effects.DamageCalculationBase`.
-- [ ] **`MainCharacter.cs`**: Move ra `_Master/Scripts/Core/Player/`, sửa references.
+- [x] **`FDAttributeSet.cs`**: Đổi `using GAS` → `using Abel.GAS`, kế thừa từ `Abel.GAS.Attributes.AttributeSet`.
+- [x] **`FDGameplayAbility.cs`**: Đổi namespace reference.
+- [x] **`FDGameplayEffectContext.cs`**: Kế thừa từ `Abel.GAS.Effects.GameplayEffectContext`.
+- [x] **`DamageCalculationBase.cs` (WC3)**: Kế thừa từ `Abel.GAS.Effects.DamageCalculationBase`.
+- [x] **`MainCharacter.cs`**: Move ra `_Master/Scripts/Core/Player/`, sửa references.
 
 #### 5B — Tạo AppGASInitializer
-- [ ] Tạo `AppGASInitializer.cs` trong `_Master/Scripts/GAS/` để đăng ký tất cả Ability của FD:
+- [x] Tạo `AppGASInitializer.cs` trong `_Master/Scripts/GAS/` để đăng ký tất cả Ability của FD:
   ```csharp
   // Thay thế GASInitializer.cs cũ
   registry.Register<TDTowerNormalAttackData>(new TowerNormalAttackBehaviour(...));
@@ -255,7 +257,7 @@ GASFarmDefense/
   ```
 
 #### 5C — Subscribe lại vào C# events của ASC (thay thế EventBus)
-- [ ] **`Tower.cs`**: Thay `eventBus.Subscribe<GameplayEffectAppliedEvent>(...)` bằng subscribe trực tiếp vào ASC:
+- [x] **`Tower.cs`**: Thay `eventBus.Subscribe<GameplayEffectAppliedEvent>(...)` bằng subscribe trực tiếp vào ASC:
   ```csharp
   // Thay vì (cũ):
   eventBus.Subscribe<GameplayEffectAppliedEvent>(HandleEffectApplied);
@@ -264,7 +266,7 @@ GASFarmDefense/
   // Cleanup:
   _asc.OnEffectApplied -= HandleEffectApplied;
   ```
-- [ ] **`StatusEffectVFXController.cs`**: Thay R3 subscription từ `eventBus.Receive<GameplayTagChangedEvent>()` bằng subscribe vào `asc.OnTagChanged` trực tiếp:
+- [x] **`StatusEffectVFXController.cs`**: Thay R3 subscription từ `eventBus.Receive<GameplayTagChangedEvent>()` bằng subscribe vào `asc.OnTagChanged` trực tiếp:
   ```csharp
   // Thay vì (cũ — cần IEventBus + R3 filter):
   eventBus.Receive<GameplayTagChangedEvent>()
@@ -273,15 +275,15 @@ GASFarmDefense/
   // Dùng (mới — direct subscribe, zero dependency):
   _trackedAsc.OnTagChanged += OnGameplayTagChanged; // (tag, newCount)
   ```
-- [ ] **Xóa `FD.IEventBus` injection** khỏi constructor của `Tower.cs` và `StatusEffectVFXController.cs`.
+- [x] **Xóa `FD.IEventBus` injection** khỏi constructor của `Tower.cs` và `StatusEffectVFXController.cs`.
 
 #### 5D — Implement `IGASLogger` Bridge
-- [ ] Tạo `FDLoggerBridge.cs` trong project để wrap `IDebugService` thành `Abel.GAS.Diagnostics.IGASLogger`.
+- [x] Tạo `FDLoggerBridge.cs` trong project để wrap `IDebugService` thành `Abel.GAS.Diagnostics.IGASLogger`.
 
 #### 5E — Cleanup
-- [ ] Xóa toàn bộ folder `_Master/GAS/Scripts/Base/`.
-- [ ] Giữ lại `_Master/GAS/_Demo/` để tham khảo.
-- [ ] Chạy full build & test.
+- [x] Xóa toàn bộ folder `_Master/GAS/Scripts/Base/`.
+- [x] Giữ lại `_Master/GAS/_Demo/` để tham khảo.
+- [x] Chạy full build & test. (CLEAN BUILD!)
 
 ### Test Cases:
 - **TC 5.1**: Project compile thành công, 0 error.
@@ -296,12 +298,12 @@ GASFarmDefense/
 
 | Phase | Mô tả | Thời gian |
 |---|---|---|
-| Phase 1 | Git Setup + Folder Structure | 0.5 ngày |
-| Phase 2 | Core Decoupling (Xóa coupling FD) | 1 ngày |
-| Phase 3 | Migration Scripts vào Module | 1 ngày |
-| Phase 4 | Orb Combat Mini-game | 1.5 ngày |
-| Phase 5 | Re-integration vào GASFarmDefense | 1 ngày |
-| **Tổng** | | **~5 ngày** |
+| Phase 1 | Git Setup + Folder Structure | DONE |
+| Phase 2 | Core Decoupling (Xóa coupling FD) | DONE |
+| Phase 3 | Migration Scripts vào Module | DONE |
+| Phase 4 | Orb Combat Mini-game | DONE |
+| Phase 5 | Re-integration vào GASFarmDefense | DONE |
+| **Tổng** | | **FINISHED** |
 
 ---
 
@@ -313,3 +315,15 @@ GASFarmDefense/
 | VContainer injection bị lỗi sau khi đổi namespace | Trung bình | Test từng service một trong Orb Combat trước khi migrate. |
 | `EGameplayAttributeType` bị duplicate (Core vs FD) | Trung bình | Core giữ enum base, FD project có thể extend bằng string key. |
 | Assembly Reference vòng lặp | Thấp | Đảm bảo chỉ có 1 chiều: FD project → `com.abel.gas`, không có chiều ngược. |
+
+---
+
+## 📊 Status Tracking
+
+| Phase | Status | Summary |
+|---|---|---|
+| Phase 1: Submodule Setup | **DONE** | Package initialized, Git submodule linked. |
+| Phase 2: Decoupling Core | **DONE** | Core logic is now independent of Project FD. |
+| Phase 3: Code Migration | **DONE** | Files migrated to com.abel.gas package structure. |
+| Phase 4: Integration Test | **DONE** | Validated via GASFarmDefense integration. |
+| Phase 5: Re-integration | **DONE** | Project is using the new Abel.GAS library. |

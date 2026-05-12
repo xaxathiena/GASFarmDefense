@@ -1,5 +1,8 @@
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -34,7 +37,7 @@ namespace Abel.TranHuongDao.Core
             int targetEnemyInstanceID,
             Vector3 spawnPosition,
             AbilitySystemComponent sourceASC,
-            GAS.GameplayEffect damageEffect,
+            Abel.GAS.Effects.GameplayEffect damageEffect,
             float damageAmount,
             float bulletSpeed,
             float collisionThreshold,
@@ -42,3 +45,5 @@ namespace Abel.TranHuongDao.Core
             System.Action<Vector3, int> onHit = null);
     }
 }
+
+

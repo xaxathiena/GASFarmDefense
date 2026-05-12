@@ -323,7 +323,7 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
 
         private int _currentStatsLoopID = 0;
 
-        private async UniTaskVoid UpdateStatsLoop(GAS.AbilitySystemComponent asc, int loopID)
+        private async UniTaskVoid UpdateStatsLoop(Abel.GAS.AbilitySystemComponent asc, int loopID)
         {
             while (loopID == _currentStatsLoopID && asc != null)
             {
@@ -407,3 +407,4 @@ namespace GASFarmDefense.UIToolkit.TranHuongDao
         }
     }
 }
+

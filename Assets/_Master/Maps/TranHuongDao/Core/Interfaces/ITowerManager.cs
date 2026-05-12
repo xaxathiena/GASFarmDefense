@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
@@ -56,11 +59,11 @@ namespace Abel.TranHuongDao.Core
         bool TryGetTower(int instanceID, out Tower tower);
 
         /// <summary>
-        /// Retrieves the <see cref="GAS.AbilitySystemComponent"/> belonging to the tower
-        /// with the given instanceID so abilities can apply <see cref="GAS.GameplayEffect"/>s.
+        /// Retrieves the <see cref="Abel.GAS.AbilitySystemComponent"/> belonging to the tower
+        /// with the given instanceID so abilities can apply <see cref="Abel.GAS.Effects.GameplayEffect"/>s.
         /// Returns false if the tower does not exist or has no ASC.
         /// </summary>
-        bool TryGetTowerASC(int instanceID, out GAS.AbilitySystemComponent asc);
+        bool TryGetTowerASC(int instanceID, out Abel.GAS.AbilitySystemComponent asc);
 
         /// <summary>
         /// Fill <paramref name="results"/> with the instance IDs of all towers whose world
@@ -73,6 +76,8 @@ namespace Abel.TranHuongDao.Core
         /// position is within <paramref name="radius"/> of <paramref name="center"/>.
         /// At most <paramref name="maxCount"/> entries are added.
         /// </summary>
-        void GetTowersInRange(Vector3 center, float radius, List<GAS.AbilitySystemComponent> ignoreList, List<GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue);
+        void GetTowersInRange(Vector3 center, float radius, List<Abel.GAS.AbilitySystemComponent> ignoreList, List<Abel.GAS.AbilitySystemComponent> results, int maxCount = int.MaxValue);
     }
 }
+
+

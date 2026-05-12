@@ -1,5 +1,8 @@
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 
 namespace FD.Abilities
 {
@@ -65,3 +68,5 @@ namespace FD.Abilities
         }
     }
 }
+
+

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using FD.Modules.VFX;
 
 namespace Abel.TranHuongDao.Core.Abilities
@@ -102,3 +105,5 @@ namespace Abel.TranHuongDao.Core.Abilities
         public void OnCancelled(GameplayAbilityData data, AbilitySystemComponent asc, GameplayAbilitySpec spec) { }
     }
 }
+
+

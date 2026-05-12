@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using FD.Modules.VFX;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using UnityEngine;
 using VContainer;
 
@@ -231,3 +234,5 @@ namespace Abel.TranHuongDao.Core.Abilities
         }
     }
 }
+
+

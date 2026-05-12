@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -66,7 +69,7 @@ namespace Abel.TranHuongDao.Core
 
         /// <summary>
         /// Retrieves the <see cref="AbilitySystemComponent"/> belonging to the enemy
-        /// with the given instanceID so abilities can apply <see cref="GAS.GameplayEffect"/>s.
+        /// with the given instanceID so abilities can apply <see cref="Abel.GAS.Effects.GameplayEffect"/>s.
         /// Returns false if the enemy does not exist or has no ASC.
         /// </summary>
         bool TryGetEnemyASC(int instanceID, out AbilitySystemComponent asc);
@@ -84,3 +87,5 @@ namespace Abel.TranHuongDao.Core
         void BeginWave(WaveConfig config, IReadOnlyList<Vector3>[] paths);
     }
 }
+
+

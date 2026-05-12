@@ -1,7 +1,10 @@
 using FD.Ability;
 using FD.Data;
 using FD.Views;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -164,3 +167,5 @@ namespace FD
         }
     }
 }
+
+

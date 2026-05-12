@@ -1,5 +1,8 @@
 using System;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 
 namespace Abel.TranHuongDao.Core
 {
@@ -118,3 +121,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

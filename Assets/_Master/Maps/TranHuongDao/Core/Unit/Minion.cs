@@ -1,6 +1,9 @@
 using System;
 using Abel.TranHuongDao.Core.VFX;
-using GAS;
+using Abel.GAS;
+using Abel.GAS.Abilities;
+using Abel.GAS.Attributes;
+using Abel.GAS.Effects;
 using UnityEngine;
 
 namespace Abel.TranHuongDao.Core
@@ -83,7 +86,7 @@ namespace Abel.TranHuongDao.Core
             _renderInitialized = true;
 
 
-            _vfxController = new StatusEffectVFXController(instanceID, () => Position, eventBus, vfxManager, vfxConfig);
+            _vfxController = new StatusEffectVFXController(instanceID, () => Position, ASC, vfxManager, vfxConfig);
 
             _logic?.OnEnter(this);
         }
@@ -118,3 +121,5 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
+

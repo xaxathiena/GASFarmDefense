@@ -72,7 +72,7 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         /// <param name="config">Authored balance snapshot — used for static meta only.</param>
         /// <param name="attributes">Live GAS attribute set — source of truth for all modifiable stats.</param>
-        public void ShowUnit(UnitConfig config, UnitAttributeSet attributes, GAS.AbilitySystemComponent asc = null)
+        public void ShowUnit(UnitConfig config, UnitAttributeSet attributes, Abel.GAS.AbilitySystemComponent asc = null)
         {
             // Activate the root panel first so all child widgets are enabled.
             SetPanelActive(true);
@@ -142,7 +142,7 @@ namespace Abel.TranHuongDao.Core
         /// the portrait animation or toggling panel visibility.
         /// Called every frame while a unit is selected.
         /// </summary>
-        public void RefreshStats(UnitConfig config, UnitAttributeSet attributes, GAS.AbilitySystemComponent asc = null)
+        public void RefreshStats(UnitConfig config, UnitAttributeSet attributes, Abel.GAS.AbilitySystemComponent asc = null)
         {
             if (hpText != null)
             {
@@ -212,3 +212,4 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+

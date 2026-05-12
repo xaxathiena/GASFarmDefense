@@ -38,11 +38,11 @@ namespace Abel.TranHuongDao.Core
         {
             public readonly string UnitID;
             public readonly UnitConfig Config;
-            public readonly GAS.AbilitySystemComponent ASC;
+            public readonly Abel.GAS.AbilitySystemComponent ASC;
             public readonly int InstanceID;
             public readonly bool IsTower;
 
-            public UnitSelectedEvent(string unitID, UnitConfig config, GAS.AbilitySystemComponent asc, int instanceID, bool isTower)
+            public UnitSelectedEvent(string unitID, UnitConfig config, Abel.GAS.AbilitySystemComponent asc, int instanceID, bool isTower)
             {
                 UnitID = unitID;
                 Config = config;
@@ -95,7 +95,7 @@ namespace Abel.TranHuongDao.Core
         // Cached config of the currently selected unit (static data, safe to cache).
         private UnitConfig _selectedConfig;
         // Cached ASC of the currently selected unit — passed to the UI for the effects panel.
-        private GAS.AbilitySystemComponent _selectedASC;
+        private Abel.GAS.AbilitySystemComponent _selectedASC;
 
         // ── Pending Merge State ───────────────────────────────────────────────────
         private Tower _pendingMergeTowerA;
@@ -306,7 +306,7 @@ namespace Abel.TranHuongDao.Core
         /// </summary>
         private void SelectUnit(
             string unitTypeID,
-            GAS.AbilitySystemComponent asc,
+            Abel.GAS.AbilitySystemComponent asc,
             bool isTower,
             Tower tower,
             Enemy enemy)
@@ -509,3 +509,4 @@ namespace Abel.TranHuongDao.Core
         }
     }
 }
+
