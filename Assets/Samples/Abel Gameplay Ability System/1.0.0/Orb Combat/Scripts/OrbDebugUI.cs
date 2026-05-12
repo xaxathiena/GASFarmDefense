@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Abel.GAS;
+using Abel.GAS.Abilities;
 using Abel.GAS.Attributes;
 using Abel.GAS.Effects;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace Abel.GAS.Samples.OrbCombat
 
         private Vector2 playerScroll;
         private Vector2 enemyScroll;
+        private Dictionary<string, GameplayEffect> _effectCache = new Dictionary<string, GameplayEffect>();
 
         private void OnGUI()
         {
@@ -37,7 +39,9 @@ namespace Abel.GAS.Samples.OrbCombat
                 enemyScroll = DrawASCDetails(new Rect(375, 25, 350, 420), eAttr, enemyASC, enemyScroll);
             }
 
-            DrawTestButtons(new Rect(5, 460, 725, 120));
+            float testHeight = Screen.height - 460 - 10;
+            if (testHeight < 200) testHeight = 200; // Guard
+            DrawTestButtons(new Rect(5, 460, 725, testHeight));
         }
 
         private Vector2 testScroll;
@@ -154,6 +158,91 @@ namespace Abel.GAS.Samples.OrbCombat
                 playerASC.ApplyGameplayEffectToSelf(geInf);
             }
 
+            if (GUILayout.Button("TC2.5: Apply Stun (2s)"))
+            {
+                var geStun = CreateSimpleGE("StunEffect", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, 0f, EGameplayEffectDurationType.Duration, 2f, new GameplayTag[] { GameplayTag.State_Stunned });
+                playerASC.ApplyGameplayEffectToSelf(geStun);
+                Debug.Log("OrbDebugUI: Applied Stun for 2 seconds.");
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // --- SECTION: PHASE 3 ---
+            GUI.color = Color.yellow;
+            GUILayout.Label("PHASE 3: STACKING LOGIC");
+            GUI.color = Color.white;
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("TC3.1: Stack Speed (Max 3)"))
+            {
+                var geStack = CreateSimpleGE("StackSpeed", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, 2f, EGameplayEffectDurationType.Duration, 5f);
+                geStack.allowStacking = true;
+                geStack.maxStacks = 3;
+                playerASC.ApplyGameplayEffectToSelf(geStack);
+            }
+
+            if (GUILayout.Button("TC3.2: Individual Stacks (3s)"))
+            {
+                var geInd = CreateSimpleGE("IndiStack", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, 1f, EGameplayEffectDurationType.Duration, 3f);
+                geInd.allowStacking = true;
+                geInd.maxStacks = 5;
+                geInd.stackingDurationPolicy = EGameplayEffectStackingDurationPolicy.IndividualStackDuration;
+                playerASC.ApplyGameplayEffectToSelf(geInd);
+            }
+
+            if (GUILayout.Button("TC3.3: Refresh Stack (5s)"))
+            {
+                var geRef = CreateSimpleGE("RefreshStack", EGameplayAttributeType.MoveSpeed, EGameplayModifierOp.Add, 1f, EGameplayEffectDurationType.Duration, 5f);
+                geRef.allowStacking = true;
+                geRef.maxStacks = 5;
+                geRef.stackingDurationPolicy = EGameplayEffectStackingDurationPolicy.RefreshEntireStack;
+                geRef.refreshDurationOnStack = true;
+                playerASC.ApplyGameplayEffectToSelf(geRef);
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // --- SECTION: PHASE 4 ---
+            GUI.color = Color.yellow;
+            GUILayout.Label("PHASE 4: EVENTS & TAGS");
+            GUI.color = Color.white;
+
+
+            if (GUILayout.Button("Setup Phase 4 (Grant Abilities)"))
+            {
+                GrantTestAbilities();
+            }
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("TC4.1: Trigger OnFire Tag"))
+            {
+                // Applying a tag should trigger the extinguishing ability
+                playerASC.AddTag(GameplayTag.State_OnFire);
+                Debug.Log("OrbDebugUI: Added Tag OnFire. Look for 'Self-Extinguish' in logs.");
+            }
+
+            if (GUILayout.Button("TC4.2: Cast Fireball (While Stunned?)"))
+            {
+                // This version of Fireball is blocked by Stun tag
+                var blockedFireball = CreateTestAbility("BlockedFireball", GameplayTag.Ability_Magic, new GameplayTag[] { GameplayTag.State_Stunned });
+                playerASC.GiveAbility(blockedFireball);
+
+
+                bool success = playerASC.TryActivateAbility(blockedFireball);
+                Debug.Log($"OrbDebugUI: Cast BlockedFireball success? {success}");
+            }
+
+            if (GUILayout.Button("TC4.3: Send Explosion Event"))
+            {
+                // Send event with payload
+                var payload = new GameplayEventData { EventTag = GameplayTag.Event_Explosion, Magnitude = 50f };
+                playerASC.HandleGameplayEvent(GameplayTag.Event_Explosion, payload);
+                Debug.Log("OrbDebugUI: Sent Event Explosion (50 dmg).");
+            }
             GUILayout.EndHorizontal();
 
 
@@ -161,17 +250,50 @@ namespace Abel.GAS.Samples.OrbCombat
             GUILayout.EndArea();
         }
 
+        private void GrantTestAbilities()
+        {
+            // 1. Ability that triggers when State.OnFire is added
+            var extinguish = CreateTestAbility("SelfExtinguish", GameplayTag.Ability_Ultimate);
+            extinguish.abilityTriggers = new AbilityTriggerData[] {
+                new AbilityTriggerData { TriggerTag = GameplayTag.State_OnFire, TriggerSource = EAbilityTriggerSource.OwnedTagAdded }
+            };
+            playerASC.GiveAbility(extinguish);
+
+            // 2. Ability that triggers on Explosion Event
+            var react = CreateTestAbility("ExplosionReact", GameplayTag.Ability_Magic);
+            react.abilityTriggers = new AbilityTriggerData[] {
+                new AbilityTriggerData { TriggerTag = GameplayTag.Event_Explosion, TriggerSource = EAbilityTriggerSource.GameplayEvent }
+            };
+            playerASC.GiveAbility(react);
+
+            Debug.Log("OrbDebugUI: Phase 4 Test Abilities Granted!");
+        }
+
+        private GameplayAbilityData CreateTestAbility(string name, GameplayTag abilityTag, GameplayTag[] blockedTags = null)
+        {
+            var ability = ScriptableObject.CreateInstance<SimpleAbilityData>();
+            ability.abilityName = name;
+            ability.abilityTags = new GameplayTag[] { abilityTag };
+            ability.activationBlockedTags = blockedTags;
+            return ability;
+        }
+
         private GameplayEffect CreateSimpleGE(string name, EGameplayAttributeType attr, EGameplayModifierOp op, float val, EGameplayEffectDurationType durationType, float duration = 0f, GameplayTag[] tags = null)
         {
+            if (_effectCache.TryGetValue(name, out var cachedGE))
+                return cachedGE;
+
             var ge = ScriptableObject.CreateInstance<GameplayEffect>();
+            ge.name = name;
             ge.effectName = name;
             ge.durationType = durationType;
             ge.durationMagnitude = duration;
             ge.grantedTags = tags;
 
-
             var mod = new GameplayEffectModifier(attr, op, val);
             ge.modifiers = new GameplayEffectModifier[] { mod };
+
+            _effectCache[name] = ge;
             return ge;
         }
 
@@ -180,6 +302,7 @@ namespace Abel.GAS.Samples.OrbCombat
             // Define the content height based on active effects
             float contentHeight = 350 + (asc.GetActiveGameplayEffects().Count * 20);
             Rect viewRect = new Rect(0, 0, rect.width - 20, contentHeight);
+
 
             scrollPos = GUI.BeginScrollView(rect, scrollPos, viewRect);
 
@@ -254,4 +377,9 @@ namespace Abel.GAS.Samples.OrbCombat
             return sb.ToString();
         }
     }
+
+    /// <summary>
+    /// Simple concrete implementation for testing purposes.
+    /// </summary>
+    public class SimpleAbilityData : GameplayAbilityData { }
 }
