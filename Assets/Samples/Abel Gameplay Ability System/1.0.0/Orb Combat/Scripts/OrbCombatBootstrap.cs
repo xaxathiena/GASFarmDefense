@@ -48,6 +48,10 @@ namespace Abel.GAS.Samples.OrbCombat
             _playerASC.InitializeAttributeSet(new OrbAttributeSet());
             _playerASC.UnitInstanceID = playerObj.GetInstanceID();
 
+            // 2. Setup Gameplay Cues
+            playerObj.AddComponent<OrbCueTest>().Initialize(GameplayTag.Cue_Shield_Loop);
+            playerObj.AddComponent<OrbCueTest>().Initialize(GameplayTag.Cue_Fireball_Impact);
+
             // Enemy
             GameObject enemyObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             enemyObj.name = "EnemyOrb";

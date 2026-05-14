@@ -4,6 +4,7 @@ using Abel.GAS;
 using Abel.GAS.Abilities;
 using Abel.GAS.Attributes;
 using Abel.GAS.Effects;
+using Abel.GAS.Cues;
 using UnityEngine;
 
 namespace Abel.GAS.Samples.OrbCombat
@@ -245,9 +246,159 @@ namespace Abel.GAS.Samples.OrbCombat
             }
             GUILayout.EndHorizontal();
 
+            GUILayout.Space(10);
+
+            // --- SECTION: PHASE 5 ---
+            GUI.color = Color.cyan;
+            GUILayout.Label("PHASE 5: GAMEPLAY CUES (VFX/SFX)");
+            GUI.color = Color.white;
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("TC5.1: Execute Instant Cue"))
+            {
+                playerASC.ExecuteGameplayCue(GameplayTag.Cue_Fireball_Impact, new GameplayCueParameters(playerASC) { Location = playerASC.Position + Vector3.up });
+            }
+
+            if (GUILayout.Button("TC5.2: Toggle Shield Cue"))
+            {
+                if (playerASC.HasAnyTags(GameplayTag.Cue_Shield_Loop))
+                    playerASC.RemoveTag(GameplayTag.Cue_Shield_Loop);
+                else
+                    playerASC.AddTag(GameplayTag.Cue_Shield_Loop);
+
+
+                Debug.Log($"OrbDebugUI: Shield Tag toggled. HasTag: {playerASC.HasAnyTags(GameplayTag.Cue_Shield_Loop)}");
+            }
+            GUILayout.EndHorizontal();
+
+            // --- SECTION: IMPROVED CUE SYSTEM (PRO) ---
+            GUI.color = Color.yellow;
+            GUILayout.Label("PRO CUE SYSTEM (IMPROVEMENTS)");
+            GUI.color = Color.white;
+
+            if (GUILayout.Button("Phase 1 Test: Bitmask Serialization"))
+            {
+                RunPhase1Test();
+            }
+
+            if (GUILayout.Button("Phase 2 Test: Asset Library (Runtime)"))
+            {
+                RunPhase2Test();
+            }
+
+            if (GUILayout.Button("Phase 3 Test: Specialized Notifiers"))
+            {
+                RunPhase3Test();
+            }
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();
+        }
+
+        private void RunPhase3Test()
+        {
+            Debug.Log("<color=yellow>[PRO CUE]</color> Starting Phase 3 Test: Specialized Notifiers...");
+
+            // 1. Create a Burst Effect object
+            GameObject burstObj = new GameObject("Phase3_Burst_Effect");
+            var burstNotify = burstObj.AddComponent<GameplayCueNotify_Burst>();
+            
+            // 2. Configure (In real use, this is done in Prefab Inspector)
+            // We'll use reflection to set private tag if needed, but here we can just use the property if public
+            // For testing, we'll manually register it to the manager
+            GameplayCueManager.Instance.RegisterNotifier(burstNotify);
+
+            Debug.Log("[Phase 3] Spawned Burst Notifier. Executing...");
+
+            // 3. Execute
+            playerASC.ExecuteGameplayCue(burstNotify.CueTag, new GameplayCueParameters(playerASC));
+
+            Debug.Log("<color=green>[Phase 3] SUCCESS!</color> Check if 'Phase3_Burst_Effect' destroys itself in 2 seconds.");
+        }
+
+        private void RunPhase1Test()
+        {
+            Debug.Log("<color=yellow>[PRO CUE]</color> Starting Phase 1 Test: Bitmask Serialization...");
+
+            // 1. Define test data
+            var originalData = new TestExplosionPayload
+            {
+                Radius = 15.5f,
+                Intensity = 0.8f,
+                // FlashColor và Pos để mặc định (Zero)
+            };
+
+            // 2. Pack data
+            var parameters = new GameplayCueParameters(playerASC);
+            parameters.SetData(originalData);
+
+            // 3. Verify Size
+            // Bitmask (8 bytes ulong) + Radius (4 bytes) + Intensity (4 bytes) = 16 bytes
+            // (Hiện tại BitmaskCompressor dùng ulong 8 bytes làm header cố định)
+            int expectedSize = 8 + 4 + 4;
+
+            int actualSize = parameters.RawPayload.Length;
+
+            Debug.Log($"[Phase 1] Packed Payload Size: {actualSize} bytes. (Expected {expectedSize} bytes if Pos/Color are zero)");
+
+            // 4. Unpack and Verify
+            var unpackedData = parameters.GetData<TestExplosionPayload>();
+
+            bool success = Mathf.Approximately(unpackedData.Radius, originalData.Radius) &&
+                           Mathf.Approximately(unpackedData.Intensity, originalData.Intensity) &&
+                           unpackedData.Pos == Vector3.zero;
+
+            if (success)
+                Debug.Log("<color=green>[Phase 1] SUCCESS!</color> Data integrity verified. Packing is efficient.");
+            else
+                Debug.LogError("[Phase 1] FAILED! Data mismatch after unpacking.");
+        }
+
+        private void RunPhase2Test()
+        {
+            Debug.Log("<color=yellow>[PRO CUE]</color> Starting Phase 2 Test: Asset Library...");
+
+            // 1. Create a runtime Cue Set
+            var runtimeSet = ScriptableObject.CreateInstance<GameplayCueSet>();
+
+            // 2. Map a tag to a dummy prefab (we'll create a simple cube)
+
+            GameObject dummyPrefab = new GameObject("Phase2_Test_Cube_Prefab");
+            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.SetParent(dummyPrefab.transform);
+            cube.transform.localScale = Vector3.one * 0.4f;
+            cube.GetComponent<Renderer>().material.color = Color.magenta;
+            Destroy(cube.GetComponent<BoxCollider>());
+
+
+            dummyPrefab.SetActive(false);
+
+            // 3. Register to runtime set
+
+            runtimeSet.AddMappingRuntime(GameplayTag.Cue_Fireball_Impact, dummyPrefab);
+
+            // 4. Inject into Manager
+
+            GameplayCueManager.Instance.SetGlobalCueSet(runtimeSet);
+
+
+            Debug.Log("[Phase 2] Registered Runtime Set with Magenta Cube. Executing Cue...");
+
+            // 5. Execute
+
+            playerASC.ExecuteGameplayCue(GameplayTag.Cue_Fireball_Impact, new GameplayCueParameters(playerASC));
+
+            Debug.Log("<color=green>[Phase 2] SUCCESS!</color> If you see a Magenta Cube, the Asset Library is working.");
+        }
+
+        // Test struct following the Optimization Standard
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        public struct TestExplosionPayload
+        {
+            public Vector3 Pos;      // 12 bytes
+            public Color32 FlashColor; // 4 bytes
+            public float Radius;     // 4 bytes
+            public float Intensity;  // 4 bytes
         }
 
         private void GrantTestAbilities()
@@ -383,3 +534,5 @@ namespace Abel.GAS.Samples.OrbCombat
     /// </summary>
     public class SimpleAbilityData : GameplayAbilityData { }
 }
+
+// Force recompile after package update 1.1.0

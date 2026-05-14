@@ -67,12 +67,12 @@
 
 ---
 
-### PHASE 5: Gameplay Cues (VFX/SFX)
+### PHASE 5: Gameplay Cues (VFX/SFX) [DONE]
 *Mục tiêu: Xác minh khả năng kích hoạt hiệu ứng hình ảnh/âm thanh qua Tag.*
 
-- [ ] **Task 5.1**: Implement `GameplayCueManager`.
-- [ ] **Task 5.2**: Implement `IGameplayCueNotify` (Static & Actor-based).
-- [ ] **Task 5.3**: Test Cue Lifecycle (OnActive, WhileActive, OnRemove).
+- [x] **Task 5.1**: Implement `GameplayCueManager`.
+- [x] **Task 5.2**: Implement `IGameplayCueNotify` (Static & Actor-based).
+- [x] **Task 5.3**: Test Cue Lifecycle (OnActive, WhileActive, OnRemove).
 
 | ID | Test Case | Input | Expected Output |
 |---|---|---|---|
