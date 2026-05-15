@@ -3,8 +3,8 @@ using System.Text;
 using Abel.GAS;
 using Abel.GAS.Abilities;
 using Abel.GAS.Attributes;
-using Abel.GAS.Effects;
 using Abel.GAS.Cues;
+using Abel.GAS.Effects;
 using UnityEngine;
 
 namespace Abel.GAS.Samples.OrbCombat
@@ -272,27 +272,36 @@ namespace Abel.GAS.Samples.OrbCombat
             GUILayout.EndHorizontal();
 
             // --- SECTION: IMPROVED CUE SYSTEM (PRO) ---
-            GUI.color = Color.yellow;
-            GUILayout.Label("PRO CUE SYSTEM (IMPROVEMENTS)");
+            GUI.color = Color.cyan;
+            GUILayout.Label("AAA CUE SYSTEM (FINAL VALIDATION)");
             GUI.color = Color.white;
 
-            if (GUILayout.Button("Phase 1 Test: Bitmask Serialization"))
+            if (GUILayout.Button("Full System Test (Pool + Tick + Addressables)"))
             {
-                RunPhase1Test();
-            }
-
-            if (GUILayout.Button("Phase 2 Test: Asset Library (Runtime)"))
-            {
-                RunPhase2Test();
-            }
-
-            if (GUILayout.Button("Phase 3 Test: Specialized Notifiers"))
-            {
-                RunPhase3Test();
+                RunFullSystemTest();
             }
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();
+        }
+
+        private void RunFullSystemTest()
+        {
+            Debug.Log("<color=cyan>[PRO CUE]</color> Starting FINAL SYSTEM TEST...");
+
+            // 1. Test Bitmask Packing
+
+            RunPhase1Test();
+
+            // 2. Test Pooling & Ticking
+            Debug.Log("[SystemTest] Spawning 10 cues rapidly to test Pooling...");
+            for (int i = 0; i < 10; i++)
+            {
+                playerASC.ExecuteGameplayCue(GameplayTag.Cue_Fireball_Impact, new GameplayCueParameters(playerASC));
+            }
+
+
+            Debug.Log("<color=green>[SystemTest] Done!</color> Check GAS Dashboard for Pool/Active stats.");
         }
 
         private void RunPhase3Test()
@@ -302,10 +311,11 @@ namespace Abel.GAS.Samples.OrbCombat
             // 1. Create a Burst Effect object
             GameObject burstObj = new GameObject("Phase3_Burst_Effect");
             var burstNotify = burstObj.AddComponent<GameplayCueNotify_Burst>();
-            
+
             // 2. Configure (In real use, this is done in Prefab Inspector)
             // We'll use reflection to set private tag if needed, but here we can just use the property if public
             // For testing, we'll manually register it to the manager
+
             GameplayCueManager.Instance.RegisterNotifier(burstNotify);
 
             Debug.Log("[Phase 3] Spawned Burst Notifier. Executing...");
@@ -358,18 +368,28 @@ namespace Abel.GAS.Samples.OrbCombat
         {
             Debug.Log("<color=yellow>[PRO CUE]</color> Starting Phase 2 Test: Asset Library...");
 
-            // 1. Create a runtime Cue Set
+            // 1. Clean up ALL previous test objects
+            var existingContainer = GameObject.Find("CUE_TEST_CONTAINER");
+            if (existingContainer != null) Destroy(existingContainer);
+
+            // 2. Create a clean container for this test run
+            GameObject testContainer = new GameObject("CUE_TEST_CONTAINER");
+            testContainer.SetActive(false); // Keep the "prefabs" hidden
+
+            // 3. Create a runtime Cue Set
             var runtimeSet = ScriptableObject.CreateInstance<GameplayCueSet>();
 
-            // 2. Map a tag to a dummy prefab (we'll create a simple cube)
-
+            // 4. Map a tag to a dummy prefab (we'll create a simple cube)
             GameObject dummyPrefab = new GameObject("Phase2_Test_Cube_Prefab");
+            dummyPrefab.transform.SetParent(testContainer.transform);
+            Debug.Log("create dummyPrefab :  " + dummyPrefab.name);
             var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.name = "TestVisualCube";
             cube.transform.SetParent(dummyPrefab.transform);
+            cube.transform.localPosition = Vector3.zero;
             cube.transform.localScale = Vector3.one * 0.4f;
             cube.GetComponent<Renderer>().material.color = Color.magenta;
-            Destroy(cube.GetComponent<BoxCollider>());
-
+            if (cube.TryGetComponent<BoxCollider>(out var col)) Destroy(col);
 
             dummyPrefab.SetActive(false);
 

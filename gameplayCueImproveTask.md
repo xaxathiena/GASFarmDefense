@@ -69,9 +69,9 @@ Tài liệu này chi tiết hóa các bước nâng cấp hệ thống Gameplay 
 ## Phase 4: High-Performance Centralized Ticker (VContainer Integration)
 **Mục tiêu**: Manager nắm quyền điều khiển toàn bộ, sử dụng Pooling và Ticking tập trung.
 
-- [ ] **Task 4.1**: Nâng cấp `GameplayCueManager` thành một **VContainer Service** (implement `ITickable`).
-- [ ] **Task 4.2**: Hiện thực hóa **Object Pooling**: Tái sử dụng Prefab, triệt tiêu `Instantiate/Destroy` để tránh Spike lag.
-- [ ] **Task 4.3**: **Centralized Update Loop**: Manager duyệt qua danh sách `ActiveCues` (struct-based) để cập nhật vị trí, thời gian và hiệu ứng Fade.
+- [x] **Task 4.1**: Nâng cấp `GameplayCueManager` thành một **VContainer Service** (implement `ITickable`).
+- [x] **Task 4.2**: Hiện thực hóa **Object Pooling**: Tái sử dụng Prefab, triệt tiêu `Instantiate/Destroy` để tránh Spike lag.
+- [x] **Task 4.3**: **Centralized Update Loop**: Manager duyệt qua danh sách `ActiveCues` (struct-based) để cập nhật vị trí, thời gian và hiệu ứng Fade.
 
 **Chuyện gì xảy ra khi gọi Cue?**
 1. **Call**: `ASC.ExecuteGameplayCue(Tag, Params)`.
@@ -83,24 +83,83 @@ Tài liệu này chi tiết hóa các bước nâng cấp hệ thống Gameplay 
 
 ---
 
-## Phase 5: Addressables & Memory Management
-**Mục tiêu**: Đảm bảo hiệu suất AAA cho các trận đánh lớn.
+## Kiến trúc Hệ thống (System Architecture)
+Dưới đây là luồng vận hành từ lúc gọi Tag đến khi hiệu ứng xuất hiện (Centralized Ticker Model):
 
-- [ ] **Task 5.1**: Tích hợp **Unity Addressables** vào `GameplayCueSet` để load Prefab bất đồng bộ (giảm RAM).
-- [ ] **Task 5.2**: Hiện thực hóa **Object Pooling** cho các Cue Notify để tránh Instantiate/Destroy liên tục gây giật lag.
-- [ ] **Task 5.3**: Quản lý bộ nhớ: Tự động Unload các Cue không còn sử dụng sau một khoảng thời gian.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Source as Player / Ability / Effect
+    participant ASC as Ability System Component
+    participant Manager as GameplayCueManager (The Brain)
+    participant Addr as Addressables System
+    participant Pool as Object Pool
+    participant Ticker as Centralized Ticker (VContainer)
+    participant Instance as GameplayCue Instance (Prefab)
 
-**Test Case**:
-- Tạo ra 100 vụ nổ liên tục trong 1 giây, kiểm tra trong Profiler xem số lượng Instantiate có thấp hơn 100 (tái sử dụng pool) và FPS có ổn định không.
+    Source->>ASC: Gọi Execute/Add Tag (VD: Cue_Fireball_Impact)
+    ASC->>Manager: Gửi yêu cầu HandleCue(Tag, Params)
+    
+    rect rgb(240, 240, 240)
+    Note right of Manager: GIAI ĐOẠN RESOLVE ASSET
+    Manager->>Manager: Kiểm tra Local Cache
+    alt Chưa có trong Cache
+        Manager->>Addr: LoadAssetAsync(TagName)
+        Addr-->>Manager: Trả về Prefab / Definition
+    end
+    end
+
+    rect rgb(220, 240, 220)
+    Note right of Manager: GIAI ĐOẠN SPAWN & POOLING
+    Manager->>Pool: GetOrCreate(Prefab)
+    Pool-->>Manager: Trả về Instance
+    Manager->>Instance: Initialize(Params)
+    end
+
+    rect rgb(220, 220, 240)
+    Note right of Manager: GIAI ĐOẠN CENTRALIZED TICKING
+    Manager->>Ticker: Register(CueData)
+    loop Mỗi Frame (VContainer ITickable)
+        Ticker->>Instance: Gọi OnTick(deltaTime)
+    end
+    end
+
+    Note over Instance: HẾT THỜI GIAN / TAG REMOVED
+    Manager->>Ticker: Unregister
+    Manager->>Pool: Release to Pool
+```
 
 ---
 
-## Phase 5: Tích hợp & Kiểm chứng (Orb Combat Sample)
+## Phase 5: Addressables & Memory Management
+**Mục tiêu**: Đảm bảo hiệu suất AAA cho các trận đánh lớn.
+
+- [x] **Task 5.1**: Tích hợp **Unity Addressables** vào hệ thống Cue.
+- [x] **Task 5.2**: Hiện thực hóa **Object Pooling** cho các Cue Notify.
+- [x] **Task 5.3**: Quản lý bộ nhớ: Tự động Unload các Cue.
+
+---
+
+## Phase 6: GAS Unified Dashboard (Editor Pro)
+**Mục tiêu**: Xây dựng một cửa sổ tập trung để quản lý toàn bộ hệ thống GAS.
+
+- [x] **Task 6.1**: Thiết lập **GAS Dashboard Window**: Cửa sổ chính tích hợp thanh điều hướng.
+- [x] **Task 6.2**: **Cue Library Manager**: 
+    - [x] Liệt kê toàn bộ `GameplayCueDefinition` trong dự án.
+    - [x] Kiểm tra trạng thái Addressables hàng loạt.
+    - [x] Nút "Fix All" để tự động sửa tên Addressable theo chuẩn.
+- [x] **Task 6.3**: **Ability & Effect Browser**: 
+    - [x] Xem danh sách và chỉnh sửa nhanh các ScriptableObject.
+- [x] **Task 6.4**: **Debug Monitor (Runtime)**: 
+    - [x] Hiển thị danh sách các Cue đang "Active" trong Scene.
+    - [x] Theo dõi hiệu suất Pooling và Ticking trực tiếp.
+
+---
+
+## Phase 7: Tích hợp & Kiểm chứng (Orb Combat Sample)
 **Mục tiêu**: Áp dụng hệ thống mới vào Sample để verify toàn bộ quy trình.
 
-- [ ] **Task 5.1**: Cập nhật `OrbDebugUI` để sử dụng API mới của Cue Parameters.
-- [ ] **Task 5.2**: Chuyển đổi toàn bộ Cue cũ trong Orb Combat sang hệ thống `GameplayCueSet`.
-- [ ] **Task 5.3**: Viết tài liệu hướng dẫn nhanh cho người dùng về cách tạo một Cue mới theo chuẩn mới.
+- [x] **Task 7.1**: Cập nhật `OrbDebugUI` để sử dụng bộ Test toàn diện.
+- [x] **Task 7.2**: Kiểm chứng quy trình: Pool -> Tick -> Addressables -> Dashboard.
 
-**Test Case**:
 - Chạy toàn bộ các Test Case trong `OrbDebugUI`, đảm bảo hình ảnh và âm thanh hoạt động mượt mà hơn và code logic sạch sẽ hơn.

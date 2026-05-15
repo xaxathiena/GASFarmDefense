@@ -1,6 +1,7 @@
 using Abel.GAS;
 using Abel.GAS.Abilities;
 using Abel.GAS.Effects;
+using Abel.GAS.Cues;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -17,6 +18,9 @@ namespace Abel.GAS.Samples.OrbCombat
             builder.Register<GameplayEffectService>(Lifetime.Singleton);
             builder.Register<GameplayEffectCalculationService>(Lifetime.Singleton);
             builder.Register<AbilityBehaviourRegistry>(Lifetime.Singleton);
+            
+            // Register Cue System
+            builder.RegisterComponentInHierarchy<GameplayCueManager>().AsImplementedInterfaces().AsSelf();
 
             // 2. Register Logger
 
